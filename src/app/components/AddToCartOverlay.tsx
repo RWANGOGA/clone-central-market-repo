@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import imgRectangle6537 from "figma:asset/052a3ae1fed9a10fabfd3fcb18c34cbc209b9bc6.png";
+import { assetUrl } from '../lib/apiBase';
 
 interface Product {
   id: number;
@@ -52,7 +53,7 @@ export default function AddToCartOverlay({ isVisible, product, quantity }: AddTo
         <div
           className="absolute bg-[#d9d9d9] left-6 rounded size-12 top-4"
           style={{
-            backgroundImage: `url('${product.image}')`,
+            backgroundImage: `url('${assetUrl(product.image)}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}

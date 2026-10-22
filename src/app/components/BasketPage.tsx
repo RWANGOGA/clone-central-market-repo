@@ -3,6 +3,7 @@ import svgPaths from "../imports/svg-ixc5uwmuox";
 import QuantityDropdown from './QuantityDropdown';
 import IconForward from '../imports/IconForward-2013-176';
 import { formatUgx } from '../lib/currency';
+import { assetUrl } from '../lib/apiBase';
 import { discountFor, promoShortfall, type AppliedPromo, type PromoResult } from '../lib/promoApi';
 
 interface CartItem {
@@ -444,7 +445,7 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
       {/* Product Image */}
       <div
         className="absolute bg-[50%_50%] bg-cover bg-no-repeat left-0 rounded size-[72px] top-0"
-        style={{ backgroundImage: `url('${item.image}')` }}
+        style={{ backgroundImage: `url('${assetUrl(item.image)}')` }}
       />
       
       {/* Product Name and Price */}

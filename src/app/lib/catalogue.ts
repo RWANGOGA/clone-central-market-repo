@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { apiUrl } from './apiBase';
+import { apiUrl, assetUrl } from './apiBase';
 
 /**
  * The shop catalogue, read from the API so products an admin adds actually
@@ -64,7 +64,9 @@ export async function fetchCatalogue(signal?: AbortSignal): Promise<CataloguePro
       farm: row.farm,
       // A product added without a photo still needs something to render, so an
       // empty list becomes a neutral placeholder rather than a broken image.
-      images: row.images.length > 0 ? row.images : [''],
+      // The paths come back relative to the API, which is a different origin
+      // once the shop is on Pages, so they are made absolute on the way in.
+      images: row.images.length > 0 ? row.images.map(assetUrl) : [''],
       isFavorite: false,
       description: row.description,
       location: row.location,
