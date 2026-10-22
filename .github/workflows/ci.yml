@@ -16,9 +16,9 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci --prefer-offline --no-audit --maxsockets 3
-        workdir: api
+        working-directory: api
       - run: npm run typecheck
-        workdir: api
+        working-directory: api
 
   tests:
     runs-on: ubuntu-latest
@@ -29,9 +29,9 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci --prefer-offline --no-audit --maxsockets 3
-        workdir: api
+        working-directory: api
       - run: npm test
-        workdir: api
+        working-directory: api
 
   audit:
     runs-on: ubuntu-latest
@@ -42,9 +42,9 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci --prefer-offline --no-audit --maxsockets 3
-        workdir: api
+        working-directory: api
       - run: npm audit --audit-level=critical
-        workdir: api
+        working-directory: api
 
   build:
     runs-on: ubuntu-latest
@@ -55,9 +55,9 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci --prefer-offline --no-audit --maxsockets 3
-        workdir: api
+        working-directory: api
       - run: npm run build
-        workdir: api
+        working-directory: api
       - run: npm ci --prefer-offline --no-audit --maxsockets 3
       - run: npm run build
 
