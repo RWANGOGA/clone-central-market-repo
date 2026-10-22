@@ -14,7 +14,6 @@ ROADMAP.md
 *.sqlite
 Dockerfile*
 docker-compose*
-nginx.conf
 .kilo
 .vscode
 .idea
