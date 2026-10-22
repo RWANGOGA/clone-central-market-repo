@@ -24,6 +24,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # The API origin is not a secret — it ships inside the bundle, plainly
+    # visible to anyone who opens devtools — so it defaults to the Render service
+    # in this file, where it can be reviewed and reverted like any other code.
+    # A repository variable of the same name still overrides it, which is what
+    # to use the moment the API moves to a custom domain. It has to agree with
+    # WEB_ORIGINS on the Render side; see DEPLOYING.md.
+    env:
+      API_BASE_URL: ${{ vars.API_BASE_URL || 'https://clone-central-market-repo-1.onrender.com' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,15 +41,20 @@ jobs:
           cache: npm
 
       - name: Check the API URL is configured
-        env:
-          API_BASE_URL: ${{ vars.API_BASE_URL }}
         run: |
+          set -eu
           if [ -z "$API_BASE_URL" ]; then
-            echo "::error::Repository variable API_BASE_URL is not set."
-            echo "Set it under Settings > Secrets and variables > Actions to the"
-            echo "Render origin of the API, e.g. https://mu-katale-api.onrender.com."
+            echo "::error::No API origin: API_BASE_URL is empty both as a repository variable and as this workflow's default."
             echo "The build bakes this in, so it cannot be fixed after deployment."
             exit 1
+          fi
+          case "$API_BASE_URL" in
+            https://*/*) echo "::error::API_BASE_URL must be an origin only (no path, no trailing slash): $API_BASE_URL"; exit 1;;
+          esac
+          if [ -n "${{ vars.API_BASE_URL }}" ]; then
+            echo "API origin: $API_BASE_URL (repository variable)"
+          else
+            echo "API origin: $API_BASE_URL (workflow default; set the API_BASE_URL variable to override)"
           fi
 
       # configure-pages knows the path a project site is really served from
@@ -55,7 +68,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_API_BASE: ${{ vars.API_BASE_URL }}
+          VITE_API_BASE: ${{ env.API_BASE_URL }}
           VITE_BASE: ${{ steps.pages.outputs.base_path }}
         run: npm run build
 
@@ -65,7 +78,6 @@ jobs:
       - name: Check the artifact
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          API_BASE_URL: ${{ vars.API_BASE_URL }}
         run: |
           set -eu
           base="${BASE_PATH%/}"

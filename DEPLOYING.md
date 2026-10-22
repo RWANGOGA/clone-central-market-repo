@@ -25,7 +25,7 @@ host, no path, no trailing slash.
 
 | Value | Where it lives | Example |
 | --- | --- | --- |
-| `API_BASE_URL` | GitHub → Settings → Secrets and variables → Actions → **Variables** | `https://mu-katale-api.onrender.com` |
+| `API_BASE_URL` | the default inside `.github/workflows/deploy-pages.yml`; a repository **variable** of the same name overrides it | `https://clone-central-market-repo-1.onrender.com` |
 | `WEB_ORIGINS` | `render.yaml`, and the Render dashboard for the service | `https://rwangoga.github.io` |
 
 Vite inlines `API_BASE_URL` at build time, so changing it means rebuilding the
@@ -161,7 +161,10 @@ row landed.
 
 1. GitHub → Settings → **Pages** → Build and deployment → Source: **GitHub
    Actions**. Leaving it on "Deploy from a branch" makes the deploy job fail.
-2. Add the `API_BASE_URL` variable from the table above.
+2. Nothing else is required: the workflow already defaults `API_BASE_URL` to the
+   Render service. Set the repository **variable** (Settings → Secrets and
+   variables → Actions → **Variables**, not Secrets) only to point the shop at a
+   different API, such as a custom domain later.
 3. Push to `main`, or run **Deploy shop to GitHub Pages** manually from the
    Actions tab. The site appears at the URL the workflow prints, and the job
    fails before publishing if the bundle does not match that URL.
