@@ -192,7 +192,9 @@ export default function PaymentPage({
         </div>
       </div>
 
-      <div className="absolute left-6 top-[190px] text-[24px] text-[#426b1f] font-['Newsreader:Regular',_sans-serif] translate-y-[-50%]">
+      {/* Clears the "1" badge the same way the checkout screen does; at left-6
+          the heading sat on top of it. */}
+      <div className="absolute left-[72px] top-[190px] text-[24px] text-[#426b1f] font-['Newsreader:Regular',_sans-serif] translate-y-[-50%]">
         <p className="leading-[32px]">Payment</p>
       </div>
 
