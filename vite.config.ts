@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react'
 function figmaAssetResolver() {
   return {
     name: 'figma-asset-resolver',
-    resolveId(id) {
+    resolveId(id: string) {
       if (id.startsWith('figma:asset/')) {
         const filename = id.replace('figma:asset/', '')
         return path.resolve(__dirname, 'src/assets', filename)
@@ -17,6 +17,11 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  // GitHub Pages serves a project site under /<repository>/, so the built
+  // index.html has to ask for its assets from there. The deploy workflow passes
+  // VITE_BASE; everywhere else — the dev server, the nginx container — the app
+  // owns the root of its host and the default is right.
+  base: process.env.VITE_BASE ?? '/',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if

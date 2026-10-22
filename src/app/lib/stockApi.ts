@@ -1,3 +1,5 @@
+import { apiUrl } from './apiBase';
+
 /**
  * Live stock levels for the catalogue.
  *
@@ -46,7 +48,7 @@ export async function fetchStock(
   signal?: AbortSignal,
 ): Promise<{ levels: Map<number, StockLevel>; summary: InventorySummary } | null> {
   try {
-    const response = await fetch('/api/inventory', { signal });
+    const response = await fetch(apiUrl('/api/inventory'), { signal });
     if (!response.ok) return null;
 
     const body = (await response.json()) as {

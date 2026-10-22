@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import StatusBar from './shared/StatusBar';
 import svgPaths from "../imports/svg-s5y93igtx2";
 import { isValidUgandanPhone, normalizeUgandanPhone } from '../lib/uganda';
+import { apiUrl } from '../lib/apiBase';
 import type { CustomerSession } from '../lib/authProvider';
 
 interface LoginPageProps {
@@ -23,7 +24,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
     setLoading(true);
 
     try {
-      const res = await fetch('/api/customers/login', {
+      const res = await fetch(apiUrl('/api/customers/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password }),

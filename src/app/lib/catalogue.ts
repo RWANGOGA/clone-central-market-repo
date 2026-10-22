@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { apiUrl } from './apiBase';
 
 /**
  * The shop catalogue, read from the API so products an admin adds actually
@@ -49,7 +50,7 @@ export type CatalogueState = {
 
 export async function fetchCatalogue(signal?: AbortSignal): Promise<CatalogueProduct[] | null> {
   try {
-    const response = await fetch('/api/products', { signal });
+    const response = await fetch(apiUrl('/api/products'), { signal });
     if (!response.ok) return null;
 
     const body = (await response.json()) as { data: ApiProduct[] };

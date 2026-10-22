@@ -1,3 +1,5 @@
+import { apiUrl } from './apiBase';
+
 export type PlaceKind = 'Region' | 'District' | 'City' | 'Municipality' | 'SubCounty' | 'Parish' | 'Village';
 
 export type GeoNode = {
@@ -30,7 +32,7 @@ export type Hierarchy = {
  */
 export async function fetchHierarchy(signal?: AbortSignal): Promise<Hierarchy | null> {
   try {
-    const response = await fetch('/api/geo/hierarchy', { signal });
+    const response = await fetch(apiUrl('/api/geo/hierarchy'), { signal });
     if (!response.ok) return null;
 
     const body = (await response.json()) as {
@@ -61,7 +63,7 @@ export type BoundaryStatus =
  */
 export async function fetchBoundaries(level: 'regions' | 'districts', signal?: AbortSignal): Promise<BoundaryStatus> {
   try {
-    const response = await fetch(`/api/geo/boundaries/${level}`, { signal });
+    const response = await fetch(apiUrl(`/api/geo/boundaries/${level}`), { signal });
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { error?: string } | null;
       return { state: 'unavailable', reason: body?.error ?? `No boundaries for ${level}` };
@@ -315,7 +317,7 @@ export async function locatePlace(
     const params = new URLSearchParams({ place });
     if (region) params.set('region', region);
 
-    const response = await fetch(`/api/geo/locate?${params.toString()}`, { signal });
+    const response = await fetch(apiUrl(`/api/geo/locate?${params.toString()}`), { signal });
     if (!response.ok) return null;
 
     const body = (await response.json()) as { data: LocatedPlace };

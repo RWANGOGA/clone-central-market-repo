@@ -1,4 +1,6 @@
-const BASE = '/api/admin';
+import { apiUrl } from './apiBase';
+
+const BASE = apiUrl('/api/admin');
 
 /**
  * Client for the staff endpoints. The session lives in an HttpOnly cookie the

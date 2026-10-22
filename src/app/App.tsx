@@ -87,13 +87,20 @@ function PaymentRoute({ onMenuClick }: { onMenuClick: () => void }) {
 }
 
 /**
+ * GitHub Pages serves a project site under /<repository>/, while every route in
+ * this app is written from the root. Vite injects the base it built with, so the
+ * router can take it back off rather than read "/repo" as part of a route name.
+ */
+const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '');
+
+/**
  * Providers must wrap every component that reads their context, and the router
  * must wrap everything that calls useNavigate (including AuthProvider itself).
  * The shell below is the first component that is allowed to use those hooks.
  */
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={BASENAME || undefined}>
       <CartProvider>
         <AuthProvider>
           <AppShell />

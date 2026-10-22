@@ -1,6 +1,7 @@
 import { triggerUnauthorized } from './apiAuth';
+import { apiUrl } from './apiBase';
 
-const API_BASE = '/api';
+const API_BASE = apiUrl('/api');
 
 export interface CustomerProfile {
   id: number;

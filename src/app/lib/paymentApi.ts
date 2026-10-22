@@ -1,3 +1,5 @@
+import { apiUrl } from './apiBase';
+
 /**
  * Client for the payment endpoints in api/.
  *
@@ -77,8 +79,11 @@ type Result<D> = Ok<D> | Fail | null;
 
 async function request<D>(path: string, init?: RequestInit): Promise<Result<D>> {
   try {
-    const response = await fetch(`/api${path}`, {
+    const response = await fetch(apiUrl(`/api${path}`), {
       ...init,
+      // An intent belongs to a cart and a tracking token, both of which live in
+      // HttpOnly cookies, so a cross-origin call has to carry them.
+      credentials: 'include',
       headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
     });
 

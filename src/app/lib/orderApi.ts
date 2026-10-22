@@ -1,4 +1,6 @@
-const BASE = '/api/admin';
+import { apiUrl } from './apiBase';
+
+const BASE = apiUrl('/api/admin');
 
 /**
  * Client for the staff order endpoints, plus the live feed.

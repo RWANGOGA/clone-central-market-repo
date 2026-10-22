@@ -1,3 +1,5 @@
+import { apiUrl } from './apiBase';
+
 /**
  * Discount codes, priced by the API.
  *
@@ -54,7 +56,7 @@ export function toAppliedPromo(quote: PromoQuote): AppliedPromo {
 
 export async function validatePromo(cartId: number, code: string): Promise<PromoResult> {
   try {
-    const response = await fetch('/api/promo/validate', {
+    const response = await fetch(apiUrl('/api/promo/validate'), {
       method: 'POST',
       credentials: 'include',
       headers: { 'content-type': 'application/json' },

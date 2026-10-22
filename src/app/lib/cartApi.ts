@@ -1,4 +1,5 @@
 import { triggerUnauthorized } from './apiAuth';
+import { apiUrl } from './apiBase';
 
 /**
  * Client for the cart endpoints in api/.
@@ -54,8 +55,11 @@ const CART_ID_KEY = 'mu-katale.cartId';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T | null> {
   try {
-    const response = await fetch(`/api${path}`, {
+    const response = await fetch(apiUrl(`/api${path}`), {
       ...init,
+      // The cart cookie is HttpOnly and scoped to /api. A cross-origin call has
+      // to ask for it explicitly or the basket comes back empty.
+      credentials: 'include',
       headers: {
         'content-type': 'application/json',
         ...(init?.headers ?? {}),
@@ -81,8 +85,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T | null> {
  */
 async function mutate<T>(path: string, init: RequestInit): Promise<T | null> {
   try {
-    const response = await fetch(`/api${path}`, {
+    const response = await fetch(apiUrl(`/api${path}`), {
       ...init,
+      credentials: 'include',
       headers: { 'content-type': 'application/json', ...(init.headers ?? {}) },
     });
 
