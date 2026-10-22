@@ -18,6 +18,16 @@ RUN npm config set fetch-timeout 300000 && \
     (sleep 5 && npm ci --prefer-offline --no-audit --maxsockets 3) || \
     (sleep 10 && npm ci --prefer-offline --no-audit --maxsockets 3)
 
+# next build imports every route to collect page data, and lib/env.ts validates
+# the environment as those modules load, so a build with no environment fails on
+# missing keys rather than on anything about the code. These satisfy the schema
+# only: no database is contacted while building, and they live in the builder
+# stage, so they never reach the image that runs. The real values arrive from the
+# compose environment at runtime.
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
+ENV PAYMENT_WEBHOOK_SECRET=build-time-placeholder
+ENV UPLOAD_DIR=/app/data/uploads
+
 RUN npm run build
 
 FROM node:22-alpine AS runner
