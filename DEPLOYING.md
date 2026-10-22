@@ -72,6 +72,36 @@ depends on a version, and local development runs 16.
 posts to the webhook route yet, so its only job is to make a missing secret a
 boot failure rather than a silent default.
 
+### If the build log ends in `failed to read dockerfile: open Dockerfile: no such file or directory`
+
+That means the service is on Render's **Docker** runtime while `render.yaml` says
+`runtime: node`. The Docker runtime always builds `./Dockerfile` at the repo root
+unless you point it somewhere else, and this repo has no root Dockerfile — its
+image recipes are `Dockerfile.api` and `Dockerfile.frontend`, written for the
+compose stack — so the clone succeeds and the image build fails on a 2-byte,
+empty "load build definition" step.
+
+Switch the runtime instead of adding a Dockerfile. Render supports changing it in
+place: service → **Settings** → *Build* section → under *Source*, **Edit** → pick
+**Node** → Deploy. That reuses the same service, so the environment variables you
+already entered (including the Neon `DATABASE_URL`) survive; then set the two
+commands to what `render.yaml` declares:
+
+| Field | Value |
+| --- | --- |
+| Build command | `npm ci --include=dev && npm run build` |
+| Start command | `npm start` |
+| Root directory / env | `api` — set `NODE_VERSION`, `TRUST_PROXY`, `WEB_ORIGINS`, `UPLOAD_DIR` as in `render.yaml` |
+
+If the service is genuinely Blueprint-managed, this cannot happen: syncing the
+Blueprint applies `runtime: node` from `render.yaml`. A Docker runtime therefore
+means the service was created with **New → Web Service**, and the tidy fix is to
+delete it and create the Blueprint once, so the file stays the source of truth.
+
+Keeping Docker is also workable if you prefer it: set *Dockerfile Path* to
+`Dockerfile.api` and leave the build context at the repo root. Render then ignores
+`buildCommand` and `startCommand` entirely and runs the image's own entrypoint.
+
 If a deploy fails during the build with a JSON list of missing keys, that is
 `api/src/lib/env.ts` doing its job: `next build` imports every route to collect
 page data, and the environment is validated as those modules load. It means a
@@ -100,6 +130,12 @@ opening stock ledger, the promos and the staff account — the admin step is par
 of that chain and needs the three `ADMIN_*` variables. Every seed script is
 idempotent, so re-running it is safe. It reads `DATABASE_URL` from the
 environment, not from `api/.env.local`, which is why it is passed inline.
+
+Against an empty database neither script asks anything. Verified on a scratch
+Postgres: `db:push` created 29 tables and `db:seed` loaded 9 products, 4 regions,
+196 districts, 9 stock movements, 3 promo codes and 1 staff account — the same
+contents as the development database, down to `sub_counties`, `parishes` and
+`villages` being empty, which they are everywhere so far.
 
 Demo orders come from `npm run db:backfill:orders` with the same inline
 `DATABASE_URL`, when you want the staff area to have something to process.
@@ -196,6 +232,11 @@ the basket. The basket surviving a reload is the real test.
   `API_BASE_URL=https://api.example.com`.
 - **The Docker stack is the same-origin path.** `docker compose up` puts nginx in
   front of both, so leave `WEB_ORIGINS` unset there. Its entrypoint runs
-  `drizzle-kit migrate` and there are no committed migrations in `api/drizzle`,
-  so the schema arrives by `npm run db:push`, as in step 3 — a fresh stack boots
+  `drizzle-kit migrate`, which exits 0 without applying anything while
+  `api/drizzle` holds no migration files — confirmed against a scratch database —
+  so the schema arrives by `npm run db:push`, as in step 3; a fresh stack boots
   against an empty database until that has been run.
+- **`npm run db:reset` does not reset a PostgreSQL database.** It still says
+  `rm -f local.db`, a leftover from the SQLite version of this API, and its seed
+  chain omits the staff account and the promo codes. On Postgres, reset by hand:
+  drop and recreate the database, then run `db:push` and `db:seed`.
