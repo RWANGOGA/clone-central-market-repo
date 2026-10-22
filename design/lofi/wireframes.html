@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mu Katale — low-fi wireframes (all screens)</title>
+<style>
+  /*
+    Low-fi on purpose: grey boxes, no brand colour, no photography, real copy
+    where the words matter and grey bars where they do not. The point is the
+    layout and the flow, not the look. Every frame is 393 x 852, which is the
+    width the running app is designed for.
+  */
+  :root {
+    --box: #ededed;
+    --box2: #f6f6f6;
+    --line: #c7c7c7;
+    --ink: #2f2f2f;
+    --soft: #8b8b8b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f2f2f2;
+    color: var(--ink);
+    font: 13px/1.45 -apple-system, "Inter", Helvetica, Arial, sans-serif;
+  }
+  .doc { max-width: 1180px; padding: 32px 32px 8px; }
+  .doc h1 { font-size: 22px; margin: 0 0 10px; }
+  .doc p { margin: 0 0 8px; max-width: 820px; color: #4a4a4a; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px; margin: 14px 0 26px;
+    padding: 14px 16px; background: #fff; border: 1px solid var(--line);
+    font-size: 12px; color: #555;
+  }
+  .legend b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--soft); }
+  #sheet { display: flex; flex-wrap: wrap; gap: 30px; padding: 0 32px 56px; align-items: flex-start; }
+  .frame { width: 393px; }
+  .frame > h2 {
+    font-size: 13px; margin: 0 0 6px; display: flex; gap: 8px;
+    align-items: baseline; justify-content: space-between;
+  }
+  .frame > h2 em { font-style: normal; }
+  .frame > h2 span { color: var(--soft); font-weight: 400; font-size: 11px; }
+  .canvas {
+    width: 393px; height: 852px; background: #fff; border: 1px solid var(--line);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .scroll { flex: 1; overflow: hidden; padding: 0 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .notes { margin: 8px 0 0; padding: 0; list-style: none; font-size: 11.5px; color: #5c5c5c; }
+  .notes li { margin: 0 0 3px; }
+  .notes li b { color: var(--ink); }
+
+  /* ---- blocks ---- */
+  .bar { display: block; background: var(--box); border-radius: 2px; height: 8px; }
+  .pad { padding: 0 20px; }
+  .top {
+    border-bottom: 1px solid var(--line); padding: 12px 16px 10px;
+    display: flex; flex-direction: column; gap: 8px; background: #fbfbfb;
+  }
+  .toprow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ico {
+    width: 26px; height: 26px; border: 1px solid var(--line); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; color: #666;
+    background: #fff;
+  }
+  .brand { font-size: 15px; color: #555; }
+  .title { font-size: 22px; margin: 2px 0 0; }
+  .sub { font-size: 15px; color: #444; margin: 0; }
+  .lead { font-size: 13px; color: #444; margin: 0; }
+  .steps { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #666; }
+  .steps i {
+    font-style: normal; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line);
+    display: inline-flex; align-items: center; justify-content: center; background: #fff; color: #777;
+  }
+  .steps i.on { background: #dcdcdc; border-color: #9a9a9a; color: #111; }
+  .steps u { text-decoration: none; }
+  .chips { display: flex; gap: 8px; }
+  .chip { border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 12px; color: #555; }
+  .chip.on { background: #dcdcdc; border-color: #9a9a9a; color: #111; }
+  .search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; color: #999; font-size: 12px; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; gap: 12px; }
+  .card .thumb {
+    width: 84px; height: 84px; flex: none; border: 1px dashed #b5b5b5; background:
+      linear-gradient(to top right, transparent calc(50% - 1px), #d5d5d5, transparent calc(50% + 1px)),
+      linear-gradient(to top left, transparent calc(50% - 1px), #d5d5d5, transparent calc(50% + 1px)), var(--box2);
+    border-radius: 8px;
+  }
+  .card .body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .card h4 { margin: 0; font-size: 14px; font-weight: 600; }
+  .price { font-size: 13px; color: #333; }
+  .meta { font-size: 11.5px; color: var(--soft); }
+  .pill { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; font-size: 11px; color: #555; }
+  .plus { width: 30px; height: 30px; flex: none; border: 1px solid #9a9a9a; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #e4e4e4; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11.5px; color: var(--soft); }
+  .field .in { border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; font-size: 13px; display: flex; justify-content: space-between; gap: 8px; color: #222; }
+  .field .in.empty { color: #a5a5a5; }
+  .field .in.off { background: var(--box2); color: #a5a5a5; }
+  .field .hint { font-size: 11px; color: var(--soft); }
+  .radios { display: flex; flex-direction: column; gap: 8px; }
+  .radio { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .radio.on { background: var(--box); border-color: #9a9a9a; }
+  .radio small { display: block; color: var(--soft); font-size: 11px; }
+  .radio .dot { width: 14px; height: 14px; border: 1px solid #9a9a9a; border-radius: 50%; flex: none; }
+  .radio.on .dot { background: #9a9a9a; box-shadow: inset 0 0 0 3px #fff; }
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .btn {
+    border: 1px solid #9a9a9a; border-radius: 10px; background: #dcdcdc; color: #111;
+    padding: 12px 14px; font-size: 14px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .btn.ghost { background: #fff; border-color: var(--line); color: #444; }
+  .btn.off { background: var(--box2); border-color: #d8d8d8; color: #ababab; }
+  .btn.danger { background: #fff; border-color: #c4a1a1; color: #8a4a4a; }
+  .foot { border-top: 1px solid var(--line); padding: 12px 20px 16px; background: #fbfbfb; display: flex; flex-direction: column; gap: 8px; }
+  .tabs { display: flex; gap: 6px; overflow: hidden; }
+  .tab { border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font-size: 12px; color: #555; white-space: nowrap; }
+  .tab.on { background: #dcdcdc; border-color: #9a9a9a; color: #111; }
+  table.grid { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.grid th { text-align: left; color: var(--soft); font-weight: 500; border-bottom: 1px solid var(--line); padding: 6px 4px; font-size: 11px; }
+  table.grid td { border-bottom: 1px solid #eee; padding: 8px 4px; vertical-align: top; }
+  table.grid td.r, table.grid th.r { text-align: right; }
+  table.grid small { display: block; color: var(--soft); font-size: 11px; }
+  .kv { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  .kv div { display: flex; justify-content: space-between; font-size: 12.5px; }
+  .kv div b { font-weight: 600; }
+  .kv div.total { border-top: 1px solid var(--line); padding-top: 8px; margin-top: 2px; font-size: 14px; }
+  .tl { display: flex; flex-direction: column; gap: 10px; }
+  .tl div { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; }
+  .tl i { width: 10px; height: 10px; border-radius: 50%; background: #cfcfcf; border: 1px solid #a5a5a5; margin-top: 3px; flex: none; }
+  .tl div.now i { background: #6f6f6f; border-color: #4a4a4a; }
+  .tl small { display: block; color: var(--soft); font-size: 11px; }
+  .map {
+    height: 260px; border: 1px dashed #b5b5b5; border-radius: 10px; background:
+      repeating-linear-gradient(45deg, #f7f7f7 0 12px, #f0f0f0 12px 24px);
+    display: flex; align-items: center; justify-content: center; color: #8f8f8f; font-size: 12px;
+  }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .stat b { display: block; font-size: 18px; }
+  .stat span { font-size: 11px; color: var(--soft); }
+  .toast { border: 1px solid #9a9a9a; background: #e0e0e0; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; }
+  .empty { border: 1px dashed #b5b5b5; border-radius: 12px; padding: 28px 16px; text-align: center; color: #7c7c7c; }
+  .empty b { display: block; color: #333; margin-bottom: 6px; }
+  .sec { font-size: 13px; font-weight: 600; margin: 4px 0 0; }
+  .hr { height: 1px; background: var(--line); }
+  .switch { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
+  .switch i { width: 34px; height: 20px; border-radius: 999px; border: 1px solid #a5a5a5; background: #e6e6e6; position: relative; flex: none; }
+  .switch i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 1px solid #a5a5a5; }
+  .switch.on i { background: #cfcfcf; }
+  .switch.on i::after { left: 16px; }
+  .banner { border: 1px solid var(--line); background: var(--box2); border-radius: 8px; padding: 9px 11px; font-size: 11.5px; color: #555; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <h1>Mu Katale — low-fi wireframes</h1>
+  <p>
+    Every screen of the market, drawn as grey boxes at 393&nbsp;×&nbsp;852 — the size the real
+    app is built for. Nothing here is decoration: the layout, the words on the buttons and the
+    order of the fields are the ones the running system actually uses, so the same sheet works as
+    the low-fi submission and as the map of the hi-fi prototype in <code>design/hifi/</code>.
+  </p>
+  <p>
+    <b>Flow:</b> each frame lists what is tappable and where it goes underneath itself
+    (<span style="color:#5c5c5c">① tap … → WF-nn</span>). Wire those arrows into Figma's prototype
+    mode and the three tasks in <code>PROTOTYPE-PLAN.md</code> run end to end without writing any code.
+  </p>
+  <div class="legend">
+    <div><b>Grey bar</b>body text that is not worth reading<br>at this stage</div>
+    <div><b>Dashed box with cross</b>photograph or map tile goes here</div>
+    <div><b>Outlined pill</b>button. Dark fill = primary action,<br>white = secondary, grey = disabled</div>
+    <div><b>Box with caret</b>dropdown, filled from the server</div>
+    <div><b>① ② ③</b>interactive targets, explained in the notes<br>under the frame</div>
+  </div>
+</div>
+<main id="sheet"></main>
+<script>
+/* ------------------------------------------------------------------ *
+ * A frame is a list of blocks. The renderer below turns them into the
+ * grey boxes, so a screen is about ten lines of data rather than a
+ * hundred of markup, and changing a layout means changing one line.
+ * ------------------------------------------------------------------ */
+const frames = [];
+const screen = (id, route, title, blocks, notes = []) => frames.push({ id, route, title, blocks, notes });
+
+/* shared pieces */
+const appTop = (right = 'basket', back = false, brand = 'Mu Katale') => ({
+  k: 'top', brand, back,
+  right,
+});
+const bar = (w, h = 8) => `<span class="bar" style="width:${w}%;height:${h}px"></span>`;
+const lines = (n) => `<div style="display:flex;flex-direction:column;gap:5px">${Array.from({ length: n }, (_, i) => bar(96 - i * 14)).join('')}</div>`;
+
+/* ---------------------------- customer ---------------------------- */
+screen('WF-01', '/', 'Shop — the aisle', [
+  appTop(),
+  { k: 'title', t: 'All Aisles/Produce' },
+  { k: 'chips', items: ['Default', 'A-Z', '$ -> $$'], active: 0 },
+  { k: 'search', ph: 'Search produce' },
+  { k: 'card', name: 'Garlic clove', price: 'USh 3,524 each', farm: 'Bukalasi Farm', stock: '90 each remaining', desc: 2, more: true },
+  { k: 'card', name: 'Sugar snap pea', price: 'USh 19,992/kg', farm: 'Rwambari Farm', stock: '30 kg remaining', desc: 2, more: true },
+  { k: 'card', name: 'Ginger', price: 'USh 36,667/kg', farm: 'Bungokho Farm', stock: '27 kg remaining', desc: 2, more: true },
+  { k: 'card', name: 'Sweet onion', price: 'USh 3,404/kg', farm: 'Nakasongola Farm', stock: '91 kg remaining', desc: 1 },
+], [
+  '<b>①</b> ☰ opens the navigation drawer → WF-03',
+  '<b>②</b> basket icon opens the basket → WF-07 (or WF-06 when empty)',
+  '<b>③</b> sort chips re-order this list in place',
+  '<b>④</b> tapping a card opens that product → WF-04',
+  '<b>⑤</b> ⊕ adds one unit and shows the toast → WF-05',
+  'Stock text is the live figure, so a card can read "sold out" — the reason the number is on the card at all.',
+]);
+
+screen('WF-02', '/', 'Shop — scrolled to the grid', [
+  { k: 'toprow-plain' },
+  { k: 'card', name: 'Raspberries', price: 'USh 92,000/box', farm: 'Kasese Farm', stock: '45 boxes remaining', desc: 2, more: true },
+  { k: 'card', name: 'Kale', price: 'USh 2,100/bunch', farm: 'Mukono Farm', stock: '75 bunches remaining', desc: 2, more: true },
+  { k: 'card', name: 'Radish', price: 'USh 1,800/bunch', farm: 'Luwero Farm', stock: '110 bunches remaining', desc: 1 },
+  { k: 'card', name: 'Avocados', price: 'USh 1,200 each', farm: 'Hoima Farm', stock: '84 remaining', desc: 2, more: true },
+  { k: 'card', name: 'Bananas', price: 'USh 1,500/bunch', farm: 'Mukono Farm', stock: '122 bunches remaining', desc: 1 },
+], [
+  'The header stays put while the grid scrolls, so basket and menu are always one tap away.',
+  'Cards repeat forever: there is no pagination control to find.',
+]);
+
+screen('WF-03', '/', 'Navigation drawer', [
+  { k: 'drawer', items: ['Shop', 'Coverage map', 'Newsstand', 'Who we are', 'My Page', 'Basket'] },
+], [
+  'The drawer replaces the page it was opened from, over a dimmed backdrop.',
+  '<b>①</b> "My Page" only appears when signed in; otherwise the fifth row reads "Sign in" → WF-17',
+  '<b>②</b> ✕ or a tap on the dimmed area closes it and stays on the current screen',
+  'Six destinations, no more: the whole app is reachable from here or from a card.',
+]);
+
+screen('WF-04', '/product/6', 'One product', [
+  appTop(),
+  { k: 'img', h: 220 },
+  { k: 'title', t: 'Bananas' },
+  { k: 'price', t: 'USh 1,500 bunch' },
+  { k: 'farm', t: 'Mukono Farm · Central Region' },
+  { k: 'pill', t: '122 bunches remaining' },
+  { k: 'text', t: 'Sweet and firm, picked green so they ripen on your shelf. Sold by the bunch of about 1 kg.' },
+  { k: 'qty' },
+  { k: 'btn', t: 'Add 3 bunches to basket' },
+  { k: 'kv', items: [['Delivery today', 'from 08:00'], ['Minimum', '1 bunch'], ['Also good for', 'school meals, juicing']] },
+], [
+  '<b>①</b> − / + choose how many; the button label changes with the number, so the price you are about to pay is on the button',
+  '<b>②</b> the button adds to the basket → WF-05',
+  '<b>③</b> heart saves to favourites (kept on this device)',
+  'The farm and the remaining stock are the two facts a buyer checks before committing, so both are above the fold.',
+]);
+
+screen('WF-05', '/product/6', 'Basket took it', [
+  appTop(),
+  { k: 'img', h: 200 },
+  { k: 'title', t: 'Bananas' },
+  { k: 'toast', t: 'Added to basket — 3 bunches · USh 4,500' },
+  { k: 'price', t: 'USh 1,500 bunch' },
+  { k: 'pill', t: '119 bunches remaining' },
+  { k: 'text', t: 'Sweet and firm, picked green so they ripen on your shelf.' },
+  { k: 'qty' },
+  { k: 'btn', t: 'Add 3 bunches to basket', kind: 'ghost' },
+  { k: 'btn', t: 'Go to basket', kind: 'primary' },
+], [
+  'The toast is the confirmation: it names the quantity and the money, so there is no guessing.',
+  'The stock line drops by what was taken, which is the only signal that another buyer has not already had it.',
+  '<b>①</b> "Go to basket" → WF-07',
+]);
+
+screen('WF-06', '/basket', 'Basket — nothing in it', [
+  appTop(),
+  { k: 'title', t: 'Your basket' },
+  { k: 'empty', t: 'Nothing chosen yet', sub: 'Go back to the shop and add something fresh.' },
+  { k: 'btn', t: 'Back to the shop', kind: 'primary' },
+], [
+  'The empty state is a real screen, not a spinner: it is where a shopper lands after a purchase and where a lost basket ends up.',
+  '<b>①</b> returns to the aisle → WF-01',
+]);
+
+screen('WF-07', '/basket', 'Basket — chosen', [
+  appTop(),
+  { k: 'title', t: 'Your basket' },
+  { k: 'rows', head: ['Item', 'Qty', 'Line'], items: [
+    ['Bananas<small>Mukono Farm</small>', '2', 'UGX 3,000'],
+    ['Garlic clove<small>Bukalasi Farm</small>', '3', 'UGX 10,572'],
+    ['Avocados<small>Hoima Farm</small>', '1', 'UGX 1,200'],
+  ] },
+  { k: 'kv', items: [['Subtotal', 'UGX 14,772'], ['Delivery to Kampala', 'UGX 3,000'], ['Total', 'UGX 17,772', true]] },
+  { k: 'btn', t: 'Proceed to checkout', kind: 'primary' },
+], [
+  '<b>①</b> quantity steppers on each line change the total immediately',
+  '<b>②</b> a line can be removed; the basket then re-reads its own total',
+  '<b>③</b> checkout → WF-08',
+  'Delivery is named with the destination, because the fee depends on it and an unnamed fee looks like a mistake.',
+]);
+
+screen('WF-08', '/checkout', 'Checkout 1 — where to deliver', [
+  appTop(),
+  { k: 'steps', active: 0, labels: ['Shipping', 'Payment', 'Done'] },
+  { k: 'lead', t: 'Where in Uganda should we deliver?' },
+  { k: 'field', label: 'Full name', value: 'Sarah Namukasa' },
+  { k: 'field', label: 'Phone number', value: '0772 000001' },
+  { k: 'field', label: 'Region', value: 'Central Region (Region)', caret: true },
+  { k: 'field', label: 'District, municipality or town', value: 'Kampala (City)', caret: true },
+  { k: 'field', label: 'Sub-county', value: 'Select sub-county', caret: true, hint: 'none recorded' },
+  { k: 'field', label: 'Parish or division', value: 'Choose sub-county first', off: true },
+  { k: 'field', label: 'Village or zone', value: 'Choose parish first', off: true },
+  { k: 'foot', t: 'Proceed to payment', kind: 'primary' },
+], [
+  'Each level only unlocks when the one above it is answered — a parish cannot be picked before its sub-county exists.',
+  '<b>①</b> the amber "none recorded" line is the reason a field is still empty; it is a prompt, not an error',
+  '<b>②</b> the button is disabled until region, district and address are present',
+  '<b>③</b> → WF-09',
+  'The list comes from the geography tables, so a place that is not served cannot be typed in.',
+]);
+
+screen('WF-09', '/pay/…', 'Checkout 2 — how to pay', [
+  appTop(),
+  { k: 'steps', active: 0, labels: ['Payment', 'Review', 'Done'] },
+  { k: 'lead', t: 'Choose how you want to pay' },
+  { k: 'cards3', items: [
+    { t: 'Mobile Money', s: 'MTN, Airtel or UTel', on: true },
+    { t: 'Wallet', s: 'Bank or mobile wallet' },
+    { t: 'Cash on delivery', s: 'Pay the rider' },
+  ] },
+  { k: 'radios', items: [
+    { t: 'MTN MoMo', s: '*165#', on: true },
+    { t: 'Airtel Money', s: '*185#' },
+    { t: 'UTel Money', s: '*111#' },
+  ] },
+  { k: 'field', label: 'Mobile money number', value: '07XX XXX XXX', empty: true, hint: 'Starts with 077, 078, 079 for MTN MoMo' },
+  { k: 'foot', t: 'Pay now', kind: 'off' },
+], [
+  '<b>①</b> changing the channel changes the instrument list below it',
+  '<b>②</b> the button stays grey while the number is missing — see WF-10 for the live state',
+  'Cash on delivery asks for nothing: the order is already placed and the rider collects.',
+]);
+
+screen('WF-10', '/pay/…', 'Checkout 2 — ready to pay', [
+  appTop(),
+  { k: 'steps', active: 0, labels: ['Payment', 'Review', 'Done'] },
+  { k: 'lead', t: 'Choose how you want to pay' },
+  { k: 'cards3', items: [
+    { t: 'Mobile Money', s: 'MTN, Airtel or UTel', on: true },
+    { t: 'Wallet', s: 'Bank or mobile wallet' },
+    { t: 'Cash on delivery', s: 'Pay the rider' },
+  ] },
+  { k: 'field', label: 'Mobile money number', value: '0772 000001' },
+  { k: 'kv', items: [['Order', 'GRC-F4BDDEA050'], ['Amount', 'UGX 30,904', true], ['Network', 'MTN MoMo']] },
+  { k: 'foot', t: 'Pay now', kind: 'primary' },
+], [
+  'The amount is read from the order on the server, so the number shown cannot drift from the one charged.',
+  '<b>①</b> Pay now asks the network to prompt the buyer → WF-11 once it settles',
+]);
+
+screen('WF-11', '/order/…', 'Order placed', [
+  appTop(),
+  { k: 'title', t: 'Thank you, Sarah' },
+  { k: 'lead', t: 'Your order is with the market.' },
+  { k: 'kv', items: [['Reference', 'GRC-F4BDDEA050'], ['Status', 'pending'], ['Total', 'UGX 30,904', true], ['Delivery', 'Kampala (City) · today from 08:00']] },
+  { k: 'rows', head: ['Item', 'Qty', 'Line'], items: [
+    ['Bananas', '2', 'UGX 3,000'], ['Garlic clove', '3', 'UGX 10,572'], ['Avocados', '1', 'UGX 1,200'],
+  ] },
+  { k: 'btn', t: 'Track this order', kind: 'primary' },
+  { k: 'btn', t: 'Back to the shop', kind: 'ghost' },
+], [
+  'The reference is the thing a buyer will quote on the phone, so it is text, not a picture.',
+  '<b>①</b> tracking → WF-12',
+  'Nothing here promises a courier or a time the market cannot keep.',
+]);
+
+screen('WF-12', '/order/…', 'Tracking', [
+  appTop(),
+  { k: 'title', t: 'GRC-F4BDDEA050' },
+  { k: 'pill', t: 'shipped · paid' },
+  { k: 'timeline', items: [
+    { t: 'Order placed', s: 'Tue 21 Oct, 14:02', now: true },
+    { t: 'Payment confirmed — cash collected', s: 'Tue 21 Oct, 14:20' },
+    { t: 'Picked at the farm gate', s: 'Tue 21 Oct, 15:05' },
+    { t: 'On a motorbike to Kampala (City)', s: 'Tue 21 Oct, 16:40', now: true },
+    { t: 'Delivered', s: 'not yet', off: true },
+  ] },
+  { k: 'kv', items: [['Items', 'UGX 14,772'], ['Delivery', 'UGX 3,000'], ['Paid', 'UGX 17,772', true], ['Refunded', 'none']] },
+], [
+  'The timeline is the order\'s own history, written by the market — not a guess from a status field.',
+  'Money and progress are on the same screen because "has it gone?" and "have you been paid?" are one question.',
+  'A stage that has not happened is greyed rather than hidden, so the shape of the journey is visible.',
+]);
+
+/* ------------------------------ account ---------------------------- */
+screen('WF-13', '/profile', 'My page — overview', [
+  appTop(),
+  { k: 'title', t: 'Sarah Namukasa' },
+  { k: 'meta', t: '0772 000001 · sarah@stfranciss.ac.ug' },
+  { k: 'tabs', items: ['Overview', 'Orders', 'Details', 'Preferences'], active: 0 },
+  { k: 'stats', items: [['3', 'orders with us'], ['21 Oct 2026', 'last order'], ['Central', 'region on file'], ['Kampala (City)', 'delivery district']] },
+  { k: 'rows', head: ['Order', 'Status', 'Total'], items: [
+    ['GRC-F4BDDEA050', 'shipped', 'UGX 30,904'],
+    ['GRC-5155B57A6F', 'delivered', 'UGX 24,150'],
+    ['GRC-0D797AF77A', 'cancelled', 'UGX 8,400'],
+  ] },
+], [
+  '<b>①</b> an order row opens that order → WF-12',
+  'The overview answers "what is happening right now" without a second tap.',
+]);
+
+screen('WF-14', '/profile?tab=orders', 'My page — orders', [
+  appTop(),
+  { k: 'tabs', items: ['Overview', 'Orders', 'Details', 'Preferences'], active: 1 },
+  { k: 'search', ph: 'Search by reference' },
+  { k: 'rows', head: ['Order', 'Placed', 'Status', 'Paid'], items: [
+    ['GRC-F4BDDEA050', '21 Oct', 'shipped', 'UGX 30,904'],
+    ['GRC-5155B57A6F', '19 Oct', 'delivered', 'UGX 24,150'],
+    ['GRC-267F104DCB', '18 Oct', 'pending', 'UGX 12,300'],
+    ['GRC-0D797AF77A', '12 Oct', 'cancelled', 'refunded'],
+  ] },
+  { k: 'btn', t: 'Cancel GRC-267F104DCB', kind: 'danger' },
+], [
+  '<b>①</b> a row opens the order → WF-12',
+  '<b>②</b> cancel is offered only while an order is still pending; once the market has picked it the button is gone, not greyed',
+  'Paid and status are separate columns because an order can be shipped and still owe cash.',
+]);
+
+screen('WF-15', '/profile?tab=details', 'My page — details', [
+  appTop(),
+  { k: 'tabs', items: ['Overview', 'Orders', 'Details', 'Preferences'], active: 2 },
+  { k: 'lead', t: 'How we reach you and where we deliver' },
+  { k: 'field', label: 'Full name', value: 'Sarah Namukasa' },
+  { k: 'field', label: 'Phone — this is what you sign in with', value: '0772 000001' },
+  { k: 'field', label: 'Email', value: 'sarah@stfranciss.ac.ug' },
+  { k: 'field', label: 'Region', value: 'Central Region (Region)', caret: true },
+  { k: 'field', label: 'District', value: 'Kampala (City)', caret: true },
+  { k: 'field', label: 'Delivery address', value: 'Plot 14, Ntinda Road' },
+  { k: 'foot', t: 'Save changes', kind: 'primary' },
+], [
+  'The phone label says what the number is for, because changing it changes how you log in.',
+  '<b>①</b> save refuses a number or email another account already holds and says so → the buyer tries a different one',
+  '<b>②</b> region and district use the same cascade as checkout → WF-08',
+]);
+
+screen('WF-16', '/profile?tab=preferences', 'My page — preferences', [
+  appTop(),
+  { k: 'tabs', items: ['Overview', 'Orders', 'Details', 'Preferences'], active: 3 },
+  { k: 'lead', t: 'How the shop should look' },
+  { k: 'field', label: 'Units', value: 'Kilograms', caret: true },
+  { k: 'field', label: 'Language', value: 'English', caret: true },
+  { k: 'switch', t: 'Show stock remaining on cards', on: true },
+  { k: 'switch', t: 'Sort by price low to high', on: false },
+  { k: 'switch', t: 'Email me about order updates', on: true },
+  { k: 'foot', t: 'Save preferences', kind: 'primary' },
+], [
+  'Preferences are stored per account, so the same buyer on another phone gets the same shop.',
+  'The save button is the same shape as the one on Details — one way to commit a change anywhere in the app.',
+]);
+
+/* ----------------------------- signed out -------------------------- */
+screen('WF-17', '/login', 'Sign in', [
+  appTop('none'),
+  { k: 'title', t: 'Sign in' },
+  { k: 'field', label: 'Phone number', value: '07XX XXX XXX', empty: true },
+  { k: 'field', label: 'Password', value: '••••••••', empty: true },
+  { k: 'foot', t: 'Sign in', kind: 'primary' },
+  { k: 'btn', t: 'Create an account', kind: 'ghost' },
+], [
+  'The phone number is normalised as it is typed, so 0772 and +256772 reach the same account.',
+  '<b>①</b> a wrong number or password gives one plain message and does not say which of the two was wrong',
+  '<b>②</b> "Create an account" → WF-18',
+]);
+
+screen('WF-18', '/signup', 'Create an account', [
+  appTop('none'),
+  { k: 'title', t: 'Create an account' },
+  { k: 'field', label: 'Full name', value: 'Sarah Namukasa' },
+  { k: 'field', label: 'Phone — you will sign in with this', value: '0772 000001' },
+  { k: 'field', label: 'Email', value: 'sarah@stfranciss.ac.ug', hint: 'We use this to tell you about your orders.' },
+  { k: 'field', label: 'Password', value: 'at least 10 characters' },
+  { k: 'field', label: 'Region', value: 'Central Region (Region)', caret: true },
+  { k: 'field', label: 'District', value: 'Kampala (City)', caret: true },
+  { k: 'field', label: 'Delivery address', value: 'Plot 14, Ntinda Road' },
+  { k: 'foot', t: 'Create account', kind: 'primary' },
+], [
+  'Contacts are collected here so the market can reach the buyer; nothing is verified by code today.',
+  '<b>①</b> a phone or email already registered is refused with "Sign in instead" — it never overwrites the other account',
+  '<b>②</b> a region outside the delivery map is refused before the account is created',
+  '<b>③</b> on success the buyer is signed straight in → WF-01',
+]);
+
+screen('WF-19', '/map', 'Coverage map', [
+  appTop(),
+  { k: 'title', t: 'Where we deliver' },
+  { k: 'map', t: 'map of the districts the market serves' },
+  { k: 'kv', items: [['Your district', 'Kampala (City)'], ['Delivery fee', 'UGX 3,000'], ['Cut-off for today', '16:00', true]] },
+], [
+  'The map answers "can you reach my school?" before a buyer spends time on checkout.',
+  'A pin is a town centre from the same geography tables that validate checkout, so the two cannot disagree.',
+]);
+
+screen('WF-20', '/news', 'Newsstand', [
+  appTop(),
+  { k: 'title', t: 'From the market' },
+  { k: 'card', name: 'Why garlic is dear this month', price: '21 Oct 2026', desc: 2 },
+  { k: 'card', name: 'New farm gate: Bungokho ginger', price: '14 Oct 2026', desc: 2 },
+  { k: 'card', name: 'Rain in Mbarara: what it means for tomatoes', price: '6 Oct 2026', desc: 1 },
+], [
+  'Prices move; saying why keeps a buyer who would otherwise assume the market is gouging them.',
+]);
+
+screen('WF-21', '/about', 'Who we are', [
+  appTop(),
+  { k: 'title', t: 'Who we are' },
+  { k: 'text', t: 'Mu Katale is a central market with a delivery bike. We buy from named farms and sell at the price the farm asks, plus the cost of getting it to you.' },
+  { k: 'kv', items: [['Farms we buy from', '9'], ['Districts served', '31'], ['How payment works', 'Mobile money, wallet or cash to the rider']] },
+], [
+  'The page exists to answer "is this a real market?" — so it names the mechanism, not the mission.',
+]);
+
+/* ------------------------------- staff ----------------------------- */
+screen('WF-22', '/staff', 'Staff sign in', [
+  { k: 'top', brand: 'Mu Katale — staff', right: 'none' },
+  { k: 'title', t: 'Staff sign in' },
+  { k: 'field', label: 'Email', value: 'you@mukenge.co.ug' },
+  { k: 'field', label: 'Password', value: '••••••••', empty: true },
+  { k: 'foot', t: 'Sign in', kind: 'primary' },
+], [
+  'A separate door from the customer one: staff accounts are issued by an owner, not self-registered.',
+  'Roles decide which tabs appear; a signed-in person who cannot see a tab never sees it greyed.',
+]);
+
+screen('WF-23', '/staff?tab=orders', 'Staff — order desk', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'lead', t: 'Order queue' },
+  { k: 'rows', head: ['Order', 'Customer', 'Status', 'Money', 'When'], items: [
+    ['GRC-F4BDDEA050', 'Sarah N.', 'shipped', 'paid', '21 Oct 14:02'],
+    ['GRC-267F104DCB', 'Peter M.', 'pending', 'cod due', '21 Oct 13:10'],
+    ['GRC-0D797AF77A', 'Aisha K.', 'pending', 'unpaid', '21 Oct 12:44'],
+  ] },
+  { k: 'chips', items: ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'], active: 0 },
+], [
+  '<b>①</b> a row opens the order → WF-24',
+  'Status and money are separate because "picked" and "paid" are different problems for different people.',
+  'The queue is live: another assistant moving an order changes this list without a refresh.',
+]);
+
+screen('WF-24', '/staff?tab=orders', 'Staff — one order', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'title', t: 'GRC-F4BDDEA050' },
+  { k: 'pill', t: 'shipped · paid · Kampala (City)' },
+  { k: 'rows', head: ['Item', 'Qty', 'Line'], items: [['Bananas', '2', 'UGX 3,000'], ['Garlic clove', '3', 'UGX 10,572']] },
+  { k: 'timeline', items: [
+    { t: 'Placed by Sarah Namukasa', s: '14:02', now: true },
+    { t: 'Cash collected by Dev Admin', s: '14:20', now: true },
+    { t: 'Marked shipped', s: '16:40', now: true },
+  ] },
+  { k: 'btn', t: 'Collect cash', kind: 'primary' },
+  { k: 'btn', t: 'Advance to delivered', kind: 'ghost' },
+  { k: 'btn', t: 'Cancel order and restock', kind: 'danger' },
+], [
+  'Only the moves the machine allows are offered: an unpaid order cannot be shipped, so the button is not there.',
+  '<b>①</b> cancelling writes the stock back to the ledger and closes any open payment — it does not delete the order',
+  '<b>②</b> a refund is recorded against the payment, and the customer sees it on their tracking screen → WF-12',
+]);
+
+screen('WF-25', '/staff?tab=catalogue', 'Staff — catalogue', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'btn', t: 'Add a product', kind: 'primary' },
+  { k: 'rows', head: ['Product', 'Price', 'Stock', 'Farm', ''], items: [
+    ['Garlic clove', 'UGX 3,524 each', '87', 'Bukalasi', 'edit'],
+    ['Bananas', 'UGX 1,500 bunch', '122', 'Mukono', 'edit'],
+    ['Kale', 'UGX 2,100 bunch', '12', 'Mukono', 'edit'],
+    ['Ginger', 'UGX 36,667 kg', '27', 'Bungokho', 'edit'],
+  ] },
+], [
+  'Price and stock are editable in place; every change is written to the audit trail → WF-31',
+  'A low number is not coloured here — the inventory tab is where stock is managed → WF-26',
+]);
+
+screen('WF-26', '/staff?tab=inventory', 'Staff — inventory', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'title', t: 'Stock movements' },
+  { k: 'meta', t: 'Latest 42 of 42 movements · the ledger nets +671 units' },
+  { k: 'rows', head: ['Product', 'Reason', 'Delta', 'When'], items: [
+    ['Bananas<small>GRC-F4BDDEA050</small>', 'sale', '-2', '21/10/2026'],
+    ['Garlic clove<small>GRC-F4BDDEA050</small>', 'sale', '-3', '21/10/2026'],
+    ['Avocados<small>GRC-F4BDDEA050</small>', 'sale', '-1', '21/10/2026'],
+  ] },
+  { k: 'field', label: 'Product', value: 'Choose a product', caret: true },
+  { k: 'field', label: 'Change', value: '-4' },
+  { k: 'field', label: 'Reason', value: 'waste', caret: true },
+  { k: 'field', label: 'Note', value: 'crushed in the crate' },
+  { k: 'foot', t: 'Record movement', kind: 'primary' },
+], [
+  'The stock number on a card is the sum of this ledger, so nothing can be taken or added without a reason and a name.',
+  'A manual adjustment is a movement, not an edit: the count is never typed over.',
+]);
+
+screen('WF-27', '/staff?tab=purchase-orders', 'Staff — purchase orders', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'btn', t: 'New purchase order', kind: 'primary' },
+  { k: 'chips', items: ['All', 'Draft', 'Sent', 'Received', 'Cancelled'], active: 0 },
+  { k: 'rows', head: ['Reference', 'Supplier', 'Status', 'Expected', ''], items: [
+    ['PO-MK4T…', 'Bukalasi Farm', 'sent', '23/10/2026', 'receive'],
+    ['PO-MK2Q…', 'Mukono Farm', 'received', '18/10/2026', '—'],
+  ] },
+], [
+  'Receiving a delivery is what puts stock on the shelves: it writes the inflow movements and the count follows.',
+  'A draft changes nothing until it is sent, so an order can be corrected before a supplier sees it.',
+]);
+
+screen('WF-28', '/staff?tab=suppliers', 'Staff — suppliers', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'btn', t: 'Add supplier', kind: 'primary' },
+  { k: 'rows', head: ['Name', 'Contact', 'District', 'Products'], items: [
+    ['Bukalasi Farm', '0772…', 'Kapsheba', '3'],
+    ['Mukono Farm', '0704…', 'Mukono', '5'],
+    ['Bungokho Farm', '—', 'Mbale', '1'],
+  ] },
+], [
+  'A supplier is linked to the products they grow, which is the "from this farm" line on a customer card.',
+]);
+
+screen('WF-29', '/staff?tab=promotions', 'Staff — promotions', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'btn', t: 'New code', kind: 'primary' },
+  { k: 'rows', head: ['Code', 'Kind', 'Value', 'Window', 'Used'], items: [
+    ['SCHOOL10', 'percent', '10%', '1–31 Oct', '14'],
+    ['FRESH500', 'amount', 'UGX 500', 'ongoing', '3'],
+  ] },
+], [
+  'A code that has expired is listed, not deleted, so past orders still explain their totals.',
+]);
+
+screen('WF-30', '/staff?tab=analytics', 'Staff — analytics', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'chips', items: ['7 days', '30 days', '90 days'], active: 1 },
+  { k: 'stats', items: [['UGX 1.24m', 'revenue, 30 days'], ['41', 'orders'], ['UGX 41.3k', 'average order'], ['9', 'products sold']] },
+  { k: 'bars' },
+  { k: 'rows', head: ['Product', 'Units', 'Revenue'], items: [['Bananas', '88', 'UGX 132,000'], ['Garlic clove', '64', 'UGX 225,536']] },
+], [
+  'Everything on this screen is derived from orders that actually happened; there is no separate figure to keep in sync.',
+]);
+
+screen('WF-31', '/staff?tab=activity', 'Staff — activity log', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'rows', head: ['When', 'Who', 'Action', 'Thing'], items: [
+    ['21/10 16:40', 'dev@mukenge', 'order.status', 'GRC-F4BDDEA050'],
+    ['21/10 14:20', 'dev@mukenge', 'payment.cash', 'GRC-F4BDDEA050'],
+    ['21/10 13:55', 'dev@mukenge', 'product.price', 'garlic-clove'],
+  ] },
+], [
+  'Append only. When a price or a count is disputed, this is where the answer is.',
+]);
+
+screen('WF-32', '/staff?tab=customers', 'Staff — customers', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'search', ph: 'Name, phone or email' },
+  { k: 'rows', head: ['Name', 'Phone', 'Email', 'Region', 'Orders'], items: [
+    ['Sarah Namukasa', '0772 000001', 'sarah@stfranciss', 'Central', '3'],
+    ['Dev Customer', '0772 000001', 'dev@example', 'Central', '9'],
+    ['maka', '0777 773673', 'maka@gmail', 'Western', '0'],
+  ] },
+], [
+  'A customer is deactivated, never deleted: their orders and the stock they took have to stay explainable.',
+]);
+
+screen('WF-33', '/staff?tab=admin', 'Staff — staff accounts', [
+  { k: 'top', brand: 'Staff · Dev Admin (Owner)', right: 'none', tabs: ['Orders', 'Catalogue', 'Inventory', 'Purchase orders', 'Suppliers'] },
+  { k: 'btn', t: 'Create account', kind: 'primary' },
+  { k: 'rows', head: ['Email', 'Name', 'Role', ''], items: [
+    ['dev@mukenge.co.ug', 'Dev Admin', 'owner', '—'],
+    ['clerk@mukenge.co.ug', 'Clerk', 'staff', 'change role'],
+  ] },
+  { k: 'banner', t: 'Roles decide the tabs a person sees: staff take orders, managers also edit stock and prices, owners see everything including this screen.' },
+], [
+  'Only an owner reaches this screen.',
+  'A password is set by the person who holds the account; an owner creating an account sets the first one here.',
+]);
+
+/* ------------------------------------------------------------------ *
+ * renderer
+ * ------------------------------------------------------------------ */
+function block(b) {
+  switch (b.k) {
+    case 'top':
+      return `<div class="top">
+        <div class="toprow">
+          <div class="ico">☰</div>
+          <div class="brand">${b.brand || 'Mu Katale'}</div>
+          ${b.right === 'basket' ? '<div class="ico">🧺</div>' : '<div class="ico" style="visibility:hidden">·</div>'}
+        </div>
+        ${b.back ? '<div class="meta">‹ Back</div>' : ''}
+        ${b.tabs ? `<div class="tabs">${b.tabs.map((t, i) => `<span class="tab${i === 0 ? ' on' : ''}">${t}</span>`).join('')}</div>` : ''}
+      </div>`;
+    case 'toprow-plain':
+      return `<div class="top"><div class="toprow"><div class="ico">☰</div><div class="brand">Mu Katale</div><div class="ico">🧺</div></div></div>`;
+    case 'title': return `<h3 class="title">${b.t}</h3>`;
+    case 'lead': return `<p class="lead">${b.t}</p>`;
+    case 'text': return `<div>${lines(3)}</div><p class="lead">${b.t}</p>`;
+    case 'meta': return `<div class="meta">${b.t}</div>`;
+    case 'price': return `<div class="price">${b.t}</div>`;
+    case 'farm': return `<div class="meta">${b.t}</div>`;
+    case 'pill': return `<div><span class="pill">${b.t}</span></div>`;
+    case 'steps': return `<div class="steps">${b.labels.map((l, i) =>
+      `<i class="${i <= b.active ? 'on' : ''}">${i + 1}</i><u>${l}</u>`).join('<span style="flex:1;height:1px;background:var(--line)"></span>')}</div>`;
+    case 'chips': return `<div class="chips">${b.items.map((t, i) => `<span class="chip${i === b.active ? ' on' : ''}">${t}</span>`).join('')}</div>`;
+    case 'tabs': return `<div class="tabs">${b.items.map((t, i) => `<span class="tab${i === b.active ? ' on' : ''}">${t}</span>`).join('')}</div>`;
+    case 'search': return `<div class="search">⌕ ${b.ph}</div>`;
+    case 'img': return `<div class="card" style="padding:0;border:none"><div class="thumb" style="width:100%;height:${b.h}px"></div></div>`;
+    case 'card': return `<div class="card">
+        <div class="thumb"></div>
+        <div class="body">
+          <h4>${b.name}</h4>
+          <div class="price">${b.price}</div>
+          ${b.farm ? `<div class="meta">${b.farm} ›</div>` : ''}
+          ${b.stock ? `<span class="pill">${b.stock}</span>` : ''}
+          ${b.desc ? lines(b.desc) : ''}
+          ${b.more ? '<div class="meta">More ⌄</div>' : ''}
+        </div>
+        ${b.more ? '<div class="plus">⊕</div>' : ''}
+      </div>`;
+    case 'field': return `<div class="field">
+        <label>${b.label}</label>
+        <div class="in${b.off ? ' off' : ''}${b.empty ? ' empty' : ''}">${b.value || ''}${b.caret ? '<span>⌄</span>' : ''}</div>
+        ${b.hint ? `<div class="hint">${b.hint}</div>` : ''}
+      </div>`;
+    case 'radios': return `<div class="radios">${b.items.map((r) =>
+      `<div class="radio${r.on ? ' on' : ''}"><div><b>${r.t}</b><small>${r.s || ''}</small></div><div class="dot"></div></div>`).join('')}</div>`;
+    case 'cards3': return `<div class="cards3">${b.items.map((c) =>
+      `<div class="radio${c.on ? ' on' : ''}" style="display:block"><b style="font-size:12.5px">${c.t}</b><small>${c.s}</small></div>`).join('')}</div>`;
+    case 'qty': return `<div class="toprow" style="gap:8px">
+        <div class="ico">−</div><div class="pill">3</div><div class="ico">＋</div>
+        <div style="flex:1"></div><div class="price">UGX 4,500</div></div>`;
+    case 'btn': return `<div class="btn ${b.kind === 'ghost' ? 'ghost' : b.kind === 'off' ? 'off' : b.kind === 'danger' ? 'danger' : ''}">${b.t}<span>→</span></div>`;
+    case 'foot': return `<div class="foot"><div class="btn ${b.kind === 'off' ? 'off' : ''}">${b.t}<span>→</span></div></div>`;
+    case 'kv': return `<div class="kv">${b.items.map(([k, v, strong]) =>
+      `<div${strong ? ' class="total"' : ''}><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
+    case 'rows': return `<table class="grid"><thead><tr>${b.head.map((h, i) =>
+      `<th class="${i ? 'r' : ''}">${h}</th>`).join('')}</tr></thead><tbody>${b.items.map((row) =>
+      `<tr>${row.map((c, i) => `<td class="${i ? 'r' : ''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    case 'timeline': return `<div class="tl">${b.items.map((s) =>
+      `<div class="${s.now ? 'now' : ''}"><i></i><div>${s.t}${s.s ? `<small>${s.s}</small>` : ''}</div></div>`).join('')}</div>`;
+    case 'stats': return `<div class="stats">${b.items.map(([v, l]) =>
+      `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('')}</div>`;
+    case 'bars': return `<div class="stat" style="display:flex;align-items:flex-end;gap:4px;height:120px">${
+      Array.from({ length: 14 }, (_, i) => `<div style="flex:1;background:#d8d8d8;height:${20 + ((i * 37) % 70)}%"></div>`).join('')}</div>`;
+    case 'map': return `<div class="map">${b.t}</div>`;
+    case 'toast': return `<div class="toast">${b.t}</div>`;
+    case 'empty': return `<div class="empty"><b>${b.t}</b>${b.sub}</div>`;
+    case 'switch': return `<div class="switch${b.on ? ' on' : ''}">${b.t}<i></i></div>`;
+    case 'banner': return `<div class="banner">${b.t}</div>`;
+    case 'drawer': return `<div style="position:relative;height:100%">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,.18)"></div>
+        <div style="position:absolute;left:0;top:0;bottom:0;width:72%;background:#e2e2e2;padding:18px 16px">
+          <div class="ico" style="border-color:#9a9a9a">✕</div>
+          <div style="display:flex;flex-direction:column;gap:16px;margin-top:26px;font-size:20px;color:#222">
+            ${b.items.map((t) => `<div>${t}</div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    default: return `<div class="banner">unhandled block: ${b.k}</div>`;
+  }
+}
+
+document.getElementById('sheet').innerHTML = frames.map((f) => `
+  <section class="frame">
+    <h2><em>${f.id} · ${f.title}</em><span>${f.route}</span></h2>
+    <div class="canvas">${f.blocks.some((b) => b.k === 'drawer') ? f.blocks.map(block).join('') : `
+      ${f.blocks.filter((b) => ['top', 'toprow-plain'].includes(b.k)).map(block).join('')}
+      <div class="scroll">${f.blocks.filter((b) => !['top', 'toprow-plain', 'foot'].includes(b.k)).map(block).join('')}</div>
+      ${f.blocks.filter((b) => b.k === 'foot').map(block).join('')}`}</div>
+    <ul class="notes">${f.notes.map((n) => `<li>${n}</li>`).join('')}</ul>
+  </section>`).join('');
+</script>
+</body>
+</html>
