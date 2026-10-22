@@ -1,0 +1,75 @@
+# Render Blueprint for the Mu Katale API: one web service and one Postgres
+# database. Push this branch, then create the Blueprint from the Render
+# dashboard ("New+" > Blueprint) pointing at this repo — Render reads this file
+# and creates both resources.
+#
+# The shop itself is not here. It is a static bundle published by
+# .github/workflows/deploy-pages.yml, so this API answers requests that arrive
+# from another site. That is what WEB_ORIGINS switches on; see
+# api/src/lib/webOrigins.ts and DEPLOYING.md before changing it.
+#
+# Everything below is on the free plan, which carries three limits worth knowing
+# before a demo: the service sleeps after 15 idle minutes and takes about a
+# minute to wake, the filesystem is wiped on every restart, and this database is
+# deleted 30 days after it is created unless it is upgraded.
+
+services:
+  - type: web
+    name: mu-katale-api
+    runtime: node
+    # The repo is a monorepo: the Vite app at the root, the Next.js API here.
+    rootDir: api
+    plan: free
+    # Frankfurt is the closest Render region to Kampala. A service and its
+    # database must use the same region to talk over the private network.
+    region: frankfurt
+    branch: main
+    autoDeployTrigger: commit
+    # Returns 503 while the database is unreachable, so Render waits for real
+    # readiness instead of accepting any port that opens.
+    healthCheckPath: /api/health
+
+    # --include=dev matters: Render sets NODE_ENV=production, which makes npm ci
+    # skip devDependencies, and `next build` type checks with the TypeScript and
+    # @types packages that live there.
+    buildCommand: npm ci --include=dev && npm run build
+    # `next start` binds to the PORT Render assigns. Do not pin a port in the
+    # start command — Render routes to 10000, not 3000.
+    startCommand: npm start
+
+    envVars:
+      # Pinned to the version the Docker build and CI use, so a Render default
+      # change cannot silently move the runtime.
+      - key: NODE_VERSION
+        value: 22.20.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mu-katale-db
+          property: connectionString
+      # Render terminates TLS and forwards through a proxy, so the real client
+      # address arrives in X-Forwarded-For. Without this, rate limiting and the
+      # activity log would record Render's proxy instead of the shopper.
+      - key: TRUST_PROXY
+        value: 'true'
+      # The one switch for cross-site access: CORS for this origin, CSRF
+      # allowance for it, and SameSite=None; Secure on session cookies. Exact
+      # origins only — credentials are shared, so a wildcard is never accepted.
+      # Add the custom domain here if the shop ever moves off github.io.
+      - key: WEB_ORIGINS
+        value: https://rwangoga.github.io
+      # Uploaded product images. The free filesystem does not survive a
+      # restart, which is acceptable today because the SPA only ever renders
+      # bundled images from src/assets and never reads /api/assets. Attach a
+      # persistent disk (paid) before relying on admin uploads.
+      - key: UPLOAD_DIR
+        value: /tmp/mu-katale-uploads
+      # Verified by the webhook route's HMAC check. No gateway posts to it yet,
+      # so a generated value only has to be stable across restarts.
+      - key: PAYMENT_WEBHOOK_SECRET
+        generateValue: true
+
+databases:
+  - name: mu-katale-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: '16'

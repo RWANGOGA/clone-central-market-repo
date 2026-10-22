@@ -31,6 +31,15 @@ npm run db:push  --prefix api
 npm run db:seed  --prefix api
 ```
 
+## Deploying it
+
+The shop is a static bundle and the API is a server, so they host separately:
+GitHub Pages publishes the shop from `main` via
+`.github/workflows/deploy-pages.yml`, and Render runs the API and its Postgres
+from `render.yaml`. `DEPLOYING.md` covers the order to do it in, the two
+variables that tie the halves together, and the free-plan limits that matter
+during a demo.
+
 ## Coverage map
 
 The app has an interactive map of Uganda at **Menu > Coverage map**. It draws
