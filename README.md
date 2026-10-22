@@ -10,9 +10,22 @@ https://www.figma.com/design/S1StqUnUeGL37S13E8w1HT/Interactive-Grocery-Mobile-A
 ## Running it
 
 ```bash
-npm i                    # frontend dependencies
-npm i --prefix api       # API dependencies
-npm run dev              # starts BOTH: the API on :3000 and the app on :5173
+docker start mk-postgres   # the development database, if it is not running
+npm i                      # frontend dependencies
+npm i --prefix api         # API dependencies
+npm run dev                # starts BOTH: the app on :3000 and the API on :3001
+```
+
+Open http://localhost:3000. The app calls `/api` on its own port and Vite
+forwards it to the API on `:3001`, so there is no CORS to configure locally.
+
+On a machine that has never run this project, create the database container
+first. It publishes 55432 to the host, which is where `DATABASE_URL` in
+`api/.env.local` points:
+
+```bash
+docker run -d --name mk-postgres -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=mu_katale -p 55432:5432 postgres:16-alpine
 ```
 
 `npm run dev` runs the two servers together, labels which is which, and stops
@@ -24,12 +37,23 @@ request then fails, and Vite's proxy answers `500` because nothing is listening
 on the target port. A console full of 500s with no other symptom almost always
 means the API is not running.
 
-Before the first run, create the database and an admin account:
+## First run only: schema and data
+
+Next.js reads `api/.env.local` by itself. The database scripts do not, so source
+it before them — `drizzle-kit` and `tsx` otherwise report a missing connection
+rather than a missing variable:
 
 ```bash
-npm run db:push  --prefix api
-npm run db:seed  --prefix api
+set -a; . api/.env.local; set +a
+npm run db:push  --prefix api   # create the tables
+npm run db:seed  --prefix api   # catalogue, geography, stock, staff login
 ```
+
+A database that already exists needs neither command. `db:push` on a populated
+schema can offer to truncate a table over a unique constraint that is in fact
+already there; answer no and check with `psql` before letting it drop data the
+app validates addresses against. The seed chain includes the staff account,
+which comes from `ADMIN_EMAIL`, `ADMIN_PASSWORD` and `ADMIN_NAME`.
 
 ## Deploying it
 

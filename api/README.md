@@ -22,8 +22,16 @@ from here, and deleting this folder does not affect the frontend build.
 npm install --prefix api   # once
 npm run db:push   --prefix api   # create tables
 npm run db:seed   --prefix api   # load the 9 products
-npm run dev       --prefix api   # http://localhost:3000
+npm run dev       --prefix api   # http://localhost:3001
 ```
+
+`npm run dev` serves the API on `:3001`; the Vite app on `:3000` proxies `/api`
+to it. A production build started with `npm run start` takes `PORT`, or `3000`
+when none is set.
+
+The two `db:` scripts read `DATABASE_URL` from the environment, not from
+`.env.local` — Next.js loads that file for the server, `drizzle-kit` and `tsx`
+do not. So source it first: `set -a; . api/.env.local; set +a`.
 
 Other scripts:
 
@@ -34,11 +42,13 @@ npm run build        --prefix api   # production build
 npm run start        --prefix api   # serve the production build
 ```
 
-The database file is `api/local.db` (gitignored).
+There is no database file. Development uses the PostgreSQL container
+`mk-postgres`, published on host port 55432, which is what `DATABASE_URL` in
+`api/.env.local` points at. The root `README.md` has the container command.
 
 ## Endpoints
 
-Base URL `http://localhost:3000`.
+Base URL `http://localhost:3001` under `npm run dev`.
 
 | Method | Path | Notes |
 | --- | --- | --- |
@@ -63,7 +73,7 @@ failed validation.
 ## Worked example
 
 ```bash
-API=http://localhost:3000
+API=http://localhost:3001
 
 # Catalogue
 curl -s "$API/api/products" | jq '.meta'
@@ -140,10 +150,11 @@ keeps names, prices and images identical to the product list. It also means the
 frontend and the seed must agree on product ids and price labels, which the two
 currently do.
 
-The Vite dev server proxies `/api` to `http://localhost:3000` (see
+The Vite dev server proxies `/api` to `http://localhost:3001` (see
 `vite.config.ts`), so the browser sees a single origin and there is no CORS to
-configure in development. In production on separate domains, add CORS headers
-to the route handlers instead.
+configure in development. A split deployment — the shop on GitHub Pages, this
+API on Render — is handled in one place, `api/src/lib/webOrigins.ts`, driven by
+the `WEB_ORIGINS` variable; `DEPLOYING.md` walks through it.
 
 Orders are not wired up yet: `POST /api/orders` still needs a `customerId`, and
 the checkout form is not yet creating a customer. A completed purchase empties
@@ -405,24 +416,13 @@ the imagery instead of duplicating it into the API.
 filenames; `toProductDto` in `api/src/lib/http.ts` maps them to `/api/assets/...`
 at the edge of the API, so the storage detail never leaks into the client.
 
-## Wiring the frontend to this API
+## The frontend and this API
 
-Not done, deliberately — the frontend still runs entirely on hardcoded data in
-`src/app/App.tsx` and nothing calls the API yet.
+Wired up. Every screen reads this API through `src/app/lib/apiBase.ts`, whose
+`apiUrl()` returns the path unchanged when `VITE_API_BASE` is not set — so
+development still runs on one origin through Vite's proxy, and only a deployment
+on two hosts needs the variable. `DEPLOYING.md` covers that case.
 
-Two changes make it work, neither of which touches the API:
-
-1. **Proxy in dev.** Add to the root `vite.config.ts`:
-   ```js
-   server: { proxy: { '/api': 'http://localhost:3000' } }
-   ```
-   The frontend then calls `/api/products` on its own origin, so there is no
-   CORS to configure in development. In production on separate domains, add
-   CORS headers to the route handlers instead.
-
-2. **Replace the inline catalogue.** `src/app/App.tsx:28-137` holds 9 hardcoded
-   products with `figma:asset/` image imports. Replace that array with a fetch
-   against `/api/products`, whose `images[]` already comes back as usable URLs.
-
-If you ever re-export from Figma Make it will overwrite `src/app/`, so keep any
-API integration outside that directory.
+The product catalogue used to be a hardcoded array in `src/app/App.tsx`. A
+re-export from Figma Make overwrites `src/app/`, so treat that directory as
+generated and keep API work in `src/app/lib/`.
