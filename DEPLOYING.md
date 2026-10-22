@@ -50,7 +50,12 @@ Both strings contain the password, which is why neither is committed.
 once at Blueprint creation and keeps it in the dashboard.
 
 Whatever Postgres major version Neon offers is fine — nothing in the schema
-depends on a version, and local development runs 16.
+depends on a version, and local development runs 16. (Measured: Neon at Postgres
+18.6, development at 16, and `db:push` produced the same 29 tables on both.)
+
+Neon now hands out connection strings ending `?sslmode=require&channel_binding=require`.
+Paste them as they come. Both the direct and the pooled endpoint were connected
+from a laptop with the app's own `pg` 8.23 driver and those parameters untouched.
 
 ## 2. API on Render
 
@@ -101,6 +106,15 @@ delete it and create the Blueprint once, so the file stays the source of truth.
 Keeping Docker is also workable if you prefer it: set *Dockerfile Path* to
 `Dockerfile.api` and leave the build context at the repo root. Render then ignores
 `buildCommand` and `startCommand` entirely and runs the image's own entrypoint.
+
+And if the log instead names `Dockerfile.api` — `open Dockerfile.api: no such file
+or directory`, again after a 2-byte transfer — the path is set correctly but the
+service also has a **Root Directory** of `api`. Render resolves *Dockerfile Path*
+relative to the root directory, so it looked for `api/Dockerfile.api`. There is no
+way to make that work: `Dockerfile.api` copies `api/src`, `api/data` and so on, so
+its build context has to be the repository root. Clear the root directory for a
+Docker service, or go back to the Node runtime, where `api` is the correct value
+because the build and start commands simply run inside it.
 
 If a deploy fails during the build with a JSON list of missing keys, that is
 `api/src/lib/env.ts` doing its job: `next build` imports every route to collect
@@ -193,6 +207,14 @@ the basket. The basket surviving a reload is the real test.
 
 ## What will bite you
 
+- **Two `DATABASE_URL` lines in one env file are not an error, they are a coin
+  flip.** Next.js and the shell both keep the *last* assignment, so leaving the
+  old local line above a new hosted one means the local database quietly stops
+  being used — and a restarted dev server appears to change its mind about which
+  data it is showing. Keep exactly one `DATABASE_URL` per file. Neon's console
+  block also hands out `DATABASE_URL_POOLED` and `NEON_AI_GATEWAY_*` keys, which
+  nothing in this application reads: paste the endpoint you want into
+  `DATABASE_URL` and drop the rest.
 - **The free API sleeps.** Fifteen minutes without traffic spins it down and the
   next request waits about a minute while it wakes. Tell your audience before
   they tap "sign in". Do not add an uptime pinger to avoid this: a free
