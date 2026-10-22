@@ -9,6 +9,15 @@ where it is cheapest to run.
 | API (Next.js routes) | Render web service | `render.yaml` |
 | Database | Neon (serverless Postgres) | created in the Neon dashboard, connected by `DATABASE_URL` |
 
+What is live today: the shop at
+`https://rwangoga.github.io/clone-central-market-repo/`, the API at
+`https://clone-central-market-repo-1.onrender.com`, and the data in `neondb` in
+`aws-us-east-2`. Note that Render fixes a service's `*.onrender.com` URL when the
+service is **created** and never changes it afterwards — renaming the service in
+the dashboard leaves the URL alone, so a service called `mu-katale-api` can be
+reachable at `clone-central-market-repo-1.onrender.com`. The URL, not the name,
+is what has to go into `API_BASE_URL` and `WEB_ORIGINS`.
+
 Neon rather than Render's own free Postgres because Render's free database is
 **deleted 30 days after it is created** (unreachable at 30 days, gone at 44)
 while Neon's is not — it has no expiry, it just suspends its compute when idle.
@@ -179,7 +188,7 @@ deep link such as `/checkout` survives a refresh on Pages.
 Run these against the deployed API. Replace both URLs with your own.
 
 ```bash
-API=https://mu-katale-api.onrender.com
+API=https://clone-central-market-repo-1.onrender.com
 PAGES=https://rwangoga.github.io
 
 # 1. A GET from the shop must come back with the shop's origin and credentials.
