@@ -1,17 +1,18 @@
-# Render Blueprint for the Mu Katale API: one web service and one Postgres
-# database. Push this branch, then create the Blueprint from the Render
-# dashboard ("New+" > Blueprint) pointing at this repo — Render reads this file
-# and creates both resources.
+# Render Blueprint for the Mu Katale API: one web service. The database is not
+# here — it runs on Neon and this file only says where its connection string
+# comes from. Push this branch, then create the Blueprint from the Render
+# dashboard ("New+" > Blueprint) pointing at this repo.
 #
-# The shop itself is not here. It is a static bundle published by
+# The shop itself is not here either. It is a static bundle published by
 # .github/workflows/deploy-pages.yml, so this API answers requests that arrive
 # from another site. That is what WEB_ORIGINS switches on; see
 # api/src/lib/webOrigins.ts and DEPLOYING.md before changing it.
 #
-# Everything below is on the free plan, which carries three limits worth knowing
-# before a demo: the service sleeps after 15 idle minutes and takes about a
-# minute to wake, the filesystem is wiped on every restart, and this database is
-# deleted 30 days after it is created unless it is upgraded.
+# Everything below is on free plans, which carry limits worth knowing before a
+# demo: the service sleeps after 15 idle minutes and takes about a minute to
+# wake, its filesystem is wiped on every restart, and Neon suspends its compute
+# after 5 idle minutes with 1 GB of storage and 100 compute hours a month. None
+# of them delete your data when you run out — they just stop answering.
 
 services:
   - type: web
@@ -20,11 +21,23 @@ services:
     # The repo is a monorepo: the Vite app at the root, the Next.js API here.
     rootDir: api
     plan: free
-    # Frankfurt is the closest Render region to Kampala. A service and its
-    # database must use the same region to talk over the private network.
-    region: frankfurt
+    # The free Render regions are Singapore, Ohio and Oregon, so this is the
+    # pairing that matters: every request queries the database, and the hop that
+    # costs is Render -> Neon, not shopper -> Render. Neon's aws-us-east-2 is in
+    # the same state as Render's Ohio region, and Ohio is still the shortest of
+    # the three from Kampala (~180ms). If the plan is ever upgraded, move the
+    # service to Frankfurt and the database to Neon's eu-central-1 together —
+    # one without the other just moves the latency somewhere else.
+    region: ohio
     branch: main
     autoDeployTrigger: commit
+    # Monorepo filter: a commit that only touches the shop or the docs would
+    # otherwise build and restart a service nobody asked to redeploy. This file
+    # is in the list because it can change how the service runs.
+    buildFilter:
+      paths:
+        - api/**
+        - render.yaml
     # Returns 503 while the database is unreachable, so Render waits for real
     # readiness instead of accepting any port that opens.
     healthCheckPath: /api/health
@@ -42,10 +55,18 @@ services:
       # change cannot silently move the runtime.
       - key: NODE_VERSION
         value: 22.20.0
+      # Paste Neon's POOLED connection string here when the Blueprint asks
+      # (Dashboard > Project > Connection details, the host ending
+      # "-pooler.us-east-2.aws.neon.tech"). Keep the ?sslmode=require suffix:
+      # node-postgres reads it and turns TLS on. The pooled host is the one that
+      # survives a sleeping compute; the direct host is for psql and the SQL
+      # editor.
+      #
+      # sync: false means Render asks once and never overwrites it, so the
+      # secret stays in the dashboard and out of this repository. Changing the
+      # database later means editing it in the service's Environment tab.
       - key: DATABASE_URL
-        fromDatabase:
-          name: mu-katale-db
-          property: connectionString
+        sync: false
       # Render terminates TLS and forwards through a proxy, so the real client
       # address arrives in X-Forwarded-For. Without this, rate limiting and the
       # activity log would record Render's proxy instead of the shopper.
@@ -67,9 +88,3 @@ services:
       # so a generated value only has to be stable across restarts.
       - key: PAYMENT_WEBHOOK_SECRET
         generateValue: true
-
-databases:
-  - name: mu-katale-db
-    plan: free
-    region: frankfurt
-    postgresMajorVersion: '16'

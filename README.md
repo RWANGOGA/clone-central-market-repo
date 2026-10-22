@@ -59,9 +59,9 @@ which comes from `ADMIN_EMAIL`, `ADMIN_PASSWORD` and `ADMIN_NAME`.
 
 The shop is a static bundle and the API is a server, so they host separately:
 GitHub Pages publishes the shop from `main` via
-`.github/workflows/deploy-pages.yml`, and Render runs the API and its Postgres
-from `render.yaml`. `DEPLOYING.md` covers the order to do it in, the two
-variables that tie the halves together, and the free-plan limits that matter
+`.github/workflows/deploy-pages.yml`, Render runs the API from `render.yaml`, and
+the Postgres data lives on Neon. `DEPLOYING.md` covers the order to do it in, the
+two variables that tie the halves together, and the free-plan limits that matter
 during a demo.
 
 ## Coverage map

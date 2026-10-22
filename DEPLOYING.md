@@ -1,13 +1,17 @@
 # Deploying Mu Katale
 
-Two hosts, because the app splits cleanly in two: a static bundle and a server
-that talks to Postgres.
+The app splits into a static bundle, a server and a database, and each one goes
+where it is cheapest to run.
 
 | Piece | Where | Published by |
 | --- | --- | --- |
 | Shop (Vite SPA) | GitHub Pages | `.github/workflows/deploy-pages.yml` |
 | API (Next.js routes) | Render web service | `render.yaml` |
-| Database | Render Postgres | `render.yaml` |
+| Database | Neon (serverless Postgres) | created in the Neon dashboard, connected by `DATABASE_URL` |
+
+Neon rather than Render's own free Postgres because Render's free database is
+**deleted 30 days after it is created** (unreachable at 30 days, gone at 44)
+while Neon's is not — it has no expiry, it just suspends its compute when idle.
 
 The Pages site is served from one origin and the API from another, so a session
 cookie is a third-party cookie. That is the whole complication in this document,
@@ -27,14 +31,39 @@ host, no path, no trailing slash.
 Vite inlines `API_BASE_URL` at build time, so changing it means rebuilding the
 frontend, not just redeploying. `WEB_ORIGINS` is read at request time.
 
-## 1. API on Render
+## 1. Database on Neon
+
+1. neon.com → sign in with GitHub → **New project**, named `mu-katale`.
+2. Pick region **AWS US East (Ohio) — `aws-us-east-2`**. A project's region never
+   changes afterwards, and it is the same state Render's Ohio region is in: the
+   hop every request takes is API to database, not shopper to API. Neon charges
+   nothing extra for it and it is one of their fully featured regions.
+3. Copy the connection string with **Pooled connection** selected, so the host
+   ends `-pooler.us-east-2.aws.neon.tech`. That is the value `DATABASE_URL` gets
+   in step 2; it survives Neon's sleep and connection churn.
+4. Copy it a second time with Pooled connection **off** (host without
+   `-pooler`). That one is for loading the schema from your laptop in step 3,
+   where drizzle-kit wants a real session rather than PgBouncer's shared one.
+
+Both strings contain the password, which is why neither is committed.
+`render.yaml` declares `DATABASE_URL` with `sync: false`, so Render asks for it
+once at Blueprint creation and keeps it in the dashboard.
+
+Whatever Postgres major version Neon offers is fine — nothing in the schema
+depends on a version, and local development runs 16.
+
+## 2. API on Render
 
 1. Push this branch to GitHub.
 2. Render dashboard → **New+** → **Blueprint** → select the repo. Render reads
-   `render.yaml` and offers to create `mu-katale-api` plus `mu-katale-db`.
+   `render.yaml`, offers to create `mu-katale-api` and prompts for the one value
+   it will not keep in the repository: paste Neon's pooled connection string as
+   `DATABASE_URL`.
 3. Wait for the first deploy, then open `https://<service>.onrender.com/api/health`.
-   `{"status":"ok"}` means the service and the database are both reachable;
-   a `503` means it cannot connect to Postgres.
+   `{"status":"ok"}` means the service reached Neon. A `503` means it did not,
+   and it is nearly always one of three things: the `?sslmode=require` suffix was
+   trimmed (Neon refuses plaintext), the direct host was pasted instead of the
+   pooled one, or the password was reset in Neon after the deploy.
 4. Note the service's URL — it is `API_BASE_URL` in the table above. The
    generated name comes from `name` in `render.yaml`, so rename it there if you
    want a tidier one before the first deploy.
@@ -50,16 +79,15 @@ variable is missing from the service, not that the code is broken — CI gets aw
 with fake values for the same reason (`.github/workflows/ci.yml`), and no
 database connection is opened while building.
 
-## 2. Load the database once
+## 3. Load the schema and data once
 
 Render's free plan has no shell access and no one-off jobs, and a pre-deploy
-command is a paid feature, so schema and seed data are applied from your machine
-against the hosted database. Copy the **External connection string** from the
-Render database page (the internal one is only reachable inside Render).
+command is a paid feature, so schema and seed data are applied from your machine.
+Use Neon's **direct** connection string here, not the pooled one.
 
 ```bash
 cd api
-DB='postgresql://user:password@dpg-xxxx-a.frankfurt.render.com:5432/dbname'
+DB='postgresql://user:password@ep-name.us-east-2.aws.neon.tech/neondb?sslmode=require'
 
 ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='at-least-10-characters' \
 ADMIN_NAME='Your Name' DATABASE_URL="$DB" npm run db:push && \
@@ -76,7 +104,10 @@ environment, not from `api/.env.local`, which is why it is passed inline.
 Demo orders come from `npm run db:backfill:orders` with the same inline
 `DATABASE_URL`, when you want the staff area to have something to process.
 
-## 3. Shop on GitHub Pages
+Neon also gives you a browser SQL Editor, which is the quickest way to confirm a
+row landed.
+
+## 4. Shop on GitHub Pages
 
 1. GitHub → Settings → **Pages** → Build and deployment → Source: **GitHub
    Actions**. Leaving it on "Deploy from a branch" makes the deploy job fail.
@@ -90,7 +121,7 @@ The workflow passes the Pages base path (`/<repository>/`) to Vite as
 the router's basename. It also copies `index.html` to `404.html`, which is how a
 deep link such as `/checkout` survives a refresh on Pages.
 
-## 4. Prove the cross-origin contract
+## 5. Prove the cross-origin contract
 
 Run these against the deployed API. Replace both URLs with your own.
 
@@ -132,10 +163,20 @@ the basket. The basket surviving a reload is the real test.
   workspace gets 750 instance hours a month and one always-on service consumes
   nearly all of them, which suspends every free service in the workspace until
   the next month.
-- **The free database expires 30 days after it is created.** It becomes
-  unreachable, and Render deletes it 14 days later unless you upgrade it. For a
-  demo after that window you either upgrade the plan or create a new database
-  and repeat step 2.
+- **Neon sleeps after 5 idle minutes and the API after 15.** A cold request pays
+  both: about a minute for Render to wake, then a second or two while Neon's
+  compute starts. This is the price of not being deleted in a month.
+- **The free Neon plan is 1 GB of storage, 100 compute hours and 5 GB of public
+  network transfer per project per month.** Running out of compute hours or
+  transfer suspends the compute until the next billing period or an upgrade;
+  running out of storage makes inserts and updates fail. Neither deletes
+  anything. The catalogue and geography in this app are a few tens of megabytes,
+  so the realistic risk is compute hours, which traffic burns one request at a
+  time — keep the free Render service asleep between demos rather than pinging
+  it.
+- **Resetting the Neon password breaks the deployed API** until `DATABASE_URL` is
+  updated in the service's Environment tab and it is redeployed. The same goes
+  for a branch deletion: the pooled URL points at one branch.
 - **The API's filesystem is wiped** on every redeploy, restart and spin-down.
   Admin-uploaded product images live in `UPLOAD_DIR` and are lost. Nothing breaks
   today because the shop renders bundled images from `src/assets` and never asks
@@ -156,5 +197,5 @@ the basket. The basket surviving a reload is the real test.
 - **The Docker stack is the same-origin path.** `docker compose up` puts nginx in
   front of both, so leave `WEB_ORIGINS` unset there. Its entrypoint runs
   `drizzle-kit migrate` and there are no committed migrations in `api/drizzle`,
-  so the schema arrives by `npm run db:push`, as in step 2 — a fresh stack boots
+  so the schema arrives by `npm run db:push`, as in step 3 — a fresh stack boots
   against an empty database until that has been run.
