@@ -43,6 +43,13 @@ frontend, not just redeploying. `WEB_ORIGINS` is read at request time.
 posts to the webhook route yet, so its only job is to make a missing secret a
 boot failure rather than a silent default.
 
+If a deploy fails during the build with a JSON list of missing keys, that is
+`api/src/lib/env.ts` doing its job: `next build` imports every route to collect
+page data, and the environment is validated as those modules load. It means a
+variable is missing from the service, not that the code is broken — CI gets away
+with fake values for the same reason (`.github/workflows/ci.yml`), and no
+database connection is opened while building.
+
 ## 2. Load the database once
 
 Render's free plan has no shell access and no one-off jobs, and a pre-deploy

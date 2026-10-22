@@ -48,6 +48,15 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    # `next build` imports every route to collect page data, and lib/env.ts
+    # validates the environment while those modules load, so a build with no
+    # environment fails on missing keys rather than on anything about the code.
+    # Nothing connects to the database during a build, so these values only have
+    # to satisfy the schema. Render and the docker stack supply the real ones.
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      PAYMENT_WEBHOOK_SECRET: ci-only-not-a-real-secret
+      UPLOAD_DIR: ./uploads
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
