@@ -8,6 +8,7 @@ import {
   type Permission,
 } from '@/lib/adminPermissions';
 import { createSessionToken, hashToken, verifyPassword } from '@/lib/password';
+import { cookieAttributes } from '@/lib/webOrigins';
 
 /**
  * Admin authentication.
@@ -168,13 +169,11 @@ export async function pruneSessions(): Promise<void> {
 }
 
 export function sessionCookie(token: string, expiresAt: string): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Expires=${new Date(expiresAt).toUTCString()}${secure}`;
+  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; ${cookieAttributes()}; Expires=${new Date(expiresAt).toUTCString()}`;
 }
 
 export function clearedCookie(): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`;
+  return `${SESSION_COOKIE}=; Path=/; HttpOnly; ${cookieAttributes()}; Max-Age=0`;
 }
 
 export { MAX_ATTEMPTS, ATTEMPT_WINDOW_MINUTES, SESSION_HOURS };

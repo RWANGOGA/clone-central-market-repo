@@ -1,6 +1,7 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 import { hashPassword as hashEncodedPassword, hashToken as hashOpaqueToken, verifyPassword } from '@/lib/password';
+import { cookieAttributes } from '@/lib/webOrigins';
 
 const SESSION_HOURS = 24 * 7;
 const LEGACY_SALT = Buffer.alloc(16);
@@ -102,23 +103,19 @@ export function readCookie(cookieHeader: string | null, name: string): string | 
 }
 
 export function sessionCookie(token: string, expiresAt: string): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `mk_customer_session=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Strict; Expires=${new Date(expiresAt).toUTCString()}${secure}`;
+  return `mk_customer_session=${encodeURIComponent(token)}; Path=/; HttpOnly; ${cookieAttributes()}; Expires=${new Date(expiresAt).toUTCString()}`;
 }
 
 export function clearedCookie(): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `mk_customer_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`;
+  return `mk_customer_session=; Path=/; HttpOnly; ${cookieAttributes()}; Max-Age=0`;
 }
 
 export function cartCookie(token: string): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `mk_cart=${encodeURIComponent(token)}; Path=/api; HttpOnly; SameSite=Strict; Max-Age=${30 * 24 * 60 * 60}${secure}`;
+  return `mk_cart=${encodeURIComponent(token)}; Path=/api; HttpOnly; ${cookieAttributes()}; Max-Age=${30 * 24 * 60 * 60}`;
 }
 
 export function trackingCookie(token: string): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `mk_order_tracking=${encodeURIComponent(token)}; Path=/api/orders; HttpOnly; SameSite=Strict; Max-Age=${30 * 24 * 60 * 60}${secure}`;
+  return `mk_order_tracking=${encodeURIComponent(token)}; Path=/api/orders; HttpOnly; ${cookieAttributes()}; Max-Age=${30 * 24 * 60 * 60}`;
 }
 
 export function getSessionExpiry(): string {
