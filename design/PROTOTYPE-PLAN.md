@@ -154,3 +154,7 @@ A prototype with no acknowledged faults is not a prototype anyone tested.
 5. **A panel that cannot load says nothing useful.** When the staff console's list endpoints were
    returning the wrong shape, six of the nine tabs went blank with no message at all. That is fixed,
    but the lesson stands: the failure state of a table needs as much design as the table.
+6. **The three-step strip names only the step you are on.** Checkout and payment both read
+   `1 Payment 2 3` — the circles for two and three carry numbers and never a word, so a shopper
+   cannot see what is coming before they get there. Task 1 ends on exactly that screen, so expect a
+   participant to ask; the fix is a label under each badge, not a redesign.
