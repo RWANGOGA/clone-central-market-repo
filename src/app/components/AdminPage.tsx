@@ -540,6 +540,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m: string) => void }) {
   const [movements, setMovements] = useState<StockMovementRow[]>([]);
+  const [totals, setTotals] = useState<{ total: number; net: number } | null>(null);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [productId, setProductId] = useState<number | null>(null);
@@ -557,6 +558,7 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
     if (!m) return fail('Could not reach the service.');
     if (!m.ok) return fail(m.error);
     setMovements(m.data.data);
+    setTotals({ total: m.data.meta.total, net: m.data.meta.net });
     if (p && p.ok) setProducts(p.data);
   }, [fail]);
 
@@ -582,6 +584,14 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
   return (
     <div className="space-y-3">
       <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Stock movements</p>
+      {/* The table is the latest window while the ledger holds more, and the net
+          is counted over all of it — so both numbers are named for what they are. */}
+      {!loading && movements.length > 0 && totals && (
+        <p className="text-[12px] text-[#757575]">
+          Latest {movements.length} of {totals.total} movements · the ledger nets{' '}
+          <span className="tabular-nums">{totals.net > 0 ? '+' : ''}{totals.net}</span> units
+        </p>
+      )}
       {loading ? (
         <p className="text-[13px] text-[#757575] py-4 text-center">Loading…</p>
       ) : movements.length === 0 ? (
@@ -590,21 +600,29 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575]">Product</th>
-              <th className="pb-2 text-[#757575]">Reason</th>
-              <th className="pb-2 text-[#757575] text-right">Delta</th>
-              <th className="pb-2 text-[#757575]">Reference</th>
-              <th className="pb-2 text-[#757575]">When</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Product</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Reason</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">Delta</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">When</th>
             </tr>
           </thead>
           <tbody>
             {movements.map((m) => (
-              <tr key={m.id} className="border-b border-neutral-100">
-                <td className="py-2">{m.productName ?? m.productId}</td>
+              <tr key={m.id} className="border-b border-neutral-100 align-top">
+                {/* The order reference sits under the product name instead of in
+                    a column of its own. At phone width a fifth column pushed the
+                    delta and the date apart until the rows collided. */}
+                <td className="py-2 pr-2">
+                  <span className="block">{m.productName ?? m.productId}</span>
+                  {m.reference && (
+                    <span className="block text-[11px] text-[#757575] break-all">{m.reference}</span>
+                  )}
+                </td>
                 <td className="py-2">{m.reason}</td>
-                <td className="py-2 text-right">{m.delta > 0 ? '+' : ''}{m.delta}</td>
-                <td className="py-2">{m.reference ?? '—'}</td>
-                <td className="py-2">{new Date(m.createdAt).toLocaleDateString()}</td>
+                <td className="py-2 text-right tabular-nums">{m.delta > 0 ? '+' : ''}{m.delta}</td>
+                <td className="py-2 text-right text-[12px] text-[#757575] whitespace-nowrap">
+                  {new Date(m.createdAt).toLocaleDateString()}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -688,7 +706,7 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
     setLoading(false);
     if (!po) return fail('Could not reach the service.');
     if (!po.ok) return fail(po.error);
-    setOrders(Array.isArray(po.data.data) ? po.data.data : [po.data.data]);
+    setOrders(po.data.data);
     if (s && s.ok) setSuppliers(s.data.data);
     if (p && p.ok) setProducts(p.data);
   }, [fail, statusFilter]);
@@ -818,25 +836,35 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575]">Reference</th>
-              <th className="pb-2 text-[#757575]">Supplier</th>
-              <th className="pb-2 text-[#757575]">Status</th>
-              <th className="pb-2 text-[#757575] text-right">Expected</th>
-              <th className="pb-2 text-[#757575]">Created</th>
-              <th className="pb-2 text-[#757575] text-right">Actions</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Order</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Status</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">Raised</th>
+              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((o) => (
-              <tr key={o.id} className="border-b border-neutral-100">
-                <td className="py-2">{o.reference}</td>
-                <td className="py-2">
-                  {suppliers.find((s) => s.id === o.supplierId)?.name ?? `Supplier ${o.supplierId}`}
+              <tr key={o.id} className="border-b border-neutral-100 align-top">
+                {/* Supplier and expected arrival are folded under the reference
+                    rather than given columns of their own: six columns at phone
+                    width squeezed the dates until "Expected" and "Created"
+                    printed on top of each other. */}
+                <td className="py-2 pr-2">
+                  <span className="block break-all">{o.reference}</span>
+                  <span className="block text-[11px] text-[#757575]">
+                    {suppliers.find((s) => s.id === o.supplierId)?.name ?? `Supplier ${o.supplierId}`}
+                  </span>
+                  {o.expectedAt && (
+                    <span className="block text-[11px] text-[#757575] tabular-nums">
+                      due {new Date(o.expectedAt).toLocaleDateString()}
+                    </span>
+                  )}
                 </td>
-                <td className="py-2">{o.status}</td>
-                <td className="py-2 text-right">{o.expectedAt ?? '—'}</td>
-                <td className="py-2">{new Date(o.createdAt).toLocaleDateString()}</td>
-                <td className="py-2 text-right">
+                <td className="py-2 pr-2">{o.status}</td>
+                <td className="py-2 text-right text-[12px] text-[#757575] whitespace-nowrap tabular-nums">
+                  {new Date(o.createdAt).toLocaleDateString()}
+                </td>
+                <td className="py-2 text-right whitespace-nowrap">
                   {o.status === 'sent' && (
                     <>
                       <button

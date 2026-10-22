@@ -54,7 +54,8 @@ export type ProductDraft = {
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string; status: number } | null;
 
-async function call<T>(path: string, init?: RequestInit): Promise<Result<T>> {
+/** Sends a request to the staff API and hands back the body untouched. */
+async function request(path: string, init?: RequestInit) {
   try {
     const response = await fetch(`${BASE}${path}`, {
       ...init,
@@ -62,19 +63,43 @@ async function call<T>(path: string, init?: RequestInit): Promise<Result<T>> {
       headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
     });
 
-    if (response.status === 401) return { ok: false, error: 'Session expired.', status: 401 };
+    if (response.status === 401) return { ok: false as const, error: 'Session expired.', status: 401 };
 
     const body = await response.json().catch(() => null);
     if (!response.ok) {
       const error =
         (body as { error?: string } | null)?.error ?? `Request failed (${response.status})`;
-      return { ok: false, error, status: response.status };
+      return { ok: false as const, error, status: response.status };
     }
 
-    return { ok: true, data: (body as { data: T }).data };
+    return { ok: true as const, body };
   } catch {
     return null;
   }
+}
+
+/**
+ * Endpoints that answer `{ data, meta }` where the caller only wants the
+ * payload: unwrap one level here so no component has to reach through it.
+ */
+async function call<T>(path: string, init?: RequestInit): Promise<Result<T>> {
+  const result = await request(path, init);
+  if (!result) return null;
+  if (!result.ok) return result;
+  return { ok: true, data: (result.body as { data: T }).data };
+}
+
+/**
+ * Paged endpoints answer `{ data, meta }` and the component needs the totals as
+ * well as the rows, so the envelope stays whole. Unwrapping these is what made
+ * `result.data.data` undefined and blanked the staff console: the types promised
+ * an envelope while `call` had already stripped it away.
+ */
+async function callEnvelope<T>(path: string, init?: RequestInit): Promise<Result<T>> {
+  const result = await request(path, init);
+  if (!result) return null;
+  if (!result.ok) return result;
+  return { ok: true, data: result.body as T };
 }
 
 export async function signIn(email: string, password: string): Promise<Result<AdminIdentity>> {
@@ -232,7 +257,7 @@ export async function listInventoryMovements(
   if (filters?.limit !== undefined) params.set('limit', String(filters.limit));
   if (filters?.offset !== undefined) params.set('offset', String(filters.offset));
   const qs = params.toString();
-  return call<InventoryMovementsResult>(`/inventory/movements${qs ? `?${qs}` : ''}`);
+  return callEnvelope<InventoryMovementsResult>(`/inventory/movements${qs ? `?${qs}` : ''}`);
 }
 
 export async function adjustInventory(
@@ -246,7 +271,7 @@ export async function adjustInventory(
 }
 
 export async function reconciliation(): Promise<Result<ReconciliationResult>> {
-  return call<ReconciliationResult>('/inventory/reconciliation');
+  return callEnvelope<ReconciliationResult>('/inventory/reconciliation');
 }
 
 /* ---------- Purchase Orders ---------- */
@@ -290,16 +315,18 @@ export type CreatePurchaseOrderInput = {
   items: { productId: number; quantity: number; unitPrice: number }[];
 };
 
+/**
+ * The queue of purchase orders. Asking for one order by id answers with a
+ * different envelope (the order with its lines), so it is not exposed here; no
+ * screen reads a single purchase order.
+ */
 export async function listPurchaseOrders(
-  filters?: { status?: string; id?: number },
-): Promise<Result<PurchaseOrderListResult | { data: PurchaseOrderDetail; items: PurchaseOrderLine[] }>> {
+  filters?: { status?: string },
+): Promise<Result<PurchaseOrderListResult>> {
   const params = new URLSearchParams();
   if (filters?.status) params.set('status', filters.status);
-  if (filters?.id !== undefined) params.set('id', String(filters.id));
   const qs = params.toString();
-  return call<PurchaseOrderListResult | { data: PurchaseOrderDetail; items: PurchaseOrderLine[] }>(
-    `/purchase-orders${qs ? `?${qs}` : ''}`,
-  );
+  return callEnvelope<PurchaseOrderListResult>(`/purchase-orders${qs ? `?${qs}` : ''}`);
 }
 
 export async function createPurchaseOrder(
@@ -351,7 +378,7 @@ export type CreateSupplierInput = {
 };
 
 export async function listSuppliers(): Promise<Result<SupplierListResult>> {
-  return call<SupplierListResult>('/suppliers');
+  return callEnvelope<SupplierListResult>('/suppliers');
 }
 
 export async function createSupplier(input: CreateSupplierInput): Promise<Result<SupplierRow>> {
@@ -559,7 +586,7 @@ export async function listActivityLog(
   if (filters?.limit !== undefined) params.set('limit', String(filters.limit));
   if (filters?.offset !== undefined) params.set('offset', String(filters.offset));
   const qs = params.toString();
-  return call<ActivityLogResult>(`/analytics/activity${qs ? `?${qs}` : ''}`);
+  return callEnvelope<ActivityLogResult>(`/analytics/activity${qs ? `?${qs}` : ''}`);
 }
 
 /* ---------- Customers ---------- */
@@ -589,7 +616,7 @@ export async function listCustomers(
   if (filters?.limit !== undefined) params.set('limit', String(filters.limit));
   if (filters?.offset !== undefined) params.set('offset', String(filters.offset));
   const qs = params.toString();
-  return call<CustomerListResult>(`/customers${qs ? `?${qs}` : ''}`);
+  return callEnvelope<CustomerListResult>(`/customers${qs ? `?${qs}` : ''}`);
 }
 
 export async function deactivateCustomer(id: number | string): Promise<Result<{ id: number; fullName: string; phone: string; active: boolean }>> {
