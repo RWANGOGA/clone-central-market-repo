@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mu Katale — low-fi wireframes (all screens)</title>
+<title>Mu Katale — central market system: low-fi wireframes</title>
 <style>
   /*
     Low-fi on purpose: grey boxes, no brand colour, no photography, real copy
@@ -81,9 +81,7 @@
   .search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; color: #999; font-size: 12px; }
   .card { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; gap: 12px; }
   .card .thumb {
-    width: 84px; height: 84px; flex: none; border: 1px dashed #b5b5b5; background:
-      linear-gradient(to top right, transparent calc(50% - 1px), #d5d5d5, transparent calc(50% + 1px)),
-      linear-gradient(to top left, transparent calc(50% - 1px), #d5d5d5, transparent calc(50% + 1px)), var(--box2);
+    width: 84px; height: 84px; flex: none; border: 1px dashed #b5b5b5; background-color: var(--box2);
     border-radius: 8px;
   }
   .card .body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
@@ -131,8 +129,8 @@
   .tl div.now i { background: #6f6f6f; border-color: #4a4a4a; }
   .tl small { display: block; color: var(--soft); font-size: 11px; }
   .map {
-    height: 260px; border: 1px dashed #b5b5b5; border-radius: 10px; background:
-      repeating-linear-gradient(45deg, #f7f7f7 0 12px, #f0f0f0 12px 24px);
+    height: 260px; border: 1px dashed #b5b5b5; border-radius: 10px; background-color: #f4f4f4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpath d='M0 17L17 0' stroke='%23e6e6e6' stroke-width='6'/%3E%3C/svg%3E");
     display: flex; align-items: center; justify-content: center; color: #8f8f8f; font-size: 12px;
   }
   .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -150,28 +148,70 @@
   .switch.on i { background: #cfcfcf; }
   .switch.on i::after { left: 16px; }
   .banner { border: 1px solid var(--line); background: var(--box2); border-radius: 8px; padding: 9px 11px; font-size: 11.5px; color: #555; }
+
+  .team { margin: 16px 0 24px; max-width: 980px; }
+  .team .cap { font-size: 13px; margin-bottom: 6px; color: var(--ink); }
+  .team table { border-collapse: collapse; width: 100%; background: #fff; font-size: 14px; }
+  .team th, .team td { border: 1px solid #222; padding: 8px 12px; text-align: left; }
+  .team th { background: #eee; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .hmw { margin: 0 0 12px; padding-left: 20px; max-width: 900px; font-size: 14px; line-height: 1.5; }
+  .hmw li { margin-bottom: 3px; }
+  .toolbar { position: sticky; top: 0; z-index: 50; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 32px; background: #222; color: #fff; font-size: 13px; }
+  .toolbar button { font: inherit; padding: 8px 14px; border: 0; border-radius: 6px; background: #fff; color: #111; cursor: pointer; }
+  .toolbar button:disabled { opacity: .5; cursor: wait; }
+  .toolbar .msg { color: #bbb; }
 </style>
 </head>
 <body>
+<div class="toolbar" data-html2canvas-ignore>
+  <button id="dlSheet">Download whole sheet (PNG, full size)</button>
+  <button id="dlZip">Download every screen (ZIP of PNGs)</button>
+  <span class="msg" id="msg">Exports keep the real layout, at 2x sharpness.</span>
+</div>
 <div class="doc">
-  <h1>Mu Katale — low-fi wireframes</h1>
+  <h1>Mu Katale — central market system: low-fi wireframes</h1>
   <p>
-    Every screen of the market, drawn as grey boxes at 393&nbsp;×&nbsp;852 — the size the real
-    app is built for. Nothing here is decoration: the layout, the words on the buttons and the
-    order of the fields are the ones the running system actually uses, so the same sheet works as
-    the low-fi submission and as the map of the hi-fi prototype in <code>design/hifi/</code>.
+    <b>What it is.</b> Mu Katale is an online central market for fresh produce and market commodities in Uganda,
+    together with the back-office system that runs it. Buyers — hotels, schools, restaurants and households — see what is in stock,
+    at what unit price and when it can be delivered, then order, pay by mobile money, wallet or cash on delivery, and follow the
+    order until it arrives. Market administrators and vendors use the staff side of the same system to publish stock, fulfil orders,
+    collect payments, raise purchase orders and read the audit trail.
   </p>
   <p>
-    <b>Flow:</b> each frame lists what is tappable and where it goes underneath itself
-    (<span style="color:#5c5c5c">① tap … → WF-nn</span>). Wire those arrows into Figma's prototype
-    mode and the three tasks in <code>PROTOTYPE-PLAN.md</code> run end to end without writing any code.
+    <b>The problem.</b> Buying market commodities still means physical market visits, phone calls and informal middlemen. Buyers cannot
+    reliably see current availability, unit prices or delivery schedules before they commit, so they over-order to avoid stockouts or
+    under-order and miss requirements. Vendors and administrators work from memory, paper and message threads, which do not enforce order
+    status, audit stock changes or produce the invoices, receipts and delivery records that institutional buyers need.
   </p>
-  <div class="legend">
+  <p>
+    <b>How these screens answer it.</b>
+  </p>
+  <ul class="hmw">
+    <li><b>Real-time visibility before ordering:</b> every product shows its price, farm and stock remaining (WF-01, 02, 04).</li>
+    <li><b>Administrators manage stock and fulfil orders without extra workload:</b> one staff desk for the order queue, catalogue, inventory and purchase orders (WF-23 to 28).</li>
+    <li><b>Trust without inspecting goods:</b> named farms, a delivery timeline and a clear order status (WF-04, 12, 24).</li>
+    <li><b>Bulk and small purchases in one interface:</b> one basket and checkout for every buyer, with saved details, order history and preferences on My page (WF-07 to 16).</li>
+    <li><b>Auditable stock:</b> every movement carries a reason, a reference and an actor (WF-26, 31).</li>
+  </ul>
+  <p>
+    <b>Reading the sheet:</b> all 33 screens of the buyer and staff sides are drawn as grey boxes at 393&nbsp;×&nbsp;852, the size the
+    app is built for. Under each frame, what is tappable and where it goes is listed
+    (<span style="color:#5c5c5c">① tap … → WF-nn</span>).
+  </p>
+    <div class="legend">
     <div><b>Grey bar</b>body text that is not worth reading<br>at this stage</div>
     <div><b>Dashed box with cross</b>photograph or map tile goes here</div>
     <div><b>Outlined pill</b>button. Dark fill = primary action,<br>white = secondary, grey = disabled</div>
     <div><b>Box with caret</b>dropdown, filled from the server</div>
     <div><b>① ② ③</b>interactive targets, explained in the notes<br>under the frame</div>
+  </div>
+  <div class="team">
+    <div class="cap"><b>College of Computing and Information Sciences</b> · Computer Science</div>
+    <table>
+      <tr><th>No.</th><th>Name</th><th>Student number</th><th>Registration number</th><th>College</th><th>Programme</th></tr>
+      <tr><td>1</td><td>Akandwanaho Jonan</td><td>2400703053</td><td>24/U/03053/PS</td><td>Computing and Information Sciences</td><td>Computer Science</td></tr>
+      <tr><td>2</td><td>Nantale Cecilia</td><td>2400724555</td><td>24/U/24555/PS</td><td>Computing and Information Sciences</td><td>Computer Science</td></tr>
+    </table>
   </div>
 </div>
 <main id="sheet"></main>
@@ -704,9 +744,9 @@ function block(b) {
     case 'chips': return `<div class="chips">${b.items.map((t, i) => `<span class="chip${i === b.active ? ' on' : ''}">${t}</span>`).join('')}</div>`;
     case 'tabs': return `<div class="tabs">${b.items.map((t, i) => `<span class="tab${i === b.active ? ' on' : ''}">${t}</span>`).join('')}</div>`;
     case 'search': return `<div class="search">⌕ ${b.ph}</div>`;
-    case 'img': return `<div class="card" style="padding:0;border:none"><div class="thumb" style="width:100%;height:${b.h}px"></div></div>`;
+    case 'img': return `<div class="card" style="padding:0;border:none"><div class="thumb" style="width:100%;height:${b.h}px"><svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="display:block"><path d="M0 100L100 0M0 0L100 100" stroke="#d0d0d0" stroke-width="1.5" vector-effect="non-scaling-stroke" fill="none"/></svg></div></div>`;
     case 'card': return `<div class="card">
-        <div class="thumb"></div>
+        <div class="thumb"><svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="display:block"><path d="M0 100L100 0M0 0L100 100" stroke="#d0d0d0" stroke-width="1.5" vector-effect="non-scaling-stroke" fill="none"/></svg></div>
         <div class="body">
           <h4>${b.name}</h4>
           <div class="price">${b.price}</div>
@@ -769,6 +809,48 @@ document.getElementById('sheet').innerHTML = frames.map((f) => `
       ${f.blocks.filter((b) => b.k === 'foot').map(block).join('')}`}</div>
     <ul class="notes">${f.notes.map((n) => `<li>${n}</li>`).join('')}</ul>
   </section>`).join('');
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(function () {
+  const msg = document.getElementById('msg');
+  const safari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+  const toBlob = (c) => new Promise((r) => c.toBlob(r, 'image/png'));
+  async function save(blob, name) {
+    try {
+      const dl = window.claude ? await window.claude.use('downloads') : null;
+      if (dl) { await dl.save({ filename: name, data: blob }); return; }
+    } catch (e) { if (e && e.code === 'declined') return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  }
+  const bg = () => getComputedStyle(document.body).backgroundColor;
+  async function run(btn, fn) {
+    btn.disabled = true;
+    try { await fn(); } catch (e) { msg.textContent = 'Failed: ' + (e && e.message || e); }
+    btn.disabled = false;
+  }
+  document.getElementById('dlSheet').onclick = (e) => run(e.target, async () => {
+    msg.textContent = 'Rendering the full sheet…';
+    const canvas = await html2canvas(document.body, { scale: safari ? 1 : 2, windowWidth: 1440, backgroundColor: bg(), useCORS: true });
+    await save(await toBlob(canvas), 'mu-katale-wireframes.png');
+    msg.textContent = 'Done.' + (safari ? ' Safari limits image size, so use Chrome for 2x.' : '');
+  });
+  document.getElementById('dlZip').onclick = (e) => run(e.target, async () => {
+    const frames = [...document.querySelectorAll('.frame')], zip = new JSZip();
+    for (let i = 0; i < frames.length; i++) {
+      msg.textContent = 'Rendering screen ' + (i + 1) + ' of ' + frames.length + '…';
+      const id = frames[i].querySelector('h2 em').textContent.split(' ')[0];
+      const canvas = await html2canvas(frames[i], { scale: 2, backgroundColor: bg() });
+      zip.file(id + '.png', await toBlob(canvas));
+    }
+    msg.textContent = 'Zipping…';
+    await save(await zip.generateAsync({ type: 'blob' }), 'mu-katale-screens.zip');
+    msg.textContent = 'Done.';
+  });
+})();
 </script>
 </body>
 </html>
