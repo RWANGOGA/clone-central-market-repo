@@ -114,10 +114,10 @@ export default function ProductDetailPage({
         <div className="px-6 py-6 space-y-6">
           {/* Product Info */}
           <div>
-            <p className="text-[18px] font-['Inter:Regular',_sans-serif] text-[#426b1f] mb-2">
+            <p className="text-[18px] font-normal text-brand mb-2">
               {product.price}
             </p>
-            <p className="text-[14px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="text-[14px] font-normal text-muted-foreground">
               {product.farm} →
             </p>
           </div>
@@ -132,16 +132,16 @@ export default function ProductDetailPage({
           <ExpandableCard
             expandLabel="Full description"
             preview={
-              <p className="text-[16px] font-['Inter:Regular',_sans-serif] text-[#000000] leading-[24px] line-clamp-3">
+              <p className="text-[16px] font-normal text-[#000000] leading-[24px] line-clamp-3">
                 {product.description}
               </p>
             }
             detail={
               <div className="space-y-3">
-                <p className="text-[16px] font-['Inter:Regular',_sans-serif] text-[#000000] leading-[24px]">
+                <p className="text-[16px] font-normal text-[#000000] leading-[24px]">
                   {product.description}
                 </p>
-                <p className="text-[16px] font-['Inter:Regular',_sans-serif] text-[#757575] leading-[20px]">
+                <p className="text-[16px] font-normal text-muted-foreground leading-[20px]">
                   {product.location}
                 </p>
                 {product.dietary && product.dietary.length > 0 && (
@@ -149,7 +149,7 @@ export default function ProductDetailPage({
                     {product.dietary.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[11px] font-medium text-[#426b1f] bg-[#426b1f]/10 border border-[#426b1f]/20 rounded px-2 py-0.5"
+                        className="text-[11px] font-medium text-brand bg-brand/10 border border-brand/20 rounded px-2 py-0.5"
                       >
                         {tag}
                       </span>
@@ -176,8 +176,8 @@ export default function ProductDetailPage({
                       onClick={() => setShowQuantityDropdown(!showQuantityDropdown)}
                       className="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative"
                     >
-                      <div className="flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left text-nowrap tracking-[-0.16px]">
-                        <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">
+                      <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left text-nowrap tracking-[-0.16px]">
+                        <p className="block leading-[24px] whitespace-pre">
                           {quantity} {product.unit}
                         </p>
                       </div>
@@ -212,9 +212,9 @@ export default function ProductDetailPage({
                     <button
                       key={num}
                       onClick={() => handleQuantitySelect(num)}
-                      className={`w-full px-4 py-2 text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal ${
+                      className={`w-full px-4 py-2 text-left text-[14px] font-normal ${
                         num === quantity
-                          ? 'bg-[#426b1f]/8 text-[#426b1f] font-medium'
+                          ? 'bg-brand/8 text-brand font-medium'
                           : 'hover:bg-gray-50 text-[#000000]'
                       }`}
                     >
@@ -226,7 +226,7 @@ export default function ProductDetailPage({
             </div>
             
             {/* Add to Basket Button */}
-            <div className={`basis-0 grow min-h-px min-w-px relative rounded-lg shrink-0 ${soldOut ? 'bg-neutral-200' : 'bg-[#426b1f]'}`}>
+            <div className={`basis-0 grow min-h-px min-w-px relative rounded-lg shrink-0 ${soldOut ? 'bg-neutral-200' : 'bg-brand'}`}>
               <button
                 onClick={handleAddToCart}
                 disabled={soldOut}
@@ -235,7 +235,7 @@ export default function ProductDetailPage({
                 }`}
               >
                 <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start pl-6 pr-4 py-2 relative w-full">
-                  <div className="basis-0 flex flex-col font-['Inter:Regular',_sans-serif] font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[16px] text-left tracking-[-0.16px]">
+                  <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[16px] text-left tracking-[-0.16px]">
                     <p className={`block leading-[24px] text-[14px] ${soldOut ? 'text-[#9a9a9a]' : 'text-[#ffffff]'}`}>
                       {soldOut ? 'Sold out' : `Add ${quantity} ${product.unit} to basket`}
                     </p>
@@ -294,8 +294,8 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute css-a0byvc font-['SF_Pro_Display:Bold',_sans-serif] h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
-          <p className="adjustLetterSpacing block leading-[22px]">9:41</p>
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+          <p className="block leading-[22px]">9:41</p>
         </div>
       </div>
     </div>
@@ -358,10 +358,10 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick, productName }: He
       <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
         <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
         <div
-          className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+          className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
         >
-          <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+          <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
         </div>
         
         {/* Cart Icon */}
@@ -377,11 +377,11 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick, productName }: He
             </svg>
           </div>
           {cartCount > 0 && (
-            <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+            <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                    <p className="adjustLetterSpacing block leading-none whitespace-pre text-[9px]">{cartCount}</p>
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                   </div>
                 </div>
               </div>
@@ -410,17 +410,17 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick, productName }: He
         <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
           <div className="relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-              <div className="basis-0 flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
+              <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
                 <h1 className="block leading-[32px] text-[24px]">{productName}</h1>
               </div>
               <button 
                 onClick={onBack}
-                className="cursor-pointer flex flex-row items-center gap-1 font-['Inter:Regular',_sans-serif] justify-center not-italic relative shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px]"
+                className="cursor-pointer flex flex-row items-center gap-1 font-normal justify-center not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px]"
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="shrink-0">
                   <path d="M7.5 2.5L4 6L7.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <span className="adjustLetterSpacing leading-[24px]">Back</span>
+                <span className="leading-[24px]">Back</span>
               </button>
             </div>
           </div>

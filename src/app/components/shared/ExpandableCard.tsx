@@ -58,7 +58,7 @@ export default function ExpandableCard({
         type="button"
         onClick={toggle}
         aria-expanded={open}
-        className="mt-2 inline-flex items-center gap-1 text-[12px] font-['Inter:Regular',_sans-serif] text-[#426b1f] hover:opacity-80 transition-opacity cursor-pointer"
+        className="mt-2 inline-flex items-center gap-1 text-[12px] font-normal text-brand hover:opacity-80 transition-opacity cursor-pointer"
       >
         {open ? 'Show less' : expandLabel}
         <svg

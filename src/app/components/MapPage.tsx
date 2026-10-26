@@ -39,14 +39,14 @@ export default function MapPage({
       {picked && (
         <div className="absolute bottom-24 left-3 right-3 z-[1150] bg-white rounded-xl shadow-lg px-3 py-2.5 flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] uppercase tracking-wide text-[#757575] font-['Inter:Medium',_sans-serif]">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
               Delivery point
             </p>
-            <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000] truncate">{picked}</p>
+            <p className="text-[14px] font-medium text-[#000000] truncate">{picked}</p>
           </div>
           <button
             onClick={() => onUseAsDeliveryPlace?.(picked)}
-            className="shrink-0 bg-[#426b1f] text-white text-[12px] font-['Inter:Medium',_sans-serif] px-3 py-2 rounded-lg"
+            className="shrink-0 bg-brand text-white text-[12px] font-medium px-3 py-2 rounded-lg"
           >
             Use this
           </button>
@@ -55,10 +55,10 @@ export default function MapPage({
 
       {initialDistrict && !picked && (
         <div className="absolute bottom-24 left-3 right-3 z-[1150] bg-white rounded-xl shadow-lg px-3 py-2">
-          <p className="text-[11px] uppercase tracking-wide text-[#757575] font-['Inter:Medium',_sans-serif]">
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
             From your checkout
           </p>
-          <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+          <p className="text-[14px] font-medium text-[#000000]">
             {initialDistrict}
           </p>
         </div>
@@ -81,12 +81,12 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
 
       <div className="absolute left-6 right-6 top-[103px]">
         <div className="flex flex-row font-normal items-center justify-start w-full">
-          <div className="flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center text-[#000000] text-[24px] tracking-[-0.48px]">
+          <div className="flex flex-col font-serif font-normal grow justify-center text-[#000000] text-[24px] tracking-[-0.48px]">
             <p className="block leading-[32px] text-[24px]">Coverage</p>
           </div>
           <button
             onClick={onBack}
-            className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
+            className="cursor-pointer flex items-center font-normal not-italic shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
           >
             <div className="flex flex-row items-center gap-1">
               <div className="w-3 h-3">
@@ -100,7 +100,7 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
                   />
                 </svg>
               </div>
-              <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Back</p>
+              <p className="block leading-[24px] whitespace-pre">Back</p>
             </div>
           </button>
         </div>
@@ -130,7 +130,7 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
           <path d={svgPaths.p2003cd00} fill="var(--fill-0, black)" />
         </svg>
         {cartCount > 0 && (
-          <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px] flex items-center justify-center">
+          <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px] flex items-center justify-center">
             <p className="text-[#ffffff] text-[9px] leading-none">{cartCount}</p>
           </div>
         )}

@@ -107,7 +107,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] leading-[19px] font-['Inter:Regular',_sans-serif] text-red-700">
+      <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] leading-[19px] font-normal text-red-700">
         {error}
       </div>
     );
@@ -131,11 +131,11 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
         return (
           <div key={level.key} className="space-y-1">
             <div className="flex items-baseline justify-between">
-              <p className="text-[14px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+              <p className="text-[14px] font-normal text-muted-foreground">
                 {level.label}
               </p>
               {parentChosen && options.length === 0 && (
-                <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#b07d2b]">
+                <p className="text-[11px] font-normal text-[#b07d2b]">
                   none recorded
                 </p>
               )}
@@ -147,7 +147,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                 disabled={disabled}
                 onClick={() => setOpenLevel(isOpen ? null : level.key)}
                 aria-expanded={isOpen}
-                className={`w-full border rounded-lg px-4 py-2 text-left font-['Inter:Regular',_sans-serif] text-[16px] flex items-center justify-between ${
+                className={`w-full border rounded-lg px-4 py-2 text-left font-normal text-[16px] flex items-center justify-between ${
                   disabled
                     ? 'bg-neutral-100 border-neutral-200 text-[#9a9a9a] cursor-not-allowed'
                     : 'bg-white border-neutral-200 text-[#000000] cursor-pointer'
@@ -185,9 +185,9 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                       key={option.id}
                       type="button"
                       onClick={() => select(level.key, option)}
-                      className={`w-full px-4 py-2 text-left text-[13px] font-['Inter:Regular',_sans-serif] hover:bg-[#426b1f]/5 ${
+                      className={`w-full px-4 py-2 text-left text-[13px] font-normal hover:bg-brand/5 ${
                         option.name === chosen
-                          ? 'text-[#426b1f] font-medium'
+                          ? 'text-brand font-medium'
                           : 'text-[#000000]'
                       }`}
                     >
@@ -199,7 +199,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
 
               {isOpen && options.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-lg px-4 py-3 z-50 shadow-lg">
-                  <p className="text-[13px] leading-[19px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                  <p className="text-[13px] leading-[19px] font-normal text-muted-foreground">
                     No {level.kindLabel.toLowerCase()}s are recorded under{' '}
                     {value[LEVELS[index - 1].key] || 'this parent'} yet.
                   </p>
@@ -211,7 +211,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
       })}
 
       {/* Makes the state of the cascade explicit rather than implied. */}
-      <p className="text-[11px] leading-[16px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+      <p className="text-[11px] leading-[16px] font-normal text-muted-foreground">
         {hierarchy
           ? `${totals.get('region')} regions · ${totals.get('district')} districts and towns available`
           : 'Loading administrative areas…'}

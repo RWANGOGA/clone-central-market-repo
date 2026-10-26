@@ -84,10 +84,10 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
         <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
           <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
           <div
-            className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+            className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
           >
-            <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+            <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
           </div>
 
           {/* Cart Icon */}
@@ -104,11 +104,11 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
               </svg>
             </div>
             {cartCount > 0 && (
-              <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+              <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                      <p className="adjustLetterSpacing block leading-none whitespace-pre text-[9px]">{cartCount}</p>
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                      <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                     </div>
                   </div>
                 </div>
@@ -138,12 +138,12 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
           <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
             <div className="relative shrink-0 w-full">
               <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-                <div className="basis-0 flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
+                <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
                   <p className="block leading-[32px] text-[24px]">Who we are</p>
                 </div>
                 <button
                   onClick={onBack}
-                  className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic relative shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
+                  className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
                 >
                   <div className="flex flex-row items-center gap-1">
                     <div className="w-3 h-3">
@@ -151,7 +151,7 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
                         <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
-                    <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Back</p>
+                    <p className="block leading-[24px] whitespace-pre">Back</p>
                   </div>
                 </button>
               </div>
@@ -165,23 +165,23 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
         <div className="px-6 pt-6 pb-10 space-y-6">
           {/* Mission Statement Hero */}
           <ExpandableCard
-            className="border border-[#426b1f]/20 bg-[#426b1f]/5 rounded-2xl p-5"
+            className="border border-brand/20 bg-brand/5 rounded-2xl p-5"
             expandLabel="Read our story"
             preview={
               <div className="space-y-3">
-                <span className="text-[11px] font-semibold text-[#426b1f] uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-brand uppercase tracking-wider">
                   Our Mission
                 </span>
-                <h2 className="font-['Newsreader:Regular',_sans-serif] text-[22px] text-[#000000] leading-[28px]">
+                <h2 className="font-serif font-normal text-[22px] text-[#000000] leading-[28px]">
                   Getting Ugandan produce from the farm to the market without losing the farmer.
                 </h2>
-                <p className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#757575] leading-[22px]">
+                <p className="font-normal text-[14px] text-muted-foreground leading-[22px]">
                   Mu Katale means &ldquo;in the market&rdquo;. Kampala&rsquo;s central markets move most of the fresh produce sold in the city, yet a tomato picked an hour outside Kampala can change hands three or four times before it reaches a plate.
                 </p>
               </div>
             }
             detail={
-              <div className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#757575] leading-[22px] space-y-3">
+              <div className="font-normal text-[14px] text-muted-foreground leading-[22px] space-y-3">
                 <p>
                   Every handover in that chain adds a margin nobody has to justify. We shorten it. We name the
                   district a product came from, we publish the farm-gate reference next to our price, and we price
@@ -199,7 +199,7 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
 
           {/* Commitments */}
           <div className="space-y-3">
-            <h3 className="font-['Inter:Medium',_sans-serif] text-[16px] text-[#000000] tracking-[-0.16px]">
+            <h3 className="font-medium text-[16px] text-[#000000] tracking-[-0.16px]">
               Our Commitments
             </h3>
             <div className="grid grid-cols-1 gap-3">
@@ -211,27 +211,27 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
                   preview={
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="font-['Newsreader:Regular',_sans-serif] text-[18px] text-[#000000]">
+                        <h4 className="font-serif font-normal text-[18px] text-[#000000]">
                           {item.title}
                         </h4>
-                        <span className="shrink-0 text-[14px] font-bold text-[#426b1f] bg-[#426b1f]/10 px-2 py-0.5 rounded">
+                        <span className="shrink-0 text-[14px] font-bold text-brand bg-brand/10 px-2 py-0.5 rounded">
                           {item.stat}
                         </span>
                       </div>
-                      <p className="font-['Inter:Regular',_sans-serif] text-[13px] text-[#757575] leading-[20px] line-clamp-3">
+                      <p className="font-normal text-[13px] text-muted-foreground leading-[20px] line-clamp-3">
                         {item.description}
                       </p>
-                      <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#426b1f] leading-[16px]">
+                      <p className="text-[11px] font-normal text-brand leading-[16px]">
                         {item.statLabel}
                       </p>
                     </div>
                   }
                   detail={
                     <div className="space-y-2">
-                      <p className="font-['Inter:Regular',_sans-serif] text-[13px] text-[#757575] leading-[20px]">
+                      <p className="font-normal text-[13px] text-muted-foreground leading-[20px]">
                         {item.description}
                       </p>
-                      <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#426b1f] leading-[16px]">
+                      <p className="text-[11px] font-normal text-brand leading-[16px]">
                         {item.statLabel}
                       </p>
                     </div>
@@ -243,7 +243,7 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
 
           {/* Sourcing Regions */}
           <div className="space-y-3">
-            <h3 className="font-['Inter:Medium',_sans-serif] text-[16px] text-[#000000] tracking-[-0.16px]">
+            <h3 className="font-medium text-[16px] text-[#000000] tracking-[-0.16px]">
               Where We Buy
             </h3>
             <div className="space-y-2">
@@ -254,24 +254,24 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
                   preview={
                     <div className="space-y-1">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-['Inter:Medium',_sans-serif] text-[14px] text-[#000000]">
+                        <span className="font-medium text-[14px] text-[#000000]">
                           {region.name}
                         </span>
-                        <span className="shrink-0 text-[12px] text-[#426b1f] font-medium">
+                        <span className="shrink-0 text-[12px] text-brand font-medium">
                           {region.location}
                         </span>
                       </div>
-                      <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575] line-clamp-2">
+                      <p className="text-[12px] font-normal text-muted-foreground line-clamp-2">
                         {region.specialty}
                       </p>
                     </div>
                   }
                   detail={
                     <div className="space-y-1.5">
-                      <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#000000]">
+                      <p className="text-[12px] font-normal text-[#000000]">
                         {region.specialty}
                       </p>
-                      <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575] leading-[18px]">
+                      <p className="text-[12px] font-normal text-muted-foreground leading-[18px]">
                         {region.detail}
                       </p>
                     </div>
@@ -282,7 +282,7 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
           </div>
 
           {/* Footer note */}
-          <div className="pt-2 text-center text-[#757575] font-['Inter:Regular',_sans-serif] text-[12px] space-y-1">
+          <div className="pt-2 text-center text-muted-foreground font-normal text-[12px] space-y-1">
             <p>Prices in Ugandan shillings &bull; Figures sourced from Ugandan market reporting</p>
             <p className="text-[11px] text-[#9a9a9a]">
               Mu Katale means &ldquo;in the market&rdquo;

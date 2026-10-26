@@ -106,11 +106,10 @@ export default function DeliveryLocationMap({
         <FallbackMap region={region} district={district} />
         <div className="absolute inset-0 bg-white/85 flex items-center justify-center px-6 text-center">
           <div>
-            <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+            <p className="text-[13px] font-medium text-[#000000]">
               Could not place this order on the map
             </p>
-            <p className="mt-1 text-[11px] leading-[16px] font-['Inter:Regular',_sans-serif] text-[#757575]">
-              The geography service did not resolve {district || 'this district'}. The rider still
+            <p className="mt-1 text-[11px] leading-[16px] font-normal text-muted-foreground"> The geography service did not resolve {district || 'this district'}. The rider still
               has your address.
             </p>
           </div>
@@ -188,11 +187,11 @@ export default function DeliveryLocationMap({
       {/* Caption states what the pin actually means. */}
       <div className="absolute left-2 top-2 right-2 z-[1050] flex items-start justify-between gap-2">
         <div className="bg-white/95 rounded-lg shadow px-2 py-1 min-w-0">
-          <p className="text-[11px] font-['Inter:Medium',_sans-serif] text-[#000000] truncate">
+          <p className="text-[11px] font-medium text-[#000000] truncate">
             {place ? `${place.name} district` : 'Locating…'}
           </p>
           {place && (
-            <p className="text-[10px] leading-[14px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="text-[10px] leading-[14px] font-normal text-muted-foreground">
               {place.precision === 'town-centre'
                 ? 'Pin marks the town centre'
                 : 'Pin marks the district centre'}
@@ -202,11 +201,11 @@ export default function DeliveryLocationMap({
       </div>
 
       <div className="absolute left-0 right-0 bottom-0 z-[1050] bg-gradient-to-t from-black/55 to-transparent px-2.5 pt-6 pb-1.5">
-        <p className="text-[10px] leading-[14px] font-['Inter:Regular',_sans-serif] text-white/95">
+        <p className="text-[10px] leading-[14px] font-normal text-white/95">
           {place ? 'Dispatch to ' : ''}
           {address ? address : place ? `${place.name}, ${region}` : region}
         </p>
-        <p className="text-[9px] leading-[12px] font-['Inter:Regular',_sans-serif] text-white/70">
+        <p className="text-[9px] leading-[12px] font-normal text-white/70">
           Map data &copy; OpenStreetMap contributors
         </p>
       </div>

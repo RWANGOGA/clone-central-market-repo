@@ -97,7 +97,7 @@ export default function AdminPage({ onClose }: { onClose?: () => void }) {
 
   if (checking) {
     return (
-      <div className="h-full flex items-center justify-center text-[14px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+      <div className="h-full flex items-center justify-center text-[14px] font-normal text-muted-foreground">
         Checking your session…
       </div>
     );
@@ -173,10 +173,10 @@ function StaffShell({
       <div className="sticky top-0 bg-white border-b border-neutral-200 px-4 py-3 z-10">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[16px] font-['Newsreader:Medium',_sans-serif] text-[#426b1f] leading-[22px]">
+            <p className="text-[16px] font-serif font-medium text-brand leading-[22px]">
               Staff
             </p>
-            <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="text-[11px] font-normal text-muted-foreground">
               {admin.name} · {ADMIN_ROLE_LABELS[admin.role] ?? admin.role}
             </p>
           </div>
@@ -184,14 +184,14 @@ function StaffShell({
             {onClose && (
               <button
                 onClick={onClose}
-                className="text-[12px] font-['Inter:Medium',_sans-serif] text-[#426b1f]"
+                className="text-[12px] font-medium text-brand"
               >
                 Back to shop
               </button>
             )}
             <button
               onClick={onSignOut}
-              className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]"
+              className="text-[12px] font-normal text-muted-foreground"
             >
               Sign out
             </button>
@@ -208,9 +208,9 @@ function StaffShell({
                 // The strip is wider than the phone: keep the chosen pill visible.
                 event.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest' });
               }}
-              className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[12px] font-['Inter:Medium',_sans-serif] ${
+              className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[12px] font-medium ${
                 tab === item.value
-                  ? 'bg-[#426b1f] text-white'
+                  ? 'bg-brand text-white'
                   : item.disabled
                     ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
                     : 'bg-neutral-100 text-[#000000]'
@@ -222,12 +222,12 @@ function StaffShell({
         </div>
 
         {notice && (
-          <p className="mt-2 rounded-lg border border-[#426b1f]/25 bg-[#426b1f]/8 px-3 py-2 text-[13px] text-[#426b1f] font-['Inter:Regular',_sans-serif]">
+          <p className="mt-2 rounded-lg border border-brand/25 bg-brand/8 px-3 py-2 text-[13px] text-brand font-normal">
             {notice}
           </p>
         )}
         {error && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-['Inter:Regular',_sans-serif]">
+          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-normal">
             {error}
           </p>
         )}
@@ -314,7 +314,7 @@ function CataloguePanel({
       {!adding && (
         <button
           onClick={() => setAdding(true)}
-          className="w-full rounded-xl bg-[#426b1f] text-white py-3 text-[14px] font-['Inter:Medium',_sans-serif]"
+          className="w-full rounded-xl bg-brand text-white py-3 text-[14px] font-medium"
         >
           Add a product
         </button>
@@ -323,7 +323,7 @@ function CataloguePanel({
       {adding && <ProductForm onCancel={() => setAdding(false)} onSubmit={handleCreated} />}
 
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">Loading the catalogue…</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading the catalogue…</p>
       ) : (
         products.map((product) => (
           <div
@@ -334,13 +334,13 @@ function CataloguePanel({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+                <p className="text-[14px] font-medium text-[#000000]">
                   {product.name}
                   {!product.active && (
                     <span className="ml-2 text-[11px] text-[#9a9a9a]">withdrawn</span>
                   )}
                 </p>
-                <p className="text-[12px] text-[#757575]">
+                <p className="text-[12px] text-muted-foreground">
                   {product.price} · {product.farm}
                 </p>
                 <StockBadge
@@ -372,7 +372,7 @@ function CataloguePanel({
                 </button>
                 <button
                   onClick={() => handleToggle(product)}
-                  className="ml-auto px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px] text-[#426b1f]"
+                  className="ml-auto px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px] text-brand"
                 >
                   {product.active ? 'Withdraw' : 'Restore'}
                 </button>
@@ -424,11 +424,11 @@ function ProductForm({
   };
 
   const inputClass =
-    'w-full border border-neutral-200 rounded-lg px-3 py-2 text-[14px] font-[\'Inter:Regular\',_sans-serif]';
+    'w-full border border-neutral-200 rounded-lg px-3 py-2 text-[14px] font-normal';
 
   return (
     <form onSubmit={submit} className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2.5">
-      <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">New product</p>
+      <p className="text-[14px] font-medium text-[#000000]">New product</p>
 
       <Field label="Name">
         <input
@@ -493,7 +493,7 @@ function ProductForm({
           />
         </Field>
       </div>
-      <p className="text-[11px] text-[#757575]">
+      <p className="text-[11px] text-muted-foreground">
         {draft.priceValue > 0 ? formatUgx(draft.priceValue) : 'the price'} per {draft.unit}
         {draft.stock > 0 ? `, ${describeStockOf(draft.stock, draft.unit)}.` : '.'}
       </p>
@@ -518,7 +518,7 @@ function ProductForm({
         <button
           type="submit"
           disabled={!valid || busy}
-          className={`flex-1 rounded-lg py-2.5 text-[13px] text-white ${!valid || busy ? 'bg-neutral-300 cursor-not-allowed' : 'bg-[#426b1f]'}`}
+          className={`flex-1 rounded-lg py-2.5 text-[13px] text-white ${!valid || busy ? 'bg-neutral-300 cursor-not-allowed' : 'bg-brand'}`}
         >
           {busy ? 'Adding…' : 'Add product'}
         </button>
@@ -530,7 +530,7 @@ function ProductForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <p className="text-[12px] text-[#757575]">{label}</p>
+      <p className="text-[12px] text-muted-foreground">{label}</p>
       {children}
     </div>
   );
@@ -583,27 +583,27 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
   return (
     <div className="space-y-3">
-      <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Stock movements</p>
+      <p className="text-[14px] font-medium text-[#000000]">Stock movements</p>
       {/* The table is the latest window while the ledger holds more, and the net
           is counted over all of it — so both numbers are named for what they are. */}
       {!loading && movements.length > 0 && totals && (
-        <p className="text-[12px] text-[#757575]">
+        <p className="text-[12px] text-muted-foreground">
           Latest {movements.length} of {totals.total} movements · the ledger nets{' '}
           <span className="tabular-nums">{totals.net > 0 ? '+' : ''}{totals.net}</span> units
         </p>
       )}
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">Loading…</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : movements.length === 0 ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">No movements yet.</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">No movements yet.</p>
       ) : (
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Product</th>
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Reason</th>
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">Delta</th>
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">When</th>
+              <th className="pb-2 text-muted-foreground font-normal">Product</th>
+              <th className="pb-2 text-muted-foreground font-normal">Reason</th>
+              <th className="pb-2 text-muted-foreground font-normal text-right">Delta</th>
+              <th className="pb-2 text-muted-foreground font-normal text-right">When</th>
             </tr>
           </thead>
           <tbody>
@@ -615,12 +615,12 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
                 <td className="py-2 pr-2">
                   <span className="block">{m.productName ?? m.productId}</span>
                   {m.reference && (
-                    <span className="block text-[11px] text-[#757575] break-all">{m.reference}</span>
+                    <span className="block text-[11px] text-muted-foreground break-all">{m.reference}</span>
                   )}
                 </td>
                 <td className="py-2">{m.reason}</td>
                 <td className="py-2 text-right tabular-nums">{m.delta > 0 ? '+' : ''}{m.delta}</td>
-                <td className="py-2 text-right text-[12px] text-[#757575] whitespace-nowrap">
+                <td className="py-2 text-right text-[12px] text-muted-foreground whitespace-nowrap">
                   {new Date(m.createdAt).toLocaleDateString()}
                 </td>
               </tr>
@@ -630,8 +630,8 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
       )}
 
       <form onSubmit={submit} className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2">
-        <p className="text-[13px] font-['Inter:Medium',_sans-serif]">Adjust stock</p>
-        <p className="text-[11px] text-[#757575]">Pick a product and enter a signed delta (negative removes stock).</p>
+        <p className="text-[13px] font-medium">Adjust stock</p>
+        <p className="text-[11px] text-muted-foreground">Pick a product and enter a signed delta (negative removes stock).</p>
         <select
           value={productId ?? ''}
           onChange={(e) => setProductId(e.target.value ? Number(e.target.value) : null)}
@@ -665,7 +665,7 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
           <button
             type="submit"
             disabled={busy || productId == null || delta === ''}
-            className="bg-[#426b1f] text-white rounded-lg px-3 py-2 text-[13px] disabled:opacity-40"
+            className="bg-brand text-white rounded-lg px-3 py-2 text-[13px] disabled:opacity-40"
           >
             {busy ? 'Applying…' : 'Apply'}
           </button>
@@ -767,7 +767,7 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
         </select>
         <button
           onClick={() => setAdding((open) => !open)}
-          className="bg-[#426b1f] text-white rounded-lg px-3 py-2 text-[13px]"
+          className="bg-brand text-white rounded-lg px-3 py-2 text-[13px]"
         >
           {adding ? 'Close' : 'New'}
         </button>
@@ -816,12 +816,12 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
             />
           </div>
           {suppliers.length === 0 && (
-            <p className="text-[11px] text-[#757575]">Add a supplier first on the Suppliers tab.</p>
+            <p className="text-[11px] text-muted-foreground">Add a supplier first on the Suppliers tab.</p>
           )}
           <button
             type="submit"
             disabled={busy || supplierId == null || productId == null}
-            className="w-full rounded-lg bg-[#426b1f] py-2 text-[13px] text-white disabled:opacity-40"
+            className="w-full rounded-lg bg-brand py-2 text-[13px] text-white disabled:opacity-40"
           >
             {busy ? 'Sending…' : 'Create purchase order'}
           </button>
@@ -829,17 +829,17 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
       )}
 
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">Loading…</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : orders.length === 0 ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">No purchase orders.</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">No purchase orders.</p>
       ) : (
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Order</th>
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif]">Status</th>
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">Raised</th>
-              <th className="pb-2 text-[#757575] font-['Inter:Regular',_sans-serif] text-right">Actions</th>
+              <th className="pb-2 text-muted-foreground font-normal">Order</th>
+              <th className="pb-2 text-muted-foreground font-normal">Status</th>
+              <th className="pb-2 text-muted-foreground font-normal text-right">Raised</th>
+              <th className="pb-2 text-muted-foreground font-normal text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -851,17 +851,17 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
                     printed on top of each other. */}
                 <td className="py-2 pr-2">
                   <span className="block break-all">{o.reference}</span>
-                  <span className="block text-[11px] text-[#757575]">
+                  <span className="block text-[11px] text-muted-foreground">
                     {suppliers.find((s) => s.id === o.supplierId)?.name ?? `Supplier ${o.supplierId}`}
                   </span>
                   {o.expectedAt && (
-                    <span className="block text-[11px] text-[#757575] tabular-nums">
+                    <span className="block text-[11px] text-muted-foreground tabular-nums">
                       due {new Date(o.expectedAt).toLocaleDateString()}
                     </span>
                   )}
                 </td>
                 <td className="py-2 pr-2">{o.status}</td>
-                <td className="py-2 text-right text-[12px] text-[#757575] whitespace-nowrap tabular-nums">
+                <td className="py-2 text-right text-[12px] text-muted-foreground whitespace-nowrap tabular-nums">
                   {new Date(o.createdAt).toLocaleDateString()}
                 </td>
                 <td className="py-2 text-right whitespace-nowrap">
@@ -869,7 +869,7 @@ function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail
                     <>
                       <button
                         onClick={() => handleReceive(o)}
-                        className="mr-2 text-[12px] text-[#426b1f] underline underline-offset-2"
+                        className="mr-2 text-[12px] text-brand underline underline-offset-2"
                       >
                         Receive
                       </button>
@@ -921,7 +921,7 @@ function SuppliersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
   return (
     <div className="space-y-3">
-      <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Suppliers</p>
+      <p className="text-[14px] font-medium text-[#000000]">Suppliers</p>
       <form onSubmit={submit} className="flex gap-2">
         <input
           value={name}
@@ -929,20 +929,20 @@ function SuppliersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
           placeholder="Supplier name"
           className="flex-1 border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
         />
-        <button className="bg-[#426b1f] text-white rounded-lg px-3 py-2 text-[13px]">Add</button>
+        <button className="bg-brand text-white rounded-lg px-3 py-2 text-[13px]">Add</button>
       </form>
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">Loading…</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : suppliers.length === 0 ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">No suppliers.</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">No suppliers.</p>
       ) : (
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575]">Name</th>
-              <th className="pb-2 text-[#757575]">Products</th>
-              <th className="pb-2 text-[#757575]">Region</th>
-              <th className="pb-2 text-[#757575]">Phone</th>
+              <th className="pb-2 text-muted-foreground">Name</th>
+              <th className="pb-2 text-muted-foreground">Products</th>
+              <th className="pb-2 text-muted-foreground">Region</th>
+              <th className="pb-2 text-muted-foreground">Phone</th>
             </tr>
           </thead>
           <tbody>
@@ -976,7 +976,7 @@ const EMPTY_PROMO: PromoDraft = {
 };
 
 const PROMO_STATE_STYLES: Record<AdminPromo['state'], string> = {
-  live: 'bg-[#426b1f]/10 text-[#426b1f]',
+  live: 'bg-brand/10 text-brand',
   scheduled: 'bg-blue-50 text-blue-700',
   paused: 'bg-neutral-100 text-neutral-600',
   expired: 'bg-red-50 text-red-700',
@@ -1042,10 +1042,10 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Promo codes</p>
+        <p className="text-[14px] font-medium text-[#000000]">Promo codes</p>
         <button
           onClick={() => setAdding((open) => !open)}
-          className="rounded-lg bg-[#426b1f] px-3 py-1.5 text-[12px] text-white"
+          className="rounded-lg bg-brand px-3 py-1.5 text-[12px] text-white"
         >
           {adding ? 'Close' : 'New code'}
         </button>
@@ -1054,7 +1054,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
       {adding && (
         <form onSubmit={submit} className="space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
           <div className="grid grid-cols-2 gap-2">
-            <label className="col-span-2 text-[12px] text-[#757575]">
+            <label className="col-span-2 text-[12px] text-muted-foreground">
               Code
               <input
                 value={draft.code}
@@ -1064,7 +1064,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] uppercase text-[#000000]"
               />
             </label>
-            <label className="col-span-2 text-[12px] text-[#757575]">
+            <label className="col-span-2 text-[12px] text-muted-foreground">
               Description
               <input
                 value={draft.description ?? ''}
@@ -1073,7 +1073,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
               />
             </label>
-            <label className="text-[12px] text-[#757575]">
+            <label className="text-[12px] text-muted-foreground">
               Type
               <select
                 value={draft.kind}
@@ -1084,7 +1084,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 <option value="fixed">Shillings off</option>
               </select>
             </label>
-            <label className="text-[12px] text-[#757575]">
+            <label className="text-[12px] text-muted-foreground">
               {draft.kind === 'percent' ? 'Percent (1–100)' : 'Shillings off'}
               <input
                 type="number"
@@ -1094,7 +1094,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
               />
             </label>
-            <label className="text-[12px] text-[#757575]">
+            <label className="text-[12px] text-muted-foreground">
               Minimum basket (UGX)
               <input
                 type="number"
@@ -1105,7 +1105,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
               />
             </label>
             {draft.kind === 'percent' && (
-              <label className="text-[12px] text-[#757575]">
+              <label className="text-[12px] text-muted-foreground">
                 Cap (UGX, optional)
                 <input
                   type="number"
@@ -1117,7 +1117,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 />
               </label>
             )}
-            <label className="text-[12px] text-[#757575]">
+            <label className="text-[12px] text-muted-foreground">
               Total uses (optional)
               <input
                 type="number"
@@ -1128,7 +1128,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
               />
             </label>
-            <label className="text-[12px] text-[#757575]">
+            <label className="text-[12px] text-muted-foreground">
               Uses per customer (optional)
               <input
                 type="number"
@@ -1139,7 +1139,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
               />
             </label>
-            <label className="col-span-2 text-[12px] text-[#757575]">
+            <label className="col-span-2 text-[12px] text-muted-foreground">
               Ends on (optional)
               <input
                 type="date"
@@ -1149,14 +1149,14 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
               />
             </label>
           </div>
-          <button className="w-full rounded-lg bg-[#426b1f] py-2 text-[13px] text-white">Create code</button>
+          <button className="w-full rounded-lg bg-brand py-2 text-[13px] text-white">Create code</button>
         </form>
       )}
 
       {loading ? (
-        <p className="py-4 text-center text-[13px] text-[#757575]">Loading…</p>
+        <p className="py-4 text-center text-[13px] text-muted-foreground">Loading…</p>
       ) : promos.length === 0 ? (
-        <p className="py-4 text-center text-[13px] text-[#757575]">No promo codes yet.</p>
+        <p className="py-4 text-center text-[13px] text-muted-foreground">No promo codes yet.</p>
       ) : (
         <div className="space-y-2">
           {promos.map((promo) => {
@@ -1168,13 +1168,13 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-['Inter:Medium',_sans-serif] text-[14px] text-[#000000]">{promo.code}</p>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-['Inter:Medium',_sans-serif] ${PROMO_STATE_STYLES[promo.state]}`}>
+                      <p className="font-medium text-[14px] text-[#000000]">{promo.code}</p>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${PROMO_STATE_STYLES[promo.state]}`}>
                         {promo.state}
                       </span>
                     </div>
                     {promo.description && (
-                      <p className="mt-0.5 text-[11px] leading-[16px] text-[#757575]">{promo.description}</p>
+                      <p className="mt-0.5 text-[11px] leading-[16px] text-muted-foreground">{promo.description}</p>
                     )}
                   </div>
                   <button
@@ -1185,7 +1185,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                     {promo.active ? 'Pause' : 'Resume'}
                   </button>
                 </div>
-                <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-[#757575]">
+                <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
                   <div className="flex justify-between">
                     <dt>Rule</dt>
                     <dd className="text-[#000000]">{rule}</dd>
@@ -1227,7 +1227,7 @@ const PIPELINE: { value: string; label: string; color: string }[] = [
   { value: 'pending', label: 'Pending', color: 'bg-amber-400' },
   { value: 'processing', label: 'Processing', color: 'bg-blue-400' },
   { value: 'shipped', label: 'Shipped', color: 'bg-indigo-400' },
-  { value: 'delivered', label: 'Delivered', color: 'bg-[#426b1f]' },
+  { value: 'delivered', label: 'Delivered', color: 'bg-brand' },
   { value: 'cancelled', label: 'Cancelled', color: 'bg-red-400' },
 ];
 
@@ -1299,23 +1299,23 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
             <button
               key={range.days}
               onClick={() => setRangeDays(range.days)}
-              className={`rounded-full px-2.5 py-1 text-[11px] font-['Inter:Medium',_sans-serif] ${
-                rangeDays === range.days ? 'bg-[#426b1f] text-white' : 'bg-neutral-100 text-[#000000]'
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                rangeDays === range.days ? 'bg-brand text-white' : 'bg-neutral-100 text-[#000000]'
               }`}
             >
               {range.label}
             </button>
           ))}
         </div>
-        <button onClick={() => load(true)} className="text-[11px] text-[#426b1f]">
+        <button onClick={() => load(true)} className="text-[11px] text-brand">
           Refresh
         </button>
       </div>
 
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-6 text-center">Crunching the last {rangeDays} days…</p>
+        <p className="text-[13px] text-muted-foreground py-6 text-center">Crunching the last {rangeDays} days…</p>
       ) : !overview || !totals ? (
-        <p className="text-[13px] text-[#757575] py-6 text-center">No analytics yet.</p>
+        <p className="text-[13px] text-muted-foreground py-6 text-center">No analytics yet.</p>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-2">
@@ -1331,7 +1331,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title={`Revenue per ${bucket}`}>
             {chart.length === 0 ? (
-              <p className="text-[12px] text-[#757575]">No paid orders in this window.</p>
+              <p className="text-[12px] text-muted-foreground">No paid orders in this window.</p>
             ) : (
               <>
                 <div className="flex h-24 items-end justify-start gap-[2px]">
@@ -1339,12 +1339,12 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
                     <div
                       key={point.bucket}
                       title={`${point.bucket}: ${formatUgx(point.revenue)} · ${point.orders} orders`}
-                      className="max-w-[18px] flex-1 rounded-t bg-[#426b1f]/80"
+                      className="max-w-[18px] flex-1 rounded-t bg-brand/80"
                       style={{ height: `${Math.max(4, (point.revenue / peak) * 96)}px` }}
                     />
                   ))}
                 </div>
-                <div className="mt-1 flex justify-between text-[10px] text-[#757575]">
+                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
                   <span>{chart[0]?.bucket}</span>
                   <span>{chart[chart.length - 1]?.bucket}</span>
                 </div>
@@ -1354,7 +1354,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title="Order pipeline">
             {pipelineTotal === 0 ? (
-              <p className="text-[12px] text-[#757575]">No orders in this window.</p>
+              <p className="text-[12px] text-muted-foreground">No orders in this window.</p>
             ) : (
               <div className="space-y-1.5">
                 {PIPELINE.map((stage) => {
@@ -1376,12 +1376,12 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title="Payment mix">
             {overview.payments.length === 0 ? (
-              <p className="text-[12px] text-[#757575]">No payments in this window.</p>
+              <p className="text-[12px] text-muted-foreground">No payments in this window.</p>
             ) : (
               <dl className="space-y-1 text-[12px]">
                 {overview.payments.map((row) => (
                   <div key={row.status} className="flex justify-between gap-2">
-                    <dt className="text-[#757575]">{PAYMENT_LABELS[row.status] ?? row.status}</dt>
+                    <dt className="text-muted-foreground">{PAYMENT_LABELS[row.status] ?? row.status}</dt>
                     <dd className="text-[#000000]">{row.count} · {formatUgx(row.amount)}</dd>
                   </div>
                 ))}
@@ -1391,18 +1391,18 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title="Top products">
             {topProducts.length === 0 ? (
-              <p className="text-[12px] text-[#757575]">Nothing sold in this window.</p>
+              <p className="text-[12px] text-muted-foreground">Nothing sold in this window.</p>
             ) : (
               <div className="space-y-1.5">
                 {topProducts.map((product) => (
                   <div key={product.productId}>
                     <div className="flex justify-between gap-2 text-[12px]">
                       <span className="truncate text-[#000000]">{product.name}</span>
-                      <span className="shrink-0 text-[#757575]">{product.units} {product.unit}</span>
+                      <span className="shrink-0 text-muted-foreground">{product.units} {product.unit}</span>
                     </div>
                     <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-neutral-100">
                       <div
-                        className="h-full bg-[#426b1f]"
+                        className="h-full bg-brand"
                         style={{ width: `${(product.revenue / productPeak) * 100}%` }}
                       />
                     </div>
@@ -1414,12 +1414,11 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title="Regional demand">
             {regions.length === 0 ? (
-              <p className="text-[12px] text-[#757575]">No deliveries in this window.</p>
+              <p className="text-[12px] text-muted-foreground">No deliveries in this window.</p>
             ) : (
               <dl className="space-y-1 text-[12px]">
                 {regions.slice(0, 5).map((row) => (
-                  <div key={`${row.region}-${row.district ?? ''}`} className="flex justify-between gap-2">
-                    <dt className="truncate text-[#757575]">{row.region}{row.district ? ` · ${row.district}` : ''}</dt>
+                  <div key={`${row.region}-${row.district ?? ''}`} className="flex justify-between gap-2"> <dt className="truncate text-muted-foreground">{row.region}{row.district ? ` · ${row.district}` : ''}</dt>
                     <dd className="shrink-0 text-[#000000]">
                       {row.orders} order{row.orders === 1 ? '' : 's'} · {formatUgx(row.revenue)}
                     </dd>
@@ -1431,12 +1430,12 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title="Restock soon">
             {restock.length === 0 ? (
-              <p className="text-[12px] text-[#757575]">Every product covers more than 10 days.</p>
+              <p className="text-[12px] text-muted-foreground">Every product covers more than 10 days.</p>
             ) : (
               <dl className="space-y-1 text-[12px]">
                 {restock.map((row) => (
                   <div key={row.productId} className="flex justify-between gap-2">
-                    <dt className="truncate text-[#757575]">{row.name}</dt>
+                    <dt className="truncate text-muted-foreground">{row.name}</dt>
                     <dd className="shrink-0 text-[#000000]">
                       {row.daysOfCover} days · {row.stock} {row.unit} left
                     </dd>
@@ -1448,13 +1447,13 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
           <Section title="Promo redemptions">
             {overview.promos.length === 0 ? (
-              <p className="text-[12px] text-[#757575]">No codes redeemed in this window.</p>
+              <p className="text-[12px] text-muted-foreground">No codes redeemed in this window.</p>
             ) : (
               <dl className="space-y-1 text-[12px]">
                 {overview.promos.map((promo) => (
                   <div key={promo.code} className="flex justify-between gap-2">
                     <dt className="text-[#000000]">{promo.code}</dt>
-                    <dd className="text-[#757575]">{promo.uses} uses · {formatUgx(promo.discount)}</dd>
+                    <dd className="text-muted-foreground">{promo.uses} uses · {formatUgx(promo.discount)}</dd>
                   </div>
                 ))}
               </dl>
@@ -1466,7 +1465,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
               <a
                 key={source}
                 href={analyticsExportUrl(source, { from })}
-                className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-[11px] text-[#426b1f]"
+                className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-[11px] text-brand"
               >
                 Download {source}.csv
               </a>
@@ -1481,9 +1480,9 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 function Kpi({ label, value, note }: { label: string; value: string; note: string }) {
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
-      <p className="text-[11px] text-[#757575]">{label}</p>
-      <p className="text-[16px] font-['Inter:Medium',_sans-serif] text-[#000000]">{value}</p>
-      <p className="text-[10px] text-[#757575]">{note}</p>
+      <p className="text-[11px] text-muted-foreground">{label}</p>
+      <p className="text-[16px] font-medium text-[#000000]">{value}</p>
+      <p className="text-[10px] text-muted-foreground">{note}</p>
     </div>
   );
 }
@@ -1491,7 +1490,7 @@ function Kpi({ label, value, note }: { label: string; value: string; note: strin
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
-      <p className="mb-2 text-[12px] font-['Inter:Medium',_sans-serif] text-[#000000]">{title}</p>
+      <p className="mb-2 text-[12px] font-medium text-[#000000]">{title}</p>
       {children}
     </div>
   );
@@ -1515,19 +1514,19 @@ function ActivityPanel({ fail }: { fail: (m: string) => void }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Activity log</p>
+      <p className="text-[14px] font-medium text-[#000000]">Activity log</p>
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">Loading…</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : logs.length === 0 ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">No activity yet.</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">No activity yet.</p>
       ) : (
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575]">When</th>
-              <th className="pb-2 text-[#757575]">Admin</th>
-              <th className="pb-2 text-[#757575]">Action</th>
-              <th className="pb-2 text-[#757575]">Entity</th>
+              <th className="pb-2 text-muted-foreground">When</th>
+              <th className="pb-2 text-muted-foreground">Admin</th>
+              <th className="pb-2 text-muted-foreground">Action</th>
+              <th className="pb-2 text-muted-foreground">Entity</th>
             </tr>
           </thead>
           <tbody>
@@ -1583,17 +1582,17 @@ function CustomersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
         />
       </div>
       {loading ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">Loading…</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : customers.length === 0 ? (
-        <p className="text-[13px] text-[#757575] py-4 text-center">No customers.</p>
+        <p className="text-[13px] text-muted-foreground py-4 text-center">No customers.</p>
       ) : (
         <table className="w-full text-left border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-[#757575]">Name</th>
-              <th className="pb-2 text-[#757575]">Phone</th>
-              <th className="pb-2 text-[#757575]">Region</th>
-              <th className="pb-2 text-[#757575] text-right">Action</th>
+              <th className="pb-2 text-muted-foreground">Name</th>
+              <th className="pb-2 text-muted-foreground">Phone</th>
+              <th className="pb-2 text-muted-foreground">Region</th>
+              <th className="pb-2 text-muted-foreground text-right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -1719,14 +1718,14 @@ function AdminsPanel({
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Staff accounts</p>
-        <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+        <p className="text-[14px] font-medium text-[#000000]">Staff accounts</p>
+        <p className="text-[11px] font-normal text-muted-foreground">
           Owners manage accounts. Managers run the shop. Shop assistants only move orders.
         </p>
       </div>
 
       {loading ? (
-        <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">Loading accounts…</p>
+        <p className="text-[12px] font-normal text-muted-foreground">Loading accounts…</p>
       ) : (
         <div className="space-y-2">
           {accounts.map((account) => {
@@ -1739,18 +1738,18 @@ function AdminsPanel({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+                    <p className="truncate text-[13px] font-medium text-[#000000]">
                       {account.name}
                       {self ? ' (you)' : ''}
                     </p>
-                    <p className="truncate text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                    <p className="truncate text-[11px] font-normal text-muted-foreground">
                       {account.email}
                     </p>
                   </div>
                   <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-['Inter:Medium',_sans-serif] ${
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                       account.active
-                        ? 'bg-[#426b1f]/10 text-[#426b1f]'
+                        ? 'bg-brand/10 text-brand'
                         : 'bg-neutral-100 text-neutral-500'
                     }`}
                   >
@@ -1758,8 +1757,7 @@ function AdminsPanel({
                   </span>
                 </div>
 
-                <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
-                  {account.activeSessions} open session{account.activeSessions === 1 ? '' : 's'} ·{' '}
+                <p className="text-[11px] font-normal text-muted-foreground"> {account.activeSessions} open session{account.activeSessions === 1 ? '' : 's'} ·{' '}
                   {account.lastLoginAt
                     ? `last sign-in ${account.lastLoginAt.slice(0, 16)}`
                     : 'never signed in'}
@@ -1771,7 +1769,7 @@ function AdminsPanel({
                     disabled={self || pending}
                     onChange={(e) => change(account, { role: e.target.value as AdminRole })}
                     title={ADMIN_ROLE_HINTS[account.role]}
-                    className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-[11px] font-['Inter:Medium',_sans-serif] disabled:bg-neutral-100 disabled:text-neutral-400"
+                    className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-[11px] font-medium disabled:bg-neutral-100 disabled:text-neutral-400"
                   >
                     {(Object.keys(ADMIN_ROLE_LABELS) as AdminRole[]).map((value) => (
                       <option key={value} value={value}>
@@ -1785,7 +1783,7 @@ function AdminsPanel({
                       type="button"
                       disabled={self || pending}
                       onClick={() => change(account, { active: false })}
-                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-['Inter:Medium',_sans-serif] text-red-600 disabled:text-neutral-300"
+                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-red-600 disabled:text-neutral-300"
                     >
                       Disable
                     </button>
@@ -1794,7 +1792,7 @@ function AdminsPanel({
                       type="button"
                       disabled={pending}
                       onClick={() => change(account, { active: true })}
-                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-['Inter:Medium',_sans-serif] text-[#426b1f] disabled:text-neutral-300"
+                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-brand disabled:text-neutral-300"
                     >
                       Enable
                     </button>
@@ -1804,7 +1802,7 @@ function AdminsPanel({
                     type="button"
                     disabled={pending || account.activeSessions === 0}
                     onClick={() => change(account, { revokeSessions: true })}
-                    className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-['Inter:Medium',_sans-serif] text-[#000000] disabled:text-neutral-300"
+                    className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-[#000000] disabled:text-neutral-300"
                   >
                     Sign out everywhere
                   </button>
@@ -1817,7 +1815,7 @@ function AdminsPanel({
                         setResetFor(resetFor === account.id ? null : account.id);
                         setResetPassword('');
                       }}
-                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-['Inter:Medium',_sans-serif] text-[#000000] disabled:text-neutral-300"
+                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-[#000000] disabled:text-neutral-300"
                     >
                       Set password
                     </button>
@@ -1845,7 +1843,7 @@ function AdminsPanel({
                       className={`shrink-0 rounded-lg px-2 py-1 text-[11px] text-white ${
                         resetPassword.length < 10 || pending
                           ? 'bg-neutral-300'
-                          : 'bg-[#426b1f]'
+                          : 'bg-brand'
                       }`}
                     >
                       Save
@@ -1859,7 +1857,7 @@ function AdminsPanel({
       )}
 
       <form onSubmit={addAccount} className="space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
-        <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+        <p className="text-[13px] font-medium text-[#000000]">
           Add a staff account
         </p>
         <Field label="Full name">
@@ -1889,7 +1887,7 @@ function AdminsPanel({
               </option>
             ))}
           </select>
-          <p className="mt-1 text-[10px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+          <p className="mt-1 text-[10px] font-normal text-muted-foreground">
             {ADMIN_ROLE_HINTS[role]}
           </p>
         </Field>
@@ -1907,18 +1905,18 @@ function AdminsPanel({
           className={`w-full rounded-lg py-2.5 text-[13px] text-white ${
             creating || !name.trim() || !email.trim() || password.length < 10
               ? 'bg-neutral-300 cursor-not-allowed'
-              : 'bg-[#426b1f]'
+              : 'bg-brand'
           }`}
         >
           {creating ? 'Creating…' : 'Create account'}
         </button>
-        <p className="text-[10px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+        <p className="text-[10px] font-normal text-muted-foreground">
           Share the temporary password in person. They can change it after signing in.
         </p>
       </form>
 
       <form onSubmit={submit} className="space-y-2">
-        <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">Change your password</p>
+        <p className="text-[14px] font-medium text-[#000000]">Change your password</p>
         <Field label="Current password">
           <input
             type="password"
@@ -1938,7 +1936,7 @@ function AdminsPanel({
         <button
           type="submit"
           disabled={busy || !current || !next}
-          className={`w-full rounded-lg py-2.5 text-[13px] text-white ${busy || !current || !next ? 'bg-neutral-300 cursor-not-allowed' : 'bg-[#426b1f]'}`}
+          className={`w-full rounded-lg py-2.5 text-[13px] text-white ${busy || !current || !next ? 'bg-neutral-300 cursor-not-allowed' : 'bg-brand'}`}
         >
           {busy ? 'Changing…' : 'Change password'}
         </button>

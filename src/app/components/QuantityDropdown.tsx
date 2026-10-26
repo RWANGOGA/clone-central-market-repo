@@ -29,8 +29,8 @@ export default function QuantityDropdown({ quantity, onQuantityChange }: Quantit
           <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start px-2 py-1 relative">
             <div className="relative shrink-0">
               <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative">
-                <div className="flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[14px] text-left text-nowrap tracking-[-0.14px]">
-                  <p className="adjustLetterSpacing block leading-[20px] whitespace-pre">{quantity}</p>
+                <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[14px] text-left text-nowrap tracking-[-0.14px]">
+                  <p className="block leading-[20px] whitespace-pre">{quantity}</p>
                 </div>
                 <div className="flex h-[4px] items-center justify-center relative shrink-0 w-[7px]">
                   <div className="flex-none rotate-[90deg]">
@@ -93,7 +93,7 @@ function MenuItem({ value, isSelected, onSelect }: MenuItemProps) {
     >
       <div className="relative size-full">
         <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start px-4 py-2 relative w-full">
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[16px] text-left text-nowrap">
+          <div className="font-normal leading-[0] not-italic relative shrink-0 text-[#1a1a1a] text-[16px] text-left text-nowrap">
             <p className="block leading-[1.5] whitespace-pre">{value}</p>
           </div>
         </div>

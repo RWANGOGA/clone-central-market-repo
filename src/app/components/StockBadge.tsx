@@ -11,9 +11,9 @@ interface StockBadgeProps {
 
 const TONE = {
   in_stock: {
-    text: 'text-[#426b1f]',
-    chip: 'bg-[#426b1f]/10 text-[#426b1f] border-[#426b1f]/20',
-    bar: 'bg-[#426b1f]',
+    text: 'text-brand',
+    chip: 'bg-brand/10 text-brand border-brand/20',
+    bar: 'bg-brand',
     label: 'In stock',
   },
   low: {
@@ -24,7 +24,7 @@ const TONE = {
   },
   out: {
     text: 'text-[#9a9a9a]',
-    chip: 'bg-neutral-100 text-[#757575] border-neutral-200',
+    chip: 'bg-neutral-100 text-muted-foreground border-neutral-200',
     bar: 'bg-neutral-300',
     label: 'Sold out',
   },
@@ -39,7 +39,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
   // No figure at all: say so rather than implying a known quantity.
   if (!level) {
     return (
-      <span className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+      <span className="text-[11px] font-normal text-[#9a9a9a]">
         {stale ? 'Stock unavailable' : 'Checking stock…'}
       </span>
     );
@@ -52,11 +52,11 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
     return (
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-2">
-          <span className={`text-[13px] font-['Inter:Medium',_sans-serif] ${tone.text}`}>
+          <span className={`text-[13px] font-medium ${tone.text}`}>
             {level.remaining}
           </span>
           <span
-            className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full border font-['Inter:Medium',_sans-serif] ${tone.chip}`}
+            className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full border font-medium ${tone.chip}`}
           >
             {tone.label}
           </span>
@@ -70,7 +70,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
                   of a whole. */}
               <div className={`h-full ${tone.bar} rounded-full`} style={{ width: level.state === 'low' ? '18%' : '62%' }} />
             </div>
-            <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+            <p className="text-[11px] font-normal text-[#9a9a9a]">
               {stale
                 ? 'Last known figure, the live service is unreachable.'
                 : `Counted in ${level.unit}. Orders are checked against this when you pay.`}
@@ -79,7 +79,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
         )}
 
         {soldOut && (
-          <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+          <p className="text-[11px] font-normal text-[#9a9a9a]">
             Nothing available. A delivery would be needed before this can be ordered.
           </p>
         )}
@@ -90,7 +90,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
   return (
     <span className="inline-flex items-center gap-1">
       <span
-        className={`text-[10px] px-1.5 py-0.5 rounded-full border font-['Inter:Medium',_sans-serif] ${tone.chip}`}
+        className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${tone.chip}`}
       >
         {level.remaining}
       </span>

@@ -55,10 +55,10 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
         <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
           <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
           <div
-            className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+            className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
           >
-            <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+            <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
           </div>
         </div>
       </div>
@@ -66,10 +66,10 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
       <div className="absolute left-0 right-0 top-[149px] bottom-0 overflow-y-auto">
         <div className="px-6 pt-6 pb-10 space-y-6">
           <div>
-            <h1 className="font-['Newsreader:Regular',_sans-serif] text-[28px] text-[#000000] leading-tight">
+            <h1 className="font-serif font-normal text-[28px] text-[#000000] leading-tight">
               Welcome back
             </h1>
-            <p className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#757575] mt-1">
+            <p className="font-normal text-[14px] text-muted-foreground mt-1">
               Sign in to your account to continue
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-[12px] text-[#757575] block mb-1 font-['Inter:Regular',_sans-serif]">
+              <label className="text-[12px] text-muted-foreground block mb-1 font-normal">
                 Phone number
               </label>
               <input
@@ -96,7 +96,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
             </div>
 
             <div>
-              <label className="text-[12px] text-[#757575] block mb-1 font-['Inter:Regular',_sans-serif]">
+              <label className="text-[12px] text-muted-foreground block mb-1 font-normal">
                 Password
               </label>
               <div className="relative">
@@ -111,7 +111,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#426b1f] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -131,7 +131,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#426b1f] text-white font-['Inter:Medium',_sans-serif] text-[15px] py-3.5 rounded-xl hover:bg-[#355a19] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-brand text-white font-medium text-[15px] py-3.5 rounded-xl hover:bg-[#355a19] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -140,7 +140,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
           <div className="text-center">
             <button
               onClick={onNavigateToSignup}
-              className="text-[#426b1f] font-['Inter:Regular',_sans-serif] text-[14px] hover:underline"
+              className="text-brand font-normal text-[14px] hover:underline"
             >
               Don't have an account? Sign up
             </button>
@@ -149,7 +149,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
           <div className="text-center">
             <button
               onClick={onBack}
-              className="text-[#757575] font-['Inter:Regular',_sans-serif] text-[13px] hover:text-[#000000]"
+              className="text-muted-foreground font-normal text-[13px] hover:text-[#000000]"
             >
               ← Back to shop
             </button>

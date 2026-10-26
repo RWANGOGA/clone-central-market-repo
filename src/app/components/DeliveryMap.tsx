@@ -175,8 +175,7 @@ export default function DeliveryMap({
     return (
       <div className="h-full w-full flex items-center justify-center bg-[#f7f7f5] px-6">
         <div className="text-center">
-          <p className="text-[15px] font-['Inter:Medium',_sans-serif] text-[#000000]">Map unavailable</p>
-          <p className="mt-2 text-[13px] text-[#757575] font-['Inter:Regular',_sans-serif] leading-[20px]">
+          <p className="text-[15px] font-medium text-[#000000]">Map unavailable</p> <p className="mt-2 text-[13px] text-muted-foreground font-normal leading-[20px]">
             {loadError}
           </p>
         </div>
@@ -280,13 +279,13 @@ export default function DeliveryMap({
       {/* Drill-down breadcrumb and region quick-jump */}
       <div className="absolute left-3 right-3 top-3 z-[1050] flex flex-col gap-2 pointer-events-none">
         <div className="pointer-events-auto self-start bg-white/95 rounded-xl shadow-lg px-3 py-2">
-          <p className="text-[11px] uppercase tracking-wide text-[#757575] font-['Inter:Medium',_sans-serif]">
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
             {breadcrumb(regions, path)}
           </p>
           {path.length > 0 && (
             <button
               onClick={goUp}
-              className="mt-0.5 text-[12px] text-[#426b1f] font-['Inter:Medium',_sans-serif] hover:underline"
+              className="mt-0.5 text-[12px] text-brand font-medium hover:underline"
             >
               &larr; {path.length > 1 ? 'Back to region' : 'All regions'}
             </button>
@@ -295,7 +294,7 @@ export default function DeliveryMap({
 
         {hierarchy && (
           <div className="pointer-events-auto self-start bg-white/95 rounded-xl shadow-lg px-3 py-2">
-            <p className="text-[11px] uppercase tracking-wide text-[#757575] mb-1.5 font-['Inter:Medium',_sans-serif]">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1.5 font-medium">
               Zoom to region
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -303,10 +302,10 @@ export default function DeliveryMap({
                 <button
                   key={region.id}
                   onClick={() => focusRegion(region)}
-                  className={`text-[11px] px-2.5 py-1 rounded-full border font-['Inter:Regular',_sans-serif] transition-colors ${
+                  className={`text-[11px] px-2.5 py-1 rounded-full border font-normal transition-colors ${
                     regionId === region.id
-                      ? 'bg-[#426b1f] text-white border-[#426b1f]'
-                      : 'bg-white text-[#000000] border-neutral-300 hover:border-[#426b1f]'
+                      ? 'bg-brand text-white border-brand'
+                      : 'bg-white text-[#000000] border-neutral-300 hover:border-brand'
                   }`}
                 >
                   {region.name.replace(' Region', '')}
@@ -321,8 +320,7 @@ export default function DeliveryMap({
 
       {selected && (
         <div className="absolute bottom-24 left-3 right-3 z-[1050] bg-white/95 rounded-xl shadow-lg px-3 py-2">
-          <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">{selected.name}</p>
-          <p className="text-[11px] text-[#757575] font-['Inter:Regular',_sans-serif]">
+          <p className="text-[13px] font-medium text-[#000000]">{selected.name}</p> <p className="text-[11px] text-muted-foreground font-normal">
             {selected.kind}
             {selected.children.length > 0
               ? ` · ${selected.children.length} below`
@@ -344,13 +342,12 @@ function Legend({
   return (
     <div className="absolute bottom-3 left-3 z-[1050] bg-white/95 rounded-lg shadow px-2.5 py-1.5 space-y-0.5 max-w-[62%]">
       {levels.map((level) => (
-        <p key={level.level} className="text-[10px] font-['Inter:Regular',_sans-serif] text-[#757575]">
-          <span className="text-[#000000]">{level.count}</span> {level.label ?? level.level.toLowerCase() + 's'}
+        <p key={level.level} className="text-[10px] font-normal text-muted-foreground"> <span className="text-[#000000]">{level.count}</span> {level.label ?? level.level.toLowerCase() + 's'}
           {!level.geometryAvailable && <span style={{ color: AMBER }}> · no outline data</span>}
         </p>
       ))}
       {drilled && (
-        <p className="text-[10px] font-['Inter:Regular',_sans-serif] pt-0.5" style={{ color: AMBER }}>
+        <p className="text-[10px] font-normal pt-0.5" style={{ color: AMBER }}>
           Sub-county, parish and village outlines are not published
         </p>
       )}

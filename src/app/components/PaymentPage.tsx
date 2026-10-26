@@ -194,11 +194,11 @@ export default function PaymentPage({
 
       {/* Clears the "1" badge the same way the checkout screen does; at left-6
           the heading sat on top of it. */}
-      <div className="absolute left-[72px] top-[190px] text-[24px] text-[#426b1f] font-['Newsreader:Regular',_sans-serif] translate-y-[-50%]">
+      <div className="absolute left-[72px] top-[190px] text-[24px] text-brand font-serif font-normal translate-y-[-50%]">
         <p className="leading-[32px]">Payment</p>
       </div>
 
-      <div className="absolute left-6 top-[258px] text-[16px] text-[#000000] font-['Inter:Regular',_sans-serif] translate-y-[-50%]">
+      <div className="absolute left-6 top-[258px] text-[16px] text-[#000000] font-normal translate-y-[-50%]">
         <p className="leading-[1.5] whitespace-pre">
           {stage === 'details' ? 'Choose how you want to pay' : stage === 'approval' ? 'Approve the payment' : 'Payment received'}
         </p>
@@ -220,18 +220,18 @@ export default function PaymentPage({
                       onClick={() => setChannel(option.id)}
                       className={`rounded-xl border px-2 py-3 text-left transition-colors ${
                         active
-                          ? 'border-[#426b1f] bg-[#426b1f]/8'
+                          ? 'border-brand bg-brand/8'
                           : 'border-neutral-200 bg-white hover:border-neutral-300'
                       }`}
                     >
                       <span
-                        className={`block text-[13px] font-['Inter:Medium',_sans-serif] ${
-                          active ? 'text-[#426b1f]' : 'text-[#000000]'
+                        className={`block text-[13px] font-medium ${
+                          active ? 'text-brand' : 'text-[#000000]'
                         }`}
                       >
                         {option.label}
                       </span>
-                      <span className="mt-0.5 block text-[10px] leading-[14px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                      <span className="mt-0.5 block text-[10px] leading-[14px] font-normal text-muted-foreground">
                         {option.blurb}
                       </span>
                     </button>
@@ -241,7 +241,7 @@ export default function PaymentPage({
 
               {activeMethods.length > 1 && (
                 <div className="space-y-2">
-                  <p className="text-[14px] text-[#757575] font-['Inter:Regular',_sans-serif]">
+                  <p className="text-[14px] text-muted-foreground font-normal">
                     {channel === 'mobile_money' ? 'Network' : 'Provider'}
                   </p>
                   <div className="space-y-1.5">
@@ -252,25 +252,25 @@ export default function PaymentPage({
                           key={method.id}
                           onClick={() => setProvider(method.id)}
                           className={`w-full flex items-center justify-between rounded-lg border px-3 py-2.5 ${
-                            active ? 'border-[#426b1f] bg-[#426b1f]/5' : 'border-neutral-200'
+                            active ? 'border-brand bg-brand/5' : 'border-neutral-200'
                           }`}
                         >
                           <span className="text-left">
-                            <span className="block text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+                            <span className="block text-[14px] font-medium text-[#000000]">
                               {method.label}
                             </span>
                             {method.ussd && (
-                              <span className="block text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                              <span className="block text-[11px] font-normal text-muted-foreground">
                                 {method.ussd}
                               </span>
                             )}
                           </span>
                           <span
                             className={`size-4 rounded-full border-2 flex items-center justify-center ${
-                              active ? 'border-[#426b1f]' : 'border-neutral-300'
+                              active ? 'border-brand' : 'border-neutral-300'
                             }`}
                           >
-                            {active && <span className="size-2 rounded-full bg-[#426b1f]" />}
+                            {active && <span className="size-2 rounded-full bg-brand" />}
                           </span>
                         </button>
                       );
@@ -286,12 +286,12 @@ export default function PaymentPage({
                     onChange={(e) => setPhone(e.target.value)}
                     inputMode="tel"
                     placeholder="07XX XXX XXX"
-                    className={`bg-white border rounded-lg px-4 py-2 w-full font-['Inter:Regular',_sans-serif] text-[16px] ${
+                    className={`bg-white border rounded-lg px-4 py-2 w-full font-normal text-[16px] ${
                       phone.length > 0 && !phoneValid ? 'border-red-500' : 'border-neutral-200'
                     }`}
                   />
                   {selectedMethod && (
-                    <p className="mt-1 text-[11px] leading-[16px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                    <p className="mt-1 text-[11px] leading-[16px] font-normal text-muted-foreground">
                       {phoneValid
                         ? selectedMethod.instructions
                         : `Starts with ${selectedMethod.prefixes?.join(', ')} for ${selectedMethod.label}`}
@@ -302,10 +302,10 @@ export default function PaymentPage({
 
               {channel === 'cod' && (
                 <div className="rounded-xl border border-neutral-200 p-4 space-y-1">
-                  <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+                  <p className="text-[14px] font-medium text-[#000000]">
                     Pay when your order arrives
                   </p>
-                  <p className="text-[12px] leading-[18px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                  <p className="text-[12px] leading-[18px] font-normal text-muted-foreground">
                     The rider collects the total in cash. Your order is confirmed immediately and
                     the items are reserved for you.
                   </p>
@@ -318,9 +318,9 @@ export default function PaymentPage({
                     value={walletId}
                     onChange={(e) => setWalletId(e.target.value)}
                     placeholder="allen@stanbic"
-                    className="bg-white border border-neutral-200 rounded-lg px-4 py-2 w-full font-['Inter:Regular',_sans-serif] text-[16px]"
+                    className="bg-white border border-neutral-200 rounded-lg px-4 py-2 w-full font-normal text-[16px]"
                   />
-                  <p className="mt-1 text-[11px] leading-[16px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                  <p className="mt-1 text-[11px] leading-[16px] font-normal text-muted-foreground">
                     Works with any wallet on the Uganda interbank and mobile money switch.
                   </p>
                 </Field>
@@ -332,25 +332,25 @@ export default function PaymentPage({
 
           {stage === 'approval' && intent && (
             <>
-              <div className="rounded-xl border border-[#426b1f]/25 bg-[#426b1f]/5 p-4 space-y-2">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-[#426b1f]">
+              <div className="rounded-xl border border-brand/25 bg-brand/5 p-4 space-y-2">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-brand">
                   {intent.nextAction?.ussd ? `Dial ${intent.nextAction.ussd}` : 'Awaiting approval'}
                 </p>
-                <p className="text-[14px] leading-[20px] font-['Inter:Regular',_sans-serif] text-[#000000]">
+                <p className="text-[14px] leading-[20px] font-normal text-[#000000]">
                   {intent.nextAction?.instructions ??
                     'Approve the request on your phone. The order moves on once the provider confirms.'}
                 </p>
                 {intent.channel === 'mobile_money' && phone && (
-                  <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                  <p className="text-[12px] font-normal text-muted-foreground">
                     Requested from {normalizeUgandanPhone(phone) ?? phone}
                   </p>
                 )}
                 {intent.maskedCard && (
-                  <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                  <p className="text-[12px] font-normal text-muted-foreground">
                     Card {intent.maskedCard}
                   </p>
                 )}
-                <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                <p className="text-[11px] font-normal text-muted-foreground">
                   Reference {intent.reference}
                 </p>
               </div>
@@ -382,7 +382,7 @@ export default function PaymentPage({
                   <button
                     onClick={confirmPayment}
                     disabled={busy}
-                    className="w-full bg-[#426b1f] text-white rounded-lg py-3 text-[14px] font-['Inter:Medium',_sans-serif] disabled:opacity-60"
+                    className="w-full bg-brand text-white rounded-lg py-3 text-[14px] font-medium disabled:opacity-60"
                   >
                     {busy ? 'Confirming…' : 'I have approved the payment'}
                   </button>
@@ -395,7 +395,7 @@ export default function PaymentPage({
                 <button
                   onClick={cancelPayment}
                   disabled={busy}
-                  className="w-full border border-neutral-300 rounded-lg py-2.5 text-[13px] font-['Inter:Regular',_sans-serif] text-[#000000] disabled:opacity-60"
+                  className="w-full border border-neutral-300 rounded-lg py-2.5 text-[13px] font-normal text-[#000000] disabled:opacity-60"
                 >
                   Cancel payment
                 </button>
@@ -421,7 +421,7 @@ export default function PaymentPage({
               </dl>
               <button
                 onClick={onProceedToConfirmation}
-                className="w-full bg-[#426b1f] text-white rounded-lg py-3 text-[14px] font-['Inter:Medium',_sans-serif]"
+                className="w-full bg-brand text-white rounded-lg py-3 text-[14px] font-medium"
               >
                 Continue to confirmation
               </button>
@@ -451,10 +451,10 @@ export default function PaymentPage({
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-[13px] font-['Inter:Regular',_sans-serif] text-[#757575]">{label}</dt>
+      <dt className="text-[13px] font-normal text-muted-foreground">{label}</dt>
       <dd
-        className={`text-[13px] font-['Inter:Regular',_sans-serif] ${
-          strong ? 'text-[#426b1f] font-semibold' : 'text-[#000000]'
+        className={`text-[13px] font-normal ${
+          strong ? 'text-brand font-semibold' : 'text-[#000000]'
         }`}
       >
         {value}
@@ -466,7 +466,7 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <p className="text-[14px] font-['Inter:Regular',_sans-serif] text-[#757575]">{label}</p>
+      <p className="text-[14px] font-normal text-muted-foreground">{label}</p>
       {children}
     </div>
   );
@@ -476,9 +476,9 @@ function Notice({ tone, children }: { tone: 'error' | 'success'; children: React
   const styles =
     tone === 'error'
       ? 'border-red-200 bg-red-50 text-red-700'
-      : 'border-[#426b1f]/25 bg-[#426b1f]/8 text-[#426b1f]';
+      : 'border-brand/25 bg-brand/8 text-brand';
   return (
-    <div className={`rounded-lg border px-3 py-2 text-[13px] leading-[19px] font-['Inter:Regular',_sans-serif] ${styles}`}>
+    <div className={`rounded-lg border px-3 py-2 text-[13px] leading-[19px] font-normal ${styles}`}>
       {children}
     </div>
   );
@@ -501,12 +501,12 @@ function Footer({
         onClick={isFormValid && !busy ? onPay : undefined}
         disabled={!isFormValid || busy}
         className={`absolute left-6 right-6 rounded-lg top-6 ${
-          isFormValid ? 'bg-[#426b1f] cursor-pointer' : 'bg-neutral-200 cursor-not-allowed'
+          isFormValid ? 'bg-brand cursor-pointer' : 'bg-neutral-200 cursor-not-allowed'
         }`}
       >
         <div className="flex flex-row items-center relative size-full">
           <div className="flex flex-row items-center justify-start pl-6 pr-4 py-2 relative w-full">
-            <p className="text-[14px] font-['Inter:Regular',_sans-serif] text-[#ffffff] grow">
+            <p className="text-[14px] font-normal text-[#ffffff] grow">
               {busy ? 'Working…' : label}
             </p>
             <div className="size-8 shrink-0">
@@ -534,8 +534,8 @@ function StatusBar() {
         </svg>
       </div>
       <div className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]" style={{ left: 'calc(50% - 135.5px)' }}>
-        <p className="font-['SF_Pro_Display:Bold',_sans-serif] h-5 leading-[0] not-italic text-[#000000] text-[17px] text-center tracking-[-0.408px] translate-x-[-50%] w-[54px]">
-          <span className="adjustLetterSpacing block leading-[22px]">9:41</span>
+        <p className="font-bold h-5 leading-[0] not-italic text-[#000000] text-[17px] text-center tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+          <span className="block leading-[22px]">9:41</span>
         </p>
       </div>
       <div className="absolute h-[13px] top-[19px] translate-x-[-50%] w-[27.401px]" style={{ left: 'calc(50% + 150.201px)' }}>
@@ -565,10 +565,10 @@ function Header({
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
       <div
-        className="absolute left-0 right-0 top-[31px] text-[24px] text-center font-['Newsreader:Medium',_sans-serif] text-[#426b1f] translate-y-[-50%]"
+        className="absolute left-0 right-0 top-[31px] text-[24px] text-center font-serif font-medium text-brand translate-y-[-50%]"
         style={{ top: 'calc(31px + 36px)' }}
       >
-        <p className="adjustLetterSpacing leading-none whitespace-pre">Mu Katale</p>
+        <p className="leading-none whitespace-pre">Mu Katale</p>
       </div>
 
       <div className="absolute right-5 rounded-2xl size-8 top-[18px]">
@@ -576,7 +576,7 @@ function Header({
           <path d={svgPaths.p2003cd00} fill="var(--fill-0, black)" />
         </svg>
         {cartCount > 0 && (
-          <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px] flex items-center justify-center">
+          <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px] flex items-center justify-center">
             <p className="text-[#ffffff] text-[9px] leading-none">{cartCount}</p>
           </div>
         )}
@@ -597,12 +597,12 @@ function Header({
 
       <div className="absolute left-6 right-6 top-[103px]">
         <div className="flex flex-row font-normal items-center justify-start w-full">
-          <div className="flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center text-[#000000] text-[24px] tracking-[-0.48px]">
+          <div className="flex flex-col font-serif font-normal grow justify-center text-[#000000] text-[24px] tracking-[-0.48px]">
             <p className="block leading-[32px] text-[24px]">Checkout</p>
           </div>
           <button
             onClick={onBack}
-            className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic shrink-0 text-[#426b1f] text-[14px] tracking-[-0.14px]"
+            className="cursor-pointer flex items-center font-normal not-italic shrink-0 text-brand text-[14px] tracking-[-0.14px]"
           >
             <div className="flex flex-row items-center gap-2">
               <div className="w-3 h-3">
@@ -610,7 +610,7 @@ function Header({
                   <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Back</p>
+              <p className="block leading-[24px] whitespace-pre">Back</p>
             </div>
           </button>
         </div>
@@ -627,7 +627,7 @@ function ProgressIndicators() {
           <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-['Roboto:Regular',_sans-serif] text-[#ffffff] text-[16px] leading-none">1</span>
+          <span className="font-normal text-[#ffffff] text-[16px] leading-none">1</span>
         </div>
       </div>
       <div className="absolute size-8 top-[174px]" style={{ left: 'calc(50% + 93.5px)' }}>
@@ -635,7 +635,7 @@ function ProgressIndicators() {
           <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-['Roboto:Regular',_sans-serif] text-[#ffffff] text-[16px] leading-none">2</span>
+          <span className="font-normal text-[#ffffff] text-[16px] leading-none">2</span>
         </div>
       </div>
       <div className="absolute size-8 top-[174px]" style={{ left: 'calc(50% + 131.5px)' }}>
@@ -643,7 +643,7 @@ function ProgressIndicators() {
           <circle cx="16" cy="16" fill="var(--fill-0, #757575)" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-['Roboto:Regular',_sans-serif] text-[#ffffff] text-[16px] leading-none">3</span>
+          <span className="font-normal text-[#ffffff] text-[16px] leading-none">3</span>
         </div>
       </div>
     </>

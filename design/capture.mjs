@@ -170,8 +170,31 @@ class Screen {
     );
   }
 
+  /**
+   * Page.navigate answers as soon as the request is in flight, not when the new
+   * document is committed, so the sleep that follows can still be spent on the
+   * page being left. Code evaluated in that window reads the old screen: the
+   * staff console readiness check matched an "Activity log" heading inside the
+   * order-detail view, declared the console ready, and then clicked nine tabs
+   * that did not exist. A token in the query string makes the handoff
+   * verifiable — until location reports it, the outgoing page is still on
+   * screen and nothing should be asked of it.
+   */
   async go(url, waitMs = 2600) {
-    await this.cdp.send('Page.navigate', { url }, this.sessionId);
+    const token = `mk${Date.now().toString(36)}${Math.floor(Math.random() * 1e4)}`;
+    await this.cdp.send(
+      'Page.navigate',
+      { url: `${url}${url.includes('?') ? '&' : '?'}capture=${token}` },
+      this.sessionId,
+    );
+    const deadline = Date.now() + 30000;
+    while (Date.now() < deadline) {
+      // The call is expected to fail while contexts are being torn down, which
+      // is itself the evidence that the navigation is still underway.
+      const committed = await this.js(`location.search.includes(${JSON.stringify(token)})`).catch(() => false);
+      if (committed) break;
+      await sleep(300);
+    }
     await sleep(waitMs);
   }
 
@@ -183,6 +206,27 @@ class Screen {
     const started = Date.now();
     while (Date.now() < started + timeoutMs) {
       const found = await this.js(`document.body.innerText.includes(${JSON.stringify(needle)})`);
+      if (found) return true;
+      await sleep(1000);
+    }
+    return false;
+  }
+
+  /**
+   * Waits for a clickable element whose text matches, rather than for text
+   * anywhere on the page. The distinction matters for the staff console:
+   * "Activity log" is both a tab label and a heading inside the order-detail
+   * view, so waiting on the text alone reports the console as ready while the
+   * tab bar is still off screen, and every tab click after it fails silently.
+   */
+  async waitForButton(pattern, timeoutMs = 45000) {
+    const started = Date.now();
+    while (Date.now() < started + timeoutMs) {
+      const found = await this.js(`(() => {
+        const re = new RegExp(${JSON.stringify(pattern)}, 'i');
+        return [...document.querySelectorAll('button, a, [role="button"], input[type=submit]')]
+          .some((el) => re.test((el.textContent || el.value || '').trim()));
+      })()`);
       if (found) return true;
       await sleep(1000);
     }
@@ -599,6 +643,24 @@ async function main() {
     console.log(`  purchase order: ${raised.status} ${body?.data?.reference ?? JSON.stringify(body).slice(0, 90)}`);
   }
 
+  // Next dev compiles a route the first time it is requested, and a route that
+  // has never been hit can take longer to answer than the settle budget allows.
+  // The result was frames showing "Loading…" that looked like broken screens
+  // when they were really the compiler. Each endpoint the console reads is
+  // requested once here, so a photograph shows the design rather than a spinner.
+  console.log('\nWarming admin routes');
+  for (const path of [
+    '/products', '/inventory/movements', '/inventory/reconciliation',
+    '/purchase-orders', '/suppliers', '/promos',
+    '/analytics/overview', '/analytics/sales', '/analytics/products',
+    '/analytics/regions', '/analytics/forecast', '/analytics/activity',
+    '/customers', '/admins',
+  ]) {
+    const res = await fetch(`${API}/admin${path}`, { headers: asAdmin }).catch(() => null);
+    if (!res?.ok) console.log(`  warning: ${path} ${res?.status ?? 'unreachable'}`);
+    else await res.arrayBuffer();
+  }
+
   console.log('\nStaff console');
   const staff = new Screen(cdp, 'staff');
   await staff.open();
@@ -606,8 +668,8 @@ async function main() {
   await staff.go(`${APP}/staff`, 3600);
   // The gate resolves the session over the API, which is slow on a cold
   // compile. Shooting before it answers produced a picture of a spinner.
-  const ready = await staff.waitForText('Activity log');
-  if (!ready) console.log('  warning: staff console did not render in time');
+  const ready = await staff.waitForButton('^Activity log$');
+  if (!ready) console.log('  warning: staff console did not render its tab bar in time');
   // An owner lands on Catalogue; the order desk is the screen the report needs
   // first, so go to it and wait for the queue to arrive.
   await staff.clickText('^Orders$');
@@ -636,7 +698,7 @@ async function main() {
     // The detail view replaces the console, so go back to the tab bar before
     // walking the tabs.
     await staff.go(`${APP}/staff`, 2600);
-    await staff.waitForText('Activity log', 20000);
+    await staff.waitForButton('^Activity log$', 20000);
   } else {
     console.log('  warning: could not open the order in the queue');
   }
@@ -652,9 +714,17 @@ async function main() {
     ['Customers', '47-staff-customers.png', 'Customer directory'],
     ['Admins', '48-staff-admins.png', 'Staff accounts and roles'],
   ]) {
-    const clicked = await staff.clickText(`^${label}$`);
+    let clicked = await staff.clickText(`^${label}$`);
     if (!clicked) {
-      console.log(`  skipped ${label}: tab not present for this role`);
+      // A cold route can still be swapping screens when the loop reaches a tab.
+      // Waiting for the tab bar and trying again separates "not rendered yet"
+      // from "genuinely not there", which the old message blurred into a note
+      // about the role when the role in fact has every tab.
+      const back = await staff.waitForButton('^Activity log$', 15000);
+      clicked = back ? await staff.clickText(`^${label}$`) : false;
+    }
+    if (!clicked) {
+      console.log(`  ERROR: could not open the ${label} tab — frame ${file} missing`);
       continue;
     }
     await staff.settle();

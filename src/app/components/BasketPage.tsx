@@ -89,30 +89,30 @@ export default function BasketPage({
 
               {/* Subtotal - 24px below the last product card */}
               <div className="flex justify-between items-center">
-                <div className="flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic text-[#000000] text-[18px] text-left text-nowrap">
+                <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-[#000000] text-[18px] text-left text-nowrap">
                   <p className="block leading-[1.45] whitespace-pre text-[18px]">Subtotal</p>
                 </div>
-                <div className="flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic text-[#426b1f] text-[18px] text-nowrap text-right">
+                <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-brand text-[18px] text-nowrap text-right">
                   <p className="block leading-[1.45] whitespace-pre text-[18px]">{formatUgx(subtotal)}</p>
                 </div>
               </div>
 
               {promo && (
                 <div className="mt-3 space-y-2">
-                  <div className="flex justify-between items-center font-['Inter:Regular',_sans-serif] text-[14px]">
-                    <span className="text-[#426b1f]">Discount &middot; {promo.code}</span>
-                    <span className="text-[#426b1f] tabular-nums">
+                  <div className="flex justify-between items-center font-normal text-[14px]">
+                    <span className="text-brand">Discount &middot; {promo.code}</span>
+                    <span className="text-brand tabular-nums">
                       {discount > 0 ? `\u2212 ${formatUgx(discount)}` : formatUgx(0)}
                     </span>
                   </div>
                   {shortfall > 0 ? (
-                    <p className="rounded-lg bg-amber-50 px-3 py-2 font-['Inter:Regular',_sans-serif] text-[12px] leading-[18px] text-amber-800">
+                    <p className="rounded-lg bg-amber-50 px-3 py-2 font-normal text-[12px] leading-[18px] text-amber-800">
                       Add {formatUgx(shortfall)} more to this basket and {promo.code} will apply.
                     </p>
                   ) : (
-                    <div className="flex justify-between items-center font-['Inter:Medium',_sans-serif] text-[15px]">
+                    <div className="flex justify-between items-center font-medium text-[15px]">
                       <span className="text-[#000000]">Total before delivery</span>
-                      <span className="text-[#426b1f] tabular-nums">{formatUgx(subtotal - discount)}</span>
+                      <span className="text-brand tabular-nums">{formatUgx(subtotal - discount)}</span>
                     </div>
                   )}
                 </div>
@@ -158,12 +158,12 @@ function PromoSection({ promo, subtotal, onApply, onClear }: PromoSectionProps) 
   if (promo) {
     const shortfall = promoShortfall(promo, subtotal);
     return (
-      <div className="mb-6 rounded-xl border border-[#426b1f]/30 bg-[#426b1f]/5 p-3">
+      <div className="mb-6 rounded-xl border border-brand/30 bg-brand/5 p-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="font-['Inter:Medium',_sans-serif] text-[13px] text-[#426b1f]">{promo.code}</p>
+            <p className="font-medium text-[13px] text-brand">{promo.code}</p>
             {promo.description && (
-              <p className="mt-0.5 font-['Inter:Regular',_sans-serif] text-[11px] leading-[16px] text-[#757575]">
+              <p className="mt-0.5 font-normal text-[11px] leading-[16px] text-muted-foreground">
                 {promo.description}
               </p>
             )}
@@ -171,13 +171,13 @@ function PromoSection({ promo, subtotal, onApply, onClear }: PromoSectionProps) 
           <button
             type="button"
             onClick={onClear}
-            className="shrink-0 font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575] underline"
+            className="shrink-0 font-normal text-[12px] text-muted-foreground underline"
           >
             Remove
           </button>
         </div>
         {shortfall > 0 && (
-          <p className="mt-2 font-['Inter:Regular',_sans-serif] text-[11px] leading-[16px] text-amber-700">
+          <p className="mt-2 font-normal text-[11px] leading-[16px] text-amber-700">
             Add {formatUgx(shortfall)} more for this code to apply.
           </p>
         )}
@@ -189,7 +189,7 @@ function PromoSection({ promo, subtotal, onApply, onClear }: PromoSectionProps) 
     <form onSubmit={apply} className="mb-6">
       <label
         htmlFor="promo-code"
-        className="mb-1 block font-['Inter:Regular',_sans-serif] text-[13px] text-[#757575]"
+        className="mb-1 block font-normal text-[13px] text-muted-foreground"
       >
         Promo code
       </label>
@@ -201,18 +201,18 @@ function PromoSection({ promo, subtotal, onApply, onClear }: PromoSectionProps) 
           placeholder="e.g. WELCOME10"
           autoCapitalize="characters"
           autoComplete="off"
-          className="min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-3 py-2 font-['Inter:Regular',_sans-serif] text-[14px] uppercase"
+          className="min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-3 py-2 font-normal text-[14px] uppercase"
         />
         <button
           type="submit"
           disabled={busy || code.trim().length === 0}
-          className="rounded-lg bg-[#426b1f] px-4 py-2 font-['Inter:Medium',_sans-serif] text-[13px] text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg bg-brand px-4 py-2 font-medium text-[13px] text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? 'Checking…' : 'Apply'}
         </button>
       </div>
       {message && (
-        <p role="alert" className="mt-1 font-['Inter:Regular',_sans-serif] text-[11px] leading-[16px] text-red-600">
+        <p role="alert" className="mt-1 font-normal text-[11px] leading-[16px] text-red-600">
           {message}
         </p>
       )}
@@ -229,22 +229,22 @@ function EmptyBasket({ onReturnToShop }: EmptyBasketProps) {
     <div className="absolute bg-neutral-200 left-[33px] rounded-3xl top-[194px] w-[327px]">
       <div className="relative size-full">
         <div className="box-border content-stretch flex flex-col gap-4 items-start justify-start p-6 relative w-[327px]">
-          <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[24px] text-left w-full">
+          <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[24px] text-left w-full">
             <p className="block leading-[1.25]">Your cart is empty!</p>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left w-full">
+          <div className="font-normal leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left w-full">
             <p className="block leading-[1.5]">
               Head back to the products page to check out our produce 🌸
             </p>
           </div>
           <button 
             onClick={onReturnToShop}
-            className="bg-[#426b1f] relative rounded-[360px] shrink-0 w-full"
+            className="bg-brand relative rounded-[360px] shrink-0 w-full"
           >
             <div className="flex flex-row items-center justify-center relative size-full">
               <div className="box-border content-stretch flex flex-row gap-2 items-center justify-center px-6 py-2 relative w-full">
-                <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[18px] text-left text-nowrap tracking-[-0.18px]">
-                  <p className="adjustLetterSpacing block leading-[32px] whitespace-pre">
+                <div className="font-normal leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[18px] text-left text-nowrap tracking-[-0.18px]">
+                  <p className="block leading-[32px] whitespace-pre">
                     Return to shop
                   </p>
                 </div>
@@ -291,8 +291,8 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute css-a0byvc font-['SF_Pro_Display:Bold',_sans-serif] h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
-          <p className="adjustLetterSpacing block leading-[22px]">9:41</p>
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+          <p className="block leading-[22px]">9:41</p>
         </div>
       </div>
     </div>
@@ -353,10 +353,10 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
       <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
         <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
         <div
-          className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+          className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
         >
-          <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+          <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
         </div>
         
         {/* Cart Icon */}
@@ -369,11 +369,11 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
             </svg>
           </div>
           {cartCount > 0 && (
-            <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+            <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                    <p className="adjustLetterSpacing block leading-none whitespace-pre">{cartCount}</p>
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <p className="block leading-none whitespace-pre">{cartCount}</p>
                   </div>
                 </div>
               </div>
@@ -402,12 +402,12 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
         <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
           <div className="relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-              <div className="basis-0 flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
+              <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
                 <p className="block leading-[32px] text-[24px]">My Basket</p>
               </div>
               <button 
                 onClick={onBack}
-                className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic relative shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px]"
+                className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px]"
               >
                 <div className="flex flex-row items-center gap-2">
                   <div className="w-3 h-3">
@@ -415,7 +415,7 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
                       <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Back</p>
+                  <p className="block leading-[24px] whitespace-pre">Back</p>
                 </div>
               </button>
             </div>
@@ -449,11 +449,11 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
       />
       
       {/* Product Name and Price */}
-      <div className="absolute flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] left-[86px] not-italic text-[#000000] text-[14px] text-left top-4 translate-y-[-50%] w-[173px]">
+      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[86px] not-italic text-[#000000] text-[14px] text-left top-4 translate-y-[-50%] w-[173px]">
         <p className="leading-[16px]">
           <span className="text-[#000000]">
             {item.name}
-            <span className="text-[#757575]">
+            <span className="text-muted-foreground">
               {' '}
               &middot; {item.quantity} {item.unit}
             </span>
@@ -461,7 +461,7 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
           <span>
             <br />
           </span>
-          <span className="text-[#426b1f]">{item.price}</span>
+          <span className="text-brand">{item.price}</span>
         </p>
       </div>
       
@@ -474,7 +474,7 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
       </div>
       
       {/* Total Price */}
-      <div className="absolute flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic right-0 text-[#757575] text-[14px] text-nowrap text-right top-[58px] translate-y-[-50%]">
+      <div className="absolute flex flex-col font-normal justify-center leading-[0] not-italic right-0 text-muted-foreground text-[14px] text-nowrap text-right top-[58px] translate-y-[-50%]">
         <p className="block leading-[16px] whitespace-pre text-[16px]">{formatUgx(totalPrice)}</p>
       </div>
     </div>
@@ -488,21 +488,21 @@ interface FooterProps {
 function Footer({ onGoToCheckout }: FooterProps) {
   return (
     <div className="absolute bg-[#ffffff] bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
-      <div className="absolute flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] left-6 not-italic text-[#426b1f] text-[14px] text-left text-nowrap top-[94px] tracking-[-0.14px] translate-y-[-50%]">
+      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-6 not-italic text-brand text-[14px] text-left text-nowrap top-[94px] tracking-[-0.14px] translate-y-[-50%]">
         <p className="leading-[24px] whitespace-pre">
-          <span className="font-['Inter:Bold',_sans-serif] font-bold not-italic text-[#426b1f]">Hooray! </span>
-          <span className="adjustLetterSpacing text-[#757575]">You qualify for free shipping</span>
+          <span className="font-bold not-italic text-brand">Hooray! </span>
+          <span className="text-muted-foreground">You qualify for free shipping</span>
         </p>
       </div>
       
       {/* Proceed to Checkout Button */}
       <button 
         onClick={onGoToCheckout}
-        className="absolute bg-[#426b1f] left-6 right-6 rounded-lg top-6"
+        className="absolute bg-brand left-6 right-6 rounded-lg top-6"
       >
         <div className="flex flex-row items-center relative size-full">
           <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start pl-6 pr-4 py-2 relative w-full">
-            <div className="basis-0 flex flex-col font-['Inter:Regular',_sans-serif] font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left tracking-[-0.16px]">
+            <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left tracking-[-0.16px]">
               <p className="block leading-[24px] text-[16px]">Proceed to checkout</p>
             </div>
             <div className="size-8 relative shrink-0">

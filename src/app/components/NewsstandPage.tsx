@@ -51,7 +51,7 @@ const ARTICLES: Article[] = [
     source: 'Africa Agricultural Network',
     summary: 'Heifer International Uganda awarded eight enterprises at the AYuTe Africa Challenge Season 5, with Piipu General Enterprises and Revmake Tech Company taking UGX 50m each. Entries rose sharply to 836 applications from 307 in 2025, and two female-led agribusinesses received UGX 10m apiece.',
     tag: 'Field Notes',
-    heroColor: 'bg-[#426b1f]/10',
+    heroColor: 'bg-brand/10',
   },
   {
     id: '3',
@@ -99,7 +99,7 @@ const ARTICLES: Article[] = [
     source: 'Daily Monitor',
     summary: 'Traders meeting KCCA at Kitante Primary School listed flooding, high rents, poor planning and taxis blocking shopfronts as their biggest pressures. KCCA Executive Director Sharifah Buzeki committed to reviewing flood compensation, market space and landlord relations, and said 550 vacant spaces sit in government markets at Wandegeya, Rusafi, Nakawa and Luzira.',
     tag: 'Market News',
-    heroColor: 'bg-[#426b1f]/10',
+    heroColor: 'bg-brand/10',
   },
 ];
 
@@ -136,10 +136,10 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
         <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
           <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
           <div
-            className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+            className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
           >
-            <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+            <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
           </div>
 
           {/* Cart Icon */}
@@ -156,11 +156,11 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
               </svg>
             </div>
             {cartCount > 0 && (
-              <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+              <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                      <p className="adjustLetterSpacing block leading-none whitespace-pre text-[9px]">{cartCount}</p>
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                      <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                     </div>
                   </div>
                 </div>
@@ -190,12 +190,12 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
           <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
             <div className="relative shrink-0 w-full">
               <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-                <div className="basis-0 flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
+                <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
                   <p className="block leading-[32px] text-[24px]">Newsstand</p>
                 </div>
                 <button
                   onClick={onBack}
-                  className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic relative shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
+                  className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
                 >
                   <div className="flex flex-row items-center gap-1">
                     <div className="w-3 h-3">
@@ -203,7 +203,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                         <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
-                    <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Back</p>
+                    <p className="block leading-[24px] whitespace-pre">Back</p>
                   </div>
                 </button>
               </div>
@@ -221,10 +221,10 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-full text-[13px] font-['Inter:Regular',_sans-serif] whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-[13px] font-normal whitespace-nowrap transition-colors ${
                   selectedCategory === cat 
-                    ? 'bg-[#426b1f] text-white font-medium' 
-                    : 'bg-[#f5f5f5] text-[#757575] hover:bg-neutral-200'
+                    ? 'bg-brand text-white font-medium' 
+                    : 'bg-[#f5f5f5] text-muted-foreground hover:bg-neutral-200'
                 }`}
               >
                 {cat}
@@ -234,9 +234,9 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
 
           {/* Lead Article Card */}
           {filteredArticles.length > 0 && (
-            <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-sm hover:border-[#426b1f]/40 transition-all">
-              <div className="p-4 bg-gradient-to-br from-[#426b1f]/10 via-[#426b1f]/5 to-white border-b border-neutral-100 flex items-start justify-between">
-                <span className="text-[11px] uppercase tracking-wider font-semibold text-[#426b1f] bg-white/80 px-2.5 py-1 rounded-md border border-[#426b1f]/20">
+            <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-sm hover:border-brand/40 transition-all">
+              <div className="p-4 bg-gradient-to-br from-brand/10 via-brand/5 to-white border-b border-neutral-100 flex items-start justify-between">
+                <span className="text-[11px] uppercase tracking-wider font-semibold text-brand bg-white/80 px-2.5 py-1 rounded-md border border-brand/20">
                   {filteredArticles[0].category}
                 </span>
               </div>
@@ -245,13 +245,13 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                   expandLabel="Read full story"
                   preview={
                     <div className="space-y-2.5">
-                      <h3 className="font-['Newsreader:Regular',_sans-serif] text-[20px] text-[#000000] leading-[26px]">
+                      <h3 className="font-serif font-normal text-[20px] text-[#000000] leading-[26px]">
                         {filteredArticles[0].title}
                       </h3>
-                      <p className="font-['Inter:Regular',_sans-serif] text-[13px] text-[#757575] leading-[20px] line-clamp-3">
+                      <p className="font-normal text-[13px] text-muted-foreground leading-[20px] line-clamp-3">
                         {filteredArticles[0].summary}
                       </p>
-                      <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a] leading-[16px]">
+                      <p className="text-[11px] font-normal text-[#9a9a9a] leading-[16px]">
                         {filteredArticles[0].source} &bull; {filteredArticles[0].date} &bull;{' '}
                         {filteredArticles[0].readTime}
                       </p>
@@ -259,10 +259,10 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                   }
                   detail={
                     <div className="space-y-2.5">
-                      <p className="font-['Inter:Regular',_sans-serif] text-[13px] text-[#757575] leading-[20px]">
+                      <p className="font-normal text-[13px] text-muted-foreground leading-[20px]">
                         {filteredArticles[0].summary}
                       </p>
-                      <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#426b1f] leading-[16px]">
+                      <p className="text-[11px] font-normal text-brand leading-[16px]">
                         Reported by {filteredArticles[0].author} &bull; {filteredArticles[0].source} &bull;{' '}
                         {filteredArticles[0].date}
                       </p>
@@ -271,7 +271,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                   action={
                     <button
                       onClick={(e) => toggleBookmark(filteredArticles[0].id, e)}
-                      className="text-[#426b1f] hover:scale-110 transition-transform"
+                      className="text-brand hover:scale-110 transition-transform"
                       aria-label="Bookmark article"
                     >
                       <svg className="w-5 h-5" fill={bookmarkedIds.has(filteredArticles[0].id) ? "#426b1f" : "none"} viewBox="0 0 24 24" stroke="#426b1f" strokeWidth="1.5">
@@ -289,29 +289,29 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
             {filteredArticles.slice(1).map(article => (
               <ExpandableCard
                 key={article.id}
-                className="p-4 border border-neutral-200 rounded-xl bg-white hover:border-[#426b1f]/30 transition-all"
+                className="p-4 border border-neutral-200 rounded-xl bg-white hover:border-brand/30 transition-all"
                 preview={
                   <div className="flex flex-col gap-2">
-                    <span className="text-[11px] font-semibold text-[#426b1f] uppercase tracking-wide">
+                    <span className="text-[11px] font-semibold text-brand uppercase tracking-wide">
                       {article.category}
                     </span>
-                    <h4 className="font-['Newsreader:Regular',_sans-serif] text-[17px] text-[#000000] leading-[22px]">
+                    <h4 className="font-serif font-normal text-[17px] text-[#000000] leading-[22px]">
                       {article.title}
                     </h4>
-                    <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575] leading-[18px] line-clamp-2">
+                    <p className="font-normal text-[12px] text-muted-foreground leading-[18px] line-clamp-2">
                       {article.summary}
                     </p>
-                    <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a] leading-[16px]">
+                    <p className="text-[11px] font-normal text-[#9a9a9a] leading-[16px]">
                       {article.source} &bull; {article.date} &bull; {article.readTime}
                     </p>
                   </div>
                 }
                 detail={
                   <div className="flex flex-col gap-2">
-                    <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575] leading-[18px]">
+                    <p className="font-normal text-[12px] text-muted-foreground leading-[18px]">
                       {article.summary}
                     </p>
-                    <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#426b1f] leading-[16px]">
+                    <p className="text-[11px] font-normal text-brand leading-[16px]">
                       Reported by {article.author} &bull; {article.source}
                     </p>
                   </div>
@@ -319,7 +319,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                 action={
                   <button
                     onClick={(e) => toggleBookmark(article.id, e)}
-                    className="text-[#426b1f]"
+                    className="text-brand"
                     aria-label="Bookmark article"
                   >
                     <svg className="w-4 h-4" fill={bookmarkedIds.has(article.id) ? "#426b1f" : "none"} viewBox="0 0 24 24" stroke="#426b1f" strokeWidth="1.5">
@@ -333,10 +333,10 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
 
           {/* Community Bulletin Note */}
           <div className="bg-[#f8f9fa] border border-neutral-200 rounded-xl p-4 text-center space-y-1">
-            <p className="font-['Newsreader:Regular',_sans-serif] text-[16px] text-[#426b1f]">
+            <p className="font-serif font-normal text-[16px] text-brand">
               Mu Katale Gazette • Issue No. 42
             </p>
-            <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575]">
+            <p className="font-normal text-[12px] text-muted-foreground">
               Reporting on Ugandan farms and markets. Each story credits its original outlet.
             </p>
           </div>

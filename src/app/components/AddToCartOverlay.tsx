@@ -30,19 +30,19 @@ export default function AddToCartOverlay({ isVisible, product, quantity }: AddTo
       }}
       className="absolute bottom-0 left-0 right-0 h-[121px] z-50 pointer-events-none"
     >
-      <div className="bg-[#426b1f] relative rounded-tl-[8px] rounded-tr-[8px] size-full">
-        <div className="absolute bg-[#426b1f] h-[39px] left-0 top-[82px] w-[393px]" />
+      <div className="bg-brand relative rounded-tl-[8px] rounded-tr-[8px] size-full">
+        <div className="absolute bg-brand h-[39px] left-0 top-[82px] w-[393px]" />
         
         {/* Background Illustration */}
         <BgIllustration />
         
         {/* Product Name */}
-        <div className="absolute flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] left-[88px] not-italic text-[#ffffff] text-[18px] text-left text-nowrap top-[50px] translate-y-[-50%]">
+        <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[88px] not-italic text-[#ffffff] text-[18px] text-left text-nowrap top-[50px] translate-y-[-50%]">
           <p className="block leading-[16px] whitespace-pre">{product.name}</p>
         </div>
         
         {/* "Adding to basket:" label */}
-        <div className="absolute flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] left-[88px] not-italic opacity-50 text-[#ffffff] text-[16px] text-left text-nowrap top-[30px] translate-y-[-50%]">
+        <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[88px] not-italic opacity-50 text-[#ffffff] text-[16px] text-left text-nowrap top-[30px] translate-y-[-50%]">
           <p className="block leading-[16px] whitespace-pre">Adding to basket:</p>
         </div>
         
@@ -89,8 +89,8 @@ function QuantityInput({ quantity }: { quantity: number }) {
         <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start px-4 py-3 relative">
           <div className="relative shrink-0">
             <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative">
-              <div className="flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left text-nowrap tracking-[-0.16px]">
-                <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">{quantity}</p>
+              <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left text-nowrap tracking-[-0.16px]">
+                <p className="block leading-[24px] whitespace-pre">{quantity}</p>
               </div>
               <div className="flex h-[4px] items-center justify-center relative shrink-0 w-[7px]">
                 <div className="flex-none rotate-[90deg]">

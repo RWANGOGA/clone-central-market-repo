@@ -460,10 +460,10 @@ export default function ProfilePage({
         <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
           <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
           <div
-            className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+            className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
           >
-            <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+            <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
           </div>
 
           {/* Cart Icon */}
@@ -480,11 +480,11 @@ export default function ProfilePage({
               </svg>
             </div>
             {cartCount > 0 && (
-              <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+              <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                      <p className="adjustLetterSpacing block leading-none whitespace-pre text-[9px]">{cartCount}</p>
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                      <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                     </div>
                   </div>
                 </div>
@@ -507,8 +507,8 @@ export default function ProfilePage({
               <div className="absolute bg-red-500 left-[17px] rounded-full size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[10px] text-center text-nowrap tracking-[-0.1px]">
-                      <p className="adjustLetterSpacing block leading-none whitespace-pre text-[9px]">{unreadCount > 9 ? '9+' : unreadCount}</p>
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[10px] text-center text-nowrap tracking-[-0.1px]">
+                      <p className="block leading-none whitespace-pre text-[9px]">{unreadCount > 9 ? '9+' : unreadCount}</p>
                     </div>
                   </div>
                 </div>
@@ -520,26 +520,26 @@ export default function ProfilePage({
           {showNotifications && (
             <div className="absolute right-0 top-[52px] w-[320px] bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-[400px] overflow-y-auto">
               <div className="p-3 border-b border-neutral-100 flex items-center justify-between">
-                <h3 className="font-['Inter:Medium',_sans-serif] text-[15px] text-[#000000]">Notifications</h3>
+                <h3 className="font-medium text-[15px] text-[#000000]">Notifications</h3>
                 <div className="flex items-center gap-3">
                   {unreadCount > 0 && (
                     <button
                       onClick={handleMarkAllRead}
-                      className="text-[#426b1f] hover:underline text-[12px] font-medium"
+                      className="text-brand hover:underline text-[12px] font-medium"
                     >
                       Mark all read
                     </button>
                   )}
                   <button
                     onClick={() => setShowNotifications(false)}
-                    className="text-[#757575] hover:text-[#000000] text-[12px]"
+                    className="text-muted-foreground hover:text-[#000000] text-[12px]"
                   >
                     Close
                   </button>
                 </div>
               </div>
               {notifications.length === 0 ? (
-                <div className="p-4 text-center text-[#757575] text-[13px]">No notifications yet</div>
+                <div className="p-4 text-center text-muted-foreground text-[13px]">No notifications yet</div>
               ) : (
                 <div className="divide-y divide-neutral-100">
                   {notifications.map((notification) => (
@@ -547,13 +547,13 @@ export default function ProfilePage({
                       key={notification.id}
                       type="button"
                       onClick={() => handleMarkOneRead(notification.id)}
-                      className={`w-full text-left p-3 transition-colors hover:bg-neutral-50 ${notification.read ? 'bg-white' : 'bg-[#426b1f]/5'}`}
+                      className={`w-full text-left p-3 transition-colors hover:bg-neutral-50 ${notification.read ? 'bg-white' : 'bg-brand/5'}`}
                     >
                       <div className="flex items-start gap-2">
-                        <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${notification.read ? 'bg-transparent' : 'bg-[#426b1f]'}`} />
+                        <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${notification.read ? 'bg-transparent' : 'bg-brand'}`} />
                         <div className="grow min-w-0">
                           <p className="text-[13px] font-medium text-[#000000] truncate">{notification.title}</p>
-                          <p className="text-[12px] text-[#757575] line-clamp-2">{notification.message}</p>
+                          <p className="text-[12px] text-muted-foreground line-clamp-2">{notification.message}</p>
                           <p className="text-[11px] text-[#9a9a9a] mt-1">
                             {new Date(notification.createdAt).toLocaleDateString('en-UG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </p>
@@ -586,13 +586,13 @@ export default function ProfilePage({
         {/* Sub Nav */}
         <div className="absolute left-6 right-6 top-[103px]">
           <div className="box-border content-stretch flex flex-col font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-            <div className="basis-0 flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
+            <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
               <p className="block leading-[32px] text-[24px]">My Page</p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={onBack}
-                className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic relative shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
+                className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
               >
                 <div className="flex flex-row items-center gap-1">
                   <div className="w-3 h-3">
@@ -600,15 +600,15 @@ export default function ProfilePage({
                       <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Back</p>
+                  <p className="block leading-[24px] whitespace-pre">Back</p>
                 </div>
               </button>
               {customerSession && (
                 <button
                   onClick={onLogout}
-                  className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic relative shrink-0 text-red-600 text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
+                  className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-red-600 text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
                 >
-                  <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Sign out</p>
+                  <p className="block leading-[24px] whitespace-pre">Sign out</p>
                 </button>
               )}
             </div>
@@ -626,21 +626,21 @@ export default function ProfilePage({
           )}
 
           {saveSuccess && (
-            <div className="p-3 bg-[#426b1f]/10 border border-[#426b1f]/30 rounded-lg text-[13px] text-[#426b1f] font-['Inter:Regular',_sans-serif] text-center">
+            <div className="p-3 bg-brand/10 border border-brand/30 rounded-lg text-[13px] text-brand font-normal text-center">
               ✓ Profile updated successfully!
             </div>
           )}
 
           {/* User Bio Card */}
           <div className="border border-neutral-200 rounded-2xl p-4 bg-white flex items-center gap-4">
-            <div className="size-14 rounded-full bg-[#426b1f] text-white flex items-center justify-center font-['Newsreader:Regular',_sans-serif] text-[22px] font-medium shrink-0">
+            <div className="size-14 rounded-full bg-brand text-white flex items-center justify-center font-serif text-[22px] font-medium shrink-0">
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div className="grow min-w-0">
-              <h2 className="font-['Newsreader:Regular',_sans-serif] text-[20px] text-[#000000] leading-tight truncate">
+              <h2 className="font-serif font-normal text-[20px] text-[#000000] leading-tight truncate">
                 {displayName}
               </h2>
-              <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575] truncate">
+              <p className="font-normal text-[12px] text-muted-foreground truncate">
                 Member since {memberSince} • Farm Patron
               </p>
             </div>
@@ -649,7 +649,7 @@ export default function ProfilePage({
           {/* Shop CTA */}
           <button
             onClick={onShopClick}
-            className="w-full bg-[#426b1f] text-white font-['Inter:Medium',_sans-serif] text-[15px] py-3.5 rounded-xl hover:bg-[#355a19] transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-brand text-white font-medium text-[15px] py-3.5 rounded-xl hover:bg-[#355a19] transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
@@ -663,37 +663,37 @@ export default function ProfilePage({
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={showAllOrders}
-                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-[#426b1f] hover:shadow-sm transition-all cursor-pointer"
+                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#757575] mb-1">Total Orders</p>
-                  <p className="font-['Newsreader:Regular',_sans-serif] text-[28px] text-[#000000] leading-none">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Total Orders</p>
+                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
                     {totalOrders}
                   </p>
                 </button>
                 <button
                   onClick={showAllOrders}
-                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-[#426b1f] hover:shadow-sm transition-all cursor-pointer"
+                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#757575] mb-1">Total Spent</p>
-                  <p className="font-['Newsreader:Regular',_sans-serif] text-[28px] text-[#000000] leading-none">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Total Spent</p>
+                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
                     {formatUgx(totalSpent)}
                   </p>
                 </button>
                 <button
                   onClick={showActiveOrders}
-                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-[#426b1f] hover:shadow-sm transition-all cursor-pointer"
+                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#757575] mb-1">Active Orders</p>
-                  <p className="font-['Newsreader:Regular',_sans-serif] text-[28px] text-[#000000] leading-none">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Active Orders</p>
+                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
                     {activeOrders.length}
                   </p>
                 </button>
                 <button
                   onClick={showDeliveredOrders}
-                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-[#426b1f] hover:shadow-sm transition-all cursor-pointer"
+                  className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#757575] mb-1">Delivered</p>
-                  <p className="font-['Newsreader:Regular',_sans-serif] text-[28px] text-[#000000] leading-none">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Delivered</p>
+                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
                     {deliveredOrders.length}
                   </p>
                 </button>
@@ -701,7 +701,7 @@ export default function ProfilePage({
 
               {/* Recent Activity */}
               <div className="border border-neutral-200 rounded-xl p-4 bg-white">
-                <h3 className="font-['Inter:Medium',_sans-serif] text-[15px] text-[#000000] mb-3">Recent Orders</h3>
+                <h3 className="font-medium text-[15px] text-[#000000] mb-3">Recent Orders</h3>
                 <div className="space-y-3">
                   {orders.slice(0, 3).map((order) => {
                     const status = statusConfig[order.status] || { label: order.status, className: 'bg-neutral-100 text-neutral-800' };
@@ -709,7 +709,7 @@ export default function ProfilePage({
                       <div key={order.id} className="flex items-center justify-between py-2 border-b border-neutral-100 last:border-0">
                         <div>
                           <p className="text-[13px] font-medium text-[#000000]">#{order.reference}</p>
-                          <p className="text-[12px] text-[#757575]">
+                          <p className="text-[12px] text-muted-foreground">
                             {new Date(order.createdAt).toLocaleDateString('en-UG', { month: 'short', day: 'numeric', year: 'numeric' })} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                           </p>
                         </div>
@@ -721,7 +721,7 @@ export default function ProfilePage({
                     );
                   })}
                   {orders.length === 0 && (
-                    <p className="text-[13px] text-[#757575] text-center py-4">No orders yet. Start shopping to see your history here.</p>
+                    <p className="text-[13px] text-muted-foreground text-center py-4">No orders yet. Start shopping to see your history here.</p>
                   )}
                 </div>
               </div>
@@ -729,11 +729,11 @@ export default function ProfilePage({
           )}
 
           {/* Segmented Tab Controls */}
-          <div className="flex rounded-lg bg-neutral-100 p-1 border border-neutral-200 text-[13px] font-['Inter:Regular',_sans-serif]">
+          <div className="flex rounded-lg bg-neutral-100 p-1 border border-neutral-200 text-[13px] font-normal">
             <button
               onClick={() => setActiveTab('overview')}
               className={`flex-1 py-1.5 rounded-md text-center transition-all ${
-                activeTab === 'overview' ? 'bg-white text-[#426b1f] font-medium shadow-sm' : 'text-[#757575]'
+                activeTab === 'overview' ? 'bg-white text-brand font-medium shadow-sm' : 'text-muted-foreground'
               }`}
             >
               Overview
@@ -741,7 +741,7 @@ export default function ProfilePage({
             <button
               onClick={() => setActiveTab('orders')}
               className={`flex-1 py-1.5 rounded-md text-center transition-all ${
-                activeTab === 'orders' ? 'bg-white text-[#426b1f] font-medium shadow-sm' : 'text-[#757575]'
+                activeTab === 'orders' ? 'bg-white text-brand font-medium shadow-sm' : 'text-muted-foreground'
               }`}
             >
               Orders
@@ -749,7 +749,7 @@ export default function ProfilePage({
             <button
               onClick={() => setActiveTab('details')}
               className={`flex-1 py-1.5 rounded-md text-center transition-all ${
-                activeTab === 'details' ? 'bg-white text-[#426b1f] font-medium shadow-sm' : 'text-[#757575]'
+                activeTab === 'details' ? 'bg-white text-brand font-medium shadow-sm' : 'text-muted-foreground'
               }`}
             >
               Details
@@ -757,7 +757,7 @@ export default function ProfilePage({
             <button
               onClick={() => setActiveTab('preferences')}
               className={`flex-1 py-1.5 rounded-md text-center transition-all ${
-                activeTab === 'preferences' ? 'bg-white text-[#426b1f] font-medium shadow-sm' : 'text-[#757575]'
+                activeTab === 'preferences' ? 'bg-white text-brand font-medium shadow-sm' : 'text-muted-foreground'
               }`}
             >
               Preferences
@@ -766,7 +766,7 @@ export default function ProfilePage({
 
           {/* Tab: Orders */}
           {activeTab === 'orders' && (
-            <div className="space-y-3 font-['Inter:Regular',_sans-serif]">
+            <div className="space-y-3 font-normal">
               {reorderFeedback && (
                 <div
                   className={`rounded-lg border p-3 text-[12px] space-y-1 ${
@@ -774,7 +774,7 @@ export default function ProfilePage({
                       ? 'bg-red-50 border-red-200 text-red-700'
                       : reorderFeedback.tone === 'warn'
                         ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                        : 'bg-[#426b1f]/10 border-[#426b1f]/30 text-[#426b1f]'
+                        : 'bg-brand/10 border-brand/30 text-brand'
                   }`}
                 >
                   {reorderFeedback.lines.map((line, index) => (
@@ -788,15 +788,15 @@ export default function ProfilePage({
               {orderFilter !== 'all' && (
                 <button
                   onClick={() => setOrderFilter('all')}
-                  className="text-[13px] text-[#426b1f] font-medium hover:underline"
+                  className="text-[13px] text-brand font-medium hover:underline"
                 >
                   ← Show all orders
                 </button>
               )}
               {ordersLoading ? (
-                <div className="p-8 text-center text-[#757575] text-[14px]">Loading orders...</div>
+                <div className="p-8 text-center text-muted-foreground text-[14px]">Loading orders...</div>
               ) : filteredOrders.length === 0 ? (
-                <div className="p-8 text-center text-[#757575] text-[14px]">
+                <div className="p-8 text-center text-muted-foreground text-[14px]">
                   {orderFilter === 'active' ? 'No active orders.' : orderFilter === 'delivered' ? 'No delivered orders yet.' : 'No orders yet.'}
                 </div>
               ) : (
@@ -808,7 +808,7 @@ export default function ProfilePage({
                         <span className="font-medium text-[#000000]">Order #{order.reference}</span>
                         <span className={`${status.className} px-2 py-0.5 rounded text-[11px] font-semibold`}>{status.label}</span>
                       </div>
-                      <p className="text-[12px] text-[#757575]">
+                      <p className="text-[12px] text-muted-foreground">
                         {new Date(order.createdAt).toLocaleDateString('en-UG', { month: 'short', day: 'numeric', year: 'numeric' })} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                       </p>
                       <div className="text-[13px] text-[#000000] pt-1 border-t border-neutral-100 space-y-1">
@@ -820,14 +820,14 @@ export default function ProfilePage({
                         ))}
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t border-neutral-100">
-                        <span className="text-[12px] text-[#757575]">{order.region}{order.district ? `, ${order.district}` : ''}</span>
+                        <span className="text-[12px] text-muted-foreground">{order.region}{order.district ? `, ${order.district}` : ''}</span>
                         <span className="font-medium text-[#000000]">{formatUgx(order.total)}</span>
                       </div>
                       <div className="flex justify-end pt-1">
                         <button
                           onClick={() => handleReorder(order.reference)}
                           disabled={reorderingReference !== null}
-                          className="text-[12px] font-medium text-[#426b1f] border border-[#426b1f]/30 rounded-lg px-3 py-1.5 hover:bg-[#426b1f]/5 transition-colors disabled:opacity-50"
+                          className="text-[12px] font-medium text-brand border border-brand/30 rounded-lg px-3 py-1.5 hover:bg-brand/5 transition-colors disabled:opacity-50"
                         >
                           {reorderingReference === order.reference ? 'Adding…' : 'Reorder'}
                         </button>
@@ -844,7 +844,7 @@ export default function ProfilePage({
             <div className="space-y-4">
             <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-                <span className="font-['Inter:Medium',_sans-serif] text-[15px] text-[#000000]">
+                <span className="font-medium text-[15px] text-[#000000]">
                   Profile Details
                 </span>
                 <button
@@ -865,16 +865,16 @@ export default function ProfilePage({
                       setIsEditing(true);
                     }
                   }}
-                  className="text-[13px] font-['Inter:Regular',_sans-serif] text-[#426b1f] font-medium hover:underline"
+                  className="text-[13px] text-brand font-medium hover:underline"
                 >
                   {isEditing ? 'Save Changes' : 'Edit'}
                 </button>
               </div>
 
               {isEditing ? (
-                <div className="space-y-3 font-['Inter:Regular',_sans-serif] text-[14px]">
+                <div className="space-y-3 font-normal text-[14px]">
                   <div>
-                    <label className="text-[12px] text-[#757575] block mb-1">Full Name</label>
+                    <label className="text-[12px] text-muted-foreground block mb-1">Full Name</label>
                     <input
                       type="text"
                       value={editedInfo.fullName}
@@ -883,7 +883,7 @@ export default function ProfilePage({
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#757575] block mb-1">Address</label>
+                    <label className="text-[12px] text-muted-foreground block mb-1">Address</label>
                     <input
                       type="text"
                       value={editedInfo.address}
@@ -892,7 +892,7 @@ export default function ProfilePage({
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#757575] block mb-1">Phone number</label>
+                    <label className="text-[12px] text-muted-foreground block mb-1">Phone number</label>
                     <input
                       type="tel"
                       value={editedInfo.phone}
@@ -905,7 +905,7 @@ export default function ProfilePage({
                     </p>
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#757575] block mb-1">Email (optional)</label>
+                    <label className="text-[12px] text-muted-foreground block mb-1">Email (optional)</label>
                     <input
                       type="email"
                       value={editedEmail}
@@ -916,7 +916,7 @@ export default function ProfilePage({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[12px] text-[#757575] block mb-1">Region</label>
+                      <label className="text-[12px] text-muted-foreground block mb-1">Region</label>
                       <input
                         type="text"
                         value={editedInfo.region}
@@ -926,7 +926,7 @@ export default function ProfilePage({
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-[#757575] block mb-1">District / town</label>
+                      <label className="text-[12px] text-muted-foreground block mb-1">District / town</label>
                       <input
                         type="text"
                         value={editedInfo.district}
@@ -938,12 +938,12 @@ export default function ProfilePage({
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1 font-['Inter:Regular',_sans-serif] text-[14px] text-[#000000] leading-[22px]">
+                <div className="space-y-1 font-normal text-[14px] text-[#000000] leading-[22px]">
                   <p className="font-medium">{displayName}</p>
-                  <p className="text-[#757575]">{displayPhone}</p>
-                  {profile?.email && <p className="text-[#757575]">{profile.email}</p>}
-                  <p className="text-[#757575]">{displayAddress}</p>
-                  <p className="text-[#757575]">{displayPlaceOrDefault}</p>
+                  <p className="text-muted-foreground">{displayPhone}</p>
+                  {profile?.email && <p className="text-muted-foreground">{profile.email}</p>}
+                  <p className="text-muted-foreground">{displayAddress}</p>
+                  <p className="text-muted-foreground">{displayPlaceOrDefault}</p>
                 </div>
               )}
             </div>
@@ -951,13 +951,13 @@ export default function ProfilePage({
             {/* Saved addresses */}
             <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="font-['Inter:Medium',_sans-serif] text-[15px] text-[#000000]">
+                <h4 className="font-medium text-[15px] text-[#000000]">
                   Saved addresses
                 </h4>
                 {!addressEditor && addresses.length < 10 && (
                   <button
                     onClick={() => openAddressEditor()}
-                    className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#426b1f] hover:underline"
+                    className="text-[13px] font-medium text-brand hover:underline"
                   >
                     Add address
                   </button>
@@ -965,11 +965,11 @@ export default function ProfilePage({
               </div>
 
               {addressError && (
-                <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-red-600">{addressError}</p>
+                <p className="font-normal text-[12px] text-red-600">{addressError}</p>
               )}
 
               {addresses.length === 0 && !addressEditor && (
-                <p className="font-['Inter:Regular',_sans-serif] text-[13px] text-[#757575]">
+                <p className="font-normal text-[13px] text-muted-foreground">
                   No saved addresses yet. Add one to check out in a couple of taps.
                 </p>
               )}
@@ -978,29 +978,29 @@ export default function ProfilePage({
                 {addresses.map((address) => (
                   <div key={address.id} className="border border-neutral-100 rounded-lg p-3 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-['Inter:Medium',_sans-serif] text-[13px] text-[#000000]">
+                      <span className="font-medium text-[13px] text-[#000000]">
                         {address.label}
                       </span>
                       {address.isDefault && (
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-[#426b1f] bg-[#426b1f]/10 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-brand bg-brand/10 px-2 py-0.5 rounded">
                           Default
                         </span>
                       )}
                     </div>
-                    <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575]">
+                    <p className="font-normal text-[12px] text-muted-foreground">
                       {address.fullName} • {address.phone}
                     </p>
-                    <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575]">
+                    <p className="font-normal text-[12px] text-muted-foreground">
                       {address.address}
                       {address.district ? `, ${address.district}` : ''}
                       {address.region ? `, ${address.region}` : ''}
                     </p>
-                    <div className="flex gap-3 pt-1 font-['Inter:Medium',_sans-serif] text-[12px]">
-                      <button onClick={() => openAddressEditor(address)} className="text-[#426b1f] hover:underline">
+                    <div className="flex gap-3 pt-1 font-medium text-[12px]">
+                      <button onClick={() => openAddressEditor(address)} className="text-brand hover:underline">
                         Edit
                       </button>
                       {!address.isDefault && (
-                        <button onClick={() => makeDefaultAddress(address)} className="text-[#426b1f] hover:underline">
+                        <button onClick={() => makeDefaultAddress(address)} className="text-brand hover:underline">
                           Set default
                         </button>
                       )}
@@ -1013,13 +1013,13 @@ export default function ProfilePage({
               </div>
 
               {addressEditor && (
-                <div className="border border-[#426b1f]/30 rounded-lg p-3 space-y-2 font-['Inter:Regular',_sans-serif] text-[14px]">
-                  <p className="font-['Inter:Medium',_sans-serif] text-[13px] text-[#000000]">
+                <div className="border border-brand/30 rounded-lg p-3 space-y-2 font-normal text-[14px]">
+                  <p className="font-medium text-[13px] text-[#000000]">
                     {addressEditor.id === null ? 'New address' : 'Edit address'}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[12px] text-[#757575] block mb-1">Label</label>
+                      <label className="text-[12px] text-muted-foreground block mb-1">Label</label>
                       <input
                         type="text"
                         value={addressEditor.draft.label}
@@ -1029,7 +1029,7 @@ export default function ProfilePage({
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-[#757575] block mb-1">Full name</label>
+                      <label className="text-[12px] text-muted-foreground block mb-1">Full name</label>
                       <input
                         type="text"
                         value={addressEditor.draft.fullName}
@@ -1039,7 +1039,7 @@ export default function ProfilePage({
                     </div>
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#757575] block mb-1">Phone number</label>
+                    <label className="text-[12px] text-muted-foreground block mb-1">Phone number</label>
                     <input
                       type="tel"
                       value={addressEditor.draft.phone}
@@ -1050,7 +1050,7 @@ export default function ProfilePage({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[12px] text-[#757575] block mb-1">Region</label>
+                      <label className="text-[12px] text-muted-foreground block mb-1">Region</label>
                       <input
                         type="text"
                         value={addressEditor.draft.region}
@@ -1060,7 +1060,7 @@ export default function ProfilePage({
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-[#757575] block mb-1">District / town</label>
+                      <label className="text-[12px] text-muted-foreground block mb-1">District / town</label>
                       <input
                         type="text"
                         value={addressEditor.draft.district}
@@ -1071,7 +1071,7 @@ export default function ProfilePage({
                     </div>
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#757575] block mb-1">Delivery address and landmark</label>
+                    <label className="text-[12px] text-muted-foreground block mb-1">Delivery address and landmark</label>
                     <input
                       type="text"
                       value={addressEditor.draft.address}
@@ -1080,12 +1080,12 @@ export default function ProfilePage({
                       className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-[14px]"
                     />
                   </div>
-                  <label className="flex items-center gap-2 text-[12px] text-[#757575] pt-1">
+                  <label className="flex items-center gap-2 text-[12px] text-muted-foreground pt-1">
                     <input
                       type="checkbox"
                       checked={addressEditor.draft.isDefault}
                       onChange={(e) => updateAddressDraft('isDefault', e.target.checked)}
-                      className="accent-[#426b1f] w-4 h-4"
+                      className="accent-brand w-4 h-4"
                     />
                     Use as my default address
                   </label>
@@ -1093,7 +1093,7 @@ export default function ProfilePage({
                     <button
                       onClick={saveAddress}
                       disabled={addressSaving}
-                      className="px-4 py-2 rounded-lg bg-[#426b1f] text-white text-[13px] font-['Inter:Medium',_sans-serif] disabled:opacity-50"
+                      className="px-4 py-2 rounded-lg bg-brand text-white text-[13px] font-medium disabled:opacity-50"
                     >
                       {addressSaving ? 'Saving…' : 'Save address'}
                     </button>
@@ -1115,15 +1115,15 @@ export default function ProfilePage({
 
           {/* Tab: Preferences */}
           {activeTab === 'preferences' && (
-            <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-4 font-['Inter:Regular',_sans-serif] text-[14px]">
+            <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-4 font-normal text-[14px]">
               <div className="flex items-center justify-between">
-                <h4 className="font-['Inter:Medium',_sans-serif] text-[15px] text-[#000000]">
+                <h4 className="font-medium text-[15px] text-[#000000]">
                   Notification & Delivery Preferences
                 </h4>
                 <button
                   onClick={handleSavePreferences}
                   disabled={savingPreferences}
-                  className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#426b1f] hover:underline disabled:opacity-50"
+                  className="text-[13px] font-medium text-brand hover:underline disabled:opacity-50"
                 >
                   {savingPreferences ? 'Saving...' : 'Save'}
                 </button>
@@ -1138,7 +1138,7 @@ export default function ProfilePage({
                       onChange={(event) =>
                         setPrefDraft((prev) => ({ ...prev, [flag.key]: event.target.checked }))
                       }
-                      className="accent-[#426b1f] w-4 h-4 rounded"
+                      className="accent-brand w-4 h-4 rounded"
                     />
                   </label>
                 ))}
@@ -1147,13 +1147,12 @@ export default function ProfilePage({
           )}
 
           {/* Environmental Impact Widget */}
-          <div className="border border-[#426b1f]/20 bg-[#426b1f]/5 rounded-xl p-4 space-y-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#426b1f]">Your Impact</span>
-            <p className="font-['Newsreader:Regular',_sans-serif] text-[16px] text-[#000000]">
+          <div className="border border-brand/20 bg-brand/5 rounded-xl p-4 space-y-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-brand">Your Impact</span>
+            <p className="font-serif font-normal text-[16px] text-[#000000]">
               {formatUgx(totalSpent)} of regional organic produce purchased
             </p>
-            <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575]">
-              {orders.length} order{orders.length !== 1 ? 's' : ''} placed • {activeOrders.length} active
+            <p className="font-normal text-[12px] text-muted-foreground"> {orders.length} order{orders.length !== 1 ? 's' : ''} placed • {activeOrders.length} active
             </p>
           </div>
         </div>

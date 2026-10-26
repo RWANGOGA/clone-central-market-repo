@@ -58,7 +58,7 @@ export default function Menu({ isOpen, onClose, onNavigate, isLoggedIn = false }
               stiffness: 400,
               mass: 0.8
             }}
-            className="absolute left-0 top-0 bottom-0 w-[280px] bg-[#426b1f] z-50 overflow-hidden"
+            className="absolute left-0 top-0 bottom-0 w-[280px] bg-brand z-50 overflow-hidden"
           >
             {/* Background Illustration */}
             <MaskGroup />
@@ -92,9 +92,9 @@ function MenuItems({ onNavigate, items }: MenuItemsProps) {
           <button
             key={item.screen}
             onClick={() => onNavigate(item.screen)}
-            className="flex flex-col font-['Newsreader:Regular',_sans-serif] font-normal justify-center leading-[0] relative shrink-0 text-[#ffffff] text-[26px] text-left text-nowrap tracking-[-0.52px] hover:opacity-80 transition-opacity"
+            className="flex flex-col font-serif font-normal justify-center leading-[0] relative shrink-0 text-[#ffffff] text-[26px] text-left text-nowrap tracking-[-0.52px] hover:opacity-80 transition-opacity"
           >
-            <p className="adjustLetterSpacing block leading-[30px] whitespace-pre text-[36px]">
+            <p className="block leading-[30px] whitespace-pre text-[36px]">
               {item.label}
             </p>
           </button>

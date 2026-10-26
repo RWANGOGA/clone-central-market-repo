@@ -59,16 +59,16 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <form onSubmit={submit} className="w-full max-w-[320px] space-y-4">
           <div>
-            <h1 className="font-['Newsreader:Medium',_sans-serif] text-[24px] text-[#426b1f] leading-[32px]">
+            <h1 className="font-serif font-medium text-[24px] text-brand leading-[32px]">
               Staff sign in
             </h1>
-            <p className="mt-1 text-[13px] leading-[20px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="mt-1 text-[13px] leading-[20px] font-normal text-muted-foreground">
               Manage the catalogue and stock levels.
             </p>
           </div>
 
           <div className="space-y-1">
-            <label className="block text-[13px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <label className="block text-[13px] font-normal text-muted-foreground">
               Email
             </label>
             <input
@@ -77,12 +77,12 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@market.ug"
-              className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-[16px] font-['Inter:Regular',_sans-serif]"
+              className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-[16px] font-normal"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="block text-[13px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <label className="block text-[13px] font-normal text-muted-foreground">
               Password
             </label>
             <div className="relative">
@@ -92,12 +92,12 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"
-                className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 pr-10 text-[16px] font-['Inter:Regular',_sans-serif]"
+                className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 pr-10 text-[16px] font-normal"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#426b1f] transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
@@ -115,7 +115,7 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
           </div>
 
           {error && (
-            <p className="text-[13px] leading-[19px] font-['Inter:Regular',_sans-serif] text-red-600">
+            <p className="text-[13px] leading-[19px] font-normal text-red-600">
               {error}
             </p>
           )}
@@ -123,14 +123,14 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
           <button
             type="submit"
             disabled={busy || !email || !password}
-            className={`w-full rounded-lg py-3 text-[15px] font-['Inter:Medium',_sans-serif] text-white ${
-              busy || !email || !password ? 'bg-neutral-300 cursor-not-allowed' : 'bg-[#426b1f]'
+            className={`w-full rounded-lg py-3 text-[15px] font-medium text-white ${
+              busy || !email || !password ? 'bg-neutral-300 cursor-not-allowed' : 'bg-brand'
             }`}
           >
             {busy ? 'Signing in…' : 'Sign in'}
           </button>
 
-          <p className="text-[11px] leading-[16px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+          <p className="text-[11px] leading-[16px] font-normal text-[#9a9a9a]">
             Accounts are created by an owner with <code>npm run db:seed:admin</code>. There is no
             default account.
           </p>

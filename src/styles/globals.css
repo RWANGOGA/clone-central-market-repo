@@ -1,7 +1,44 @@
-@custom-variant dark (&:is(.dark *));
+/*
+ * Mu Katale — design tokens and element defaults.
+ *
+ * This is the only stylesheet the app loads, and it is the only place a colour,
+ * a type size or a font family is decided. It used to be four files:
+ * `default_theme.css` and `globals.css` both set the same variables with
+ * different values (16px and 14px root), and `theme.css` and `fonts.css` were
+ * imported by nothing at all. Whichever happened to be imported last won, so a
+ * change in one file silently did nothing.
+ *
+ * The root font size is now the browser default of 16px. It was 14px, which
+ * quietly shrank every rem-based utility — Tailwind's own `text-sm`, `gap-2`,
+ * `p-4`, `rounded-lg` — by 12.5%, while the Figma-exported components kept
+ * specifying absolute pixels (`text-[24px]`). Two scales that disagree are why
+ * the app looked almost right and never quite was.
+ */
+
+/*
+ * Self-hosted, so the typeface does not depend on a third party being reachable.
+ * Both are variable fonts: one file each covers every weight the app uses, and
+ * the browser only downloads the latin subset it actually needs (~48 KB and
+ * ~60 KB). Inter is the interface voice; Newsreader is the serif used for the
+ * wordmark and page titles.
+ *
+ * They are loaded from src/main.tsx rather than imported here: Tailwind's
+ * stylesheet is run through PostCSS before Vite resolves paths, so a bare
+ * package @import in this file fails the build with "Missed semicolon".
+ */
 
 :root {
-  --font-size: 14px;
+  /* ---- brand ---- */
+  /*
+   * The market green. It was repeated as a literal hex 227 times across the
+   * components, so a rebrand meant a search and replace and a decision about
+   * which of the four near-identical greens were the same colour.
+   */
+  --brand: #426b1f;
+  --brand-deep: #35571a;
+  --brand-soft: #eef3e6;
+
+  /* ---- surfaces, as shadcn/ui expects them ---- */
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
@@ -22,8 +59,6 @@
   --input: transparent;
   --input-background: #f3f3f5;
   --switch-background: #cbced4;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -61,8 +96,9 @@
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
+  --brand: #7fb04a;
+  --brand-deep: #6b9a3a;
+  --brand-soft: oklch(0.269 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -79,6 +115,39 @@
 }
 
 @theme inline {
+  /*
+   * Two families, chosen once. `font-sans` is applied to the body below, so a
+   * component that says nothing about type is already correct — that is why the
+   * 331 `font-['Inter:Regular',_sans-serif]` utilities are gone rather than
+   * translated. Newsreader is opt-in through `font-serif`, because a serif on
+   * a price or a form label would not belong.
+   */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
+
+  /*
+   * The scale a page is built from. Sizes are rem so they respect the root, and
+   * tracking tightens as size grows, which is what makes large type look set
+   * rather than merely big.
+   */
+  --text-display: 1.5rem;
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 500;
+
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.015em;
+  --text-title--font-weight: 500;
+
+  --text-subtitle: 1rem;
+  --text-subtitle--line-height: 1.4;
+  --text-subtitle--letter-spacing: -0.01em;
+
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-soft: var(--brand-soft);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -124,61 +193,75 @@
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  html {
+    /* A phone rotates; text size should not silently change when it does. */
+    -webkit-text-size-adjust: 100%;
   }
-}
 
-@layer base {
-  h1 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-medium);
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
     line-height: 1.5;
+  }
+
+  /*
+   * Element defaults, so correct typography is the thing you get for doing
+   * nothing. Only five of the app's screens had an <h1>, and most titles were
+   * <p> elements — a reader or a screen reader saw a page with no structure.
+   * Real headings are introduced screen by screen in the pass that follows.
+   */
+  h1 {
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+    letter-spacing: var(--text-display--letter-spacing);
+    font-weight: var(--text-display--font-weight);
   }
 
   h2 {
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+    font-size: var(--text-title);
+    line-height: var(--text-title--line-height);
+    letter-spacing: var(--text-title--letter-spacing);
+    font-weight: var(--text-title--font-weight);
   }
 
   h3 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+    font-size: 1.125rem;
+    line-height: 1.35;
+    font-weight: 500;
   }
 
   h4 {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  p {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-normal);
-    line-height: 1.5;
-  }
-
-  label {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.4;
+    font-weight: 500;
   }
 
   button {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+    font: inherit;
   }
 
-  input {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-normal);
-    line-height: 1.5;
+  input,
+  textarea,
+  select {
+    font: inherit;
   }
-}
 
-html {
-  font-size: var(--font-size);
+  /*
+   * Focus must survive the reset. Keyboard users had no visible caret anywhere
+   * in the app because the Figma export styled buttons and inputs with no focus
+   * state at all.
+   */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

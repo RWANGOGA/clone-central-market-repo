@@ -163,7 +163,7 @@ export default function OrderConfirmationPage({
               <p className="text-[13px] text-red-700">{error}</p>
               <button
                 onClick={() => void load()}
-                className="text-[13px] font-medium text-[#426b1f] hover:underline"
+                className="text-[13px] font-medium text-brand hover:underline"
               >
                 Try again
               </button>
@@ -176,7 +176,7 @@ export default function OrderConfirmationPage({
               <div className="flex items-start gap-3">
                 <div
                   className={`size-8 rounded-full flex items-center justify-center shrink-0 ${
-                    status === 'cancelled' ? 'bg-red-600' : 'bg-[#426b1f]'
+                    status === 'cancelled' ? 'bg-red-600' : 'bg-brand'
                   }`}
                 >
                   {status === 'cancelled' ? (
@@ -191,8 +191,8 @@ export default function OrderConfirmationPage({
                 </div>
                 <div className="min-w-0">
                   <h1
-                    className={`font-['Newsreader:Regular',_sans-serif] text-[24px] tracking-[-0.48px] leading-[30px] ${
-                      status === 'cancelled' ? 'text-red-700' : 'text-[#426b1f]'
+                    className={`font-serif font-normal text-[24px] tracking-[-0.48px] leading-[30px] ${
+                      status === 'cancelled' ? 'text-red-700' : 'text-brand'
                     }`}
                   >
                     {copy.title}
@@ -201,8 +201,8 @@ export default function OrderConfirmationPage({
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-neutral-500">
                     {orderReference && <span>Order {orderReference}</span>}
                     {isActive && (
-                      <span className="inline-flex items-center gap-1 text-[#426b1f]">
-                        <span className="size-1.5 rounded-full bg-[#426b1f] animate-pulse" />
+                      <span className="inline-flex items-center gap-1 text-brand">
+                        <span className="size-1.5 rounded-full bg-brand animate-pulse" />
                         Updates automatically
                       </span>
                     )}
@@ -212,18 +212,18 @@ export default function OrderConfirmationPage({
 
               {/* Payment call to action */}
               {needsPayment && onPay && (
-                <div className="bg-[#426b1f]/5 border border-[#426b1f]/20 rounded-xl p-4 space-y-2">
-                  <h3 className="font-['Inter:Medium',_sans-serif] text-[14px] text-[#000000]">
+                <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 space-y-2">
+                  <h3 className="font-medium text-[14px] text-[#000000]">
                     {awaitingApproval ? 'Payment is waiting for approval' : 'Payment is still due'}
                   </h3>
-                  <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575] leading-[18px]">
+                  <p className="font-normal text-[12px] text-muted-foreground leading-[18px]">
                     {awaitingApproval
                       ? 'Approve the prompt on your phone, or start a fresh attempt if it expired.'
                       : 'Your produce is reserved until the order is paid for. Unpaid orders are released after 15 minutes.'}
                   </p>
                   <button
                     onClick={onPay}
-                    className="w-full bg-[#426b1f] text-white rounded-lg py-2.5 text-[14px] font-['Inter:Medium',_sans-serif] hover:bg-[#355a19] transition-colors"
+                    className="w-full bg-brand text-white rounded-lg py-2.5 text-[14px] font-medium hover:bg-[#355a19] transition-colors"
                   >
                     {awaitingApproval ? 'Review payment' : `Pay ${order ? formatUgx(order.total) : 'now'}`}
                   </button>
@@ -233,15 +233,15 @@ export default function OrderConfirmationPage({
               {/* Progress stepper */}
               {status === 'cancelled' ? (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                  <h3 className="font-['Inter:Medium',_sans-serif] text-[14px] text-red-800 mb-1">Order cancelled</h3>
-                  <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-red-700 leading-[18px]">
+                  <h3 className="font-medium text-[14px] text-red-800 mb-1">Order cancelled</h3>
+                  <p className="font-normal text-[12px] text-red-700 leading-[18px]">
                     {order?.timeline.find((event) => event.toStatus === 'cancelled')?.note ??
                       'This order will not be delivered.'}
                   </p>
                 </div>
               ) : (
                 <div className="bg-[#f8f9fa] rounded-xl p-4 border border-neutral-200">
-                  <h3 className="font-['Inter:Medium',_sans-serif] text-[15px] text-[#000000] mb-4">
+                  <h3 className="font-medium text-[15px] text-[#000000] mb-4">
                     Delivery progress
                   </h3>
                   <ol className="space-y-0">
@@ -256,9 +256,9 @@ export default function OrderConfirmationPage({
                             <div
                               className={`size-6 rounded-full flex items-center justify-center shrink-0 border-2 ${
                                 done
-                                  ? 'bg-[#426b1f] border-[#426b1f]'
+                                  ? 'bg-brand border-brand'
                                   : current
-                                    ? 'bg-white border-[#426b1f]'
+                                    ? 'bg-white border-brand'
                                     : 'bg-white border-neutral-300'
                               }`}
                             >
@@ -267,26 +267,26 @@ export default function OrderConfirmationPage({
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                 </svg>
                               ) : (
-                                <span className={`size-2 rounded-full ${current ? 'bg-[#426b1f]' : 'bg-neutral-300'}`} />
+                                <span className={`size-2 rounded-full ${current ? 'bg-brand' : 'bg-neutral-300'}`} />
                               )}
                             </div>
                             {!last && (
-                              <div className={`w-0.5 flex-1 min-h-[26px] ${done ? 'bg-[#426b1f]' : 'bg-neutral-200'}`} />
+                              <div className={`w-0.5 flex-1 min-h-[26px] ${done ? 'bg-brand' : 'bg-neutral-200'}`} />
                             )}
                           </div>
                           <div className={`pb-4 ${last ? 'pb-0' : ''}`}>
                             <p
-                              className={`font-['Inter:Medium',_sans-serif] text-[13px] leading-[18px] ${
+                              className={`font-medium text-[13px] leading-[18px] ${
                                 done || current ? 'text-[#000000]' : 'text-[#9a9a9a]'
                               }`}
                             >
                               {step.label}
                             </p>
-                            <p className="font-['Inter:Regular',_sans-serif] text-[12px] leading-[17px] text-[#757575]">
+                            <p className="font-normal text-[12px] leading-[17px] text-muted-foreground">
                               {step.description}
                             </p>
                             {when && (
-                              <p className="font-['Inter:Regular',_sans-serif] text-[11px] text-[#9a9a9a] mt-0.5">
+                              <p className="font-normal text-[11px] text-[#9a9a9a] mt-0.5">
                                 {formatWhen(when)}
                               </p>
                             )}
@@ -302,33 +302,33 @@ export default function OrderConfirmationPage({
               {order && (
                 <div className="border border-neutral-200 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-['Inter:Medium',_sans-serif] text-[14px] text-[#000000]">Your basket</h3>
-                    <span className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575]">
+                    <h3 className="font-medium text-[14px] text-[#000000]">Your basket</h3>
+                    <span className="font-normal text-[12px] text-muted-foreground">
                       {itemCount} item{itemCount === 1 ? '' : 's'}
                     </span>
                   </div>
                   <div className="space-y-1">
                     {order.items.map((item) => (
-                      <div key={item.id} className="flex justify-between gap-2 font-['Inter:Regular',_sans-serif] text-[13px]">
+                      <div key={item.id} className="flex justify-between gap-2 font-normal text-[13px]">
                         <span className="text-[#000000] truncate">
                           {item.quantity} × {item.name}
                         </span>
-                        <span className="text-[#757575] whitespace-nowrap">{formatUgx(item.lineTotal)}</span>
+                        <span className="text-muted-foreground whitespace-nowrap">{formatUgx(item.lineTotal)}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="pt-2 border-t border-neutral-100 space-y-1 font-['Inter:Regular',_sans-serif] text-[12px]">
-                    <div className="flex justify-between text-[#757575]">
+                  <div className="pt-2 border-t border-neutral-100 space-y-1 font-normal text-[12px]">
+                    <div className="flex justify-between text-muted-foreground">
                       <span>Subtotal</span>
                       <span>{formatUgx(order.subtotal)}</span>
                     </div>
                     {order.discount > 0 && (
-                      <div className="flex justify-between text-[#426b1f]">
+                      <div className="flex justify-between text-brand">
                         <span>{order.promoCode ? `Discount · ${order.promoCode}` : 'Discount'}</span>
                         <span>− {formatUgx(order.discount)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-[#757575]">
+                    <div className="flex justify-between text-muted-foreground">
                       <span>Delivery</span>
                       <span>{formatUgx(order.shipping)}</span>
                     </div>
@@ -345,14 +345,14 @@ export default function OrderConfirmationPage({
 
               <div className="grid grid-cols-2 gap-4 pt-1 border-t border-neutral-100">
                 <div>
-                  <h3 className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#757575] tracking-[-0.14px] leading-[24px] mb-1">
+                  <h3 className="font-normal text-[14px] text-muted-foreground tracking-[-0.14px] leading-[24px] mb-1">
                     Delivery to
                   </h3>
                   <div className="space-y-0.5">
                     {addressLines.map((line, index) => (
                       <p
                         key={index}
-                        className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]"
+                        className="font-normal text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]"
                       >
                         {line}
                       </p>
@@ -360,13 +360,13 @@ export default function OrderConfirmationPage({
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#757575] tracking-[-0.14px] leading-[24px] mb-1">
+                  <h3 className="font-normal text-[14px] text-muted-foreground tracking-[-0.14px] leading-[24px] mb-1">
                     Placed
                   </h3>
-                  <p className="font-['Inter:Regular',_sans-serif] text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]">
+                  <p className="font-normal text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]">
                     {order ? formatWhen(order.createdAt) : '—'}
                   </p>
-                  <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#426b1f] mt-2 font-medium">
+                  <p className="text-[12px] text-brand mt-2 font-medium">
                     Standard Eco Courier • Tracking enabled
                   </p>
                 </div>
@@ -375,7 +375,7 @@ export default function OrderConfirmationPage({
               {/* Status history */}
               {order && order.timeline.length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="font-['Inter:Medium',_sans-serif] text-[14px] text-[#000000]">Order updates</h3>
+                  <h3 className="font-medium text-[14px] text-[#000000]">Order updates</h3>
                   <div className="divide-y divide-neutral-100 border border-neutral-200 rounded-xl overflow-hidden">
                     {order.timeline
                       .slice()
@@ -383,15 +383,15 @@ export default function OrderConfirmationPage({
                       .map((event) => (
                         <div key={event.id} className="p-3 bg-white">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-['Inter:Medium',_sans-serif] text-[12px] text-[#000000] capitalize">
+                            <span className="font-medium text-[12px] text-[#000000] capitalize">
                               {event.toStatus}
                             </span>
-                            <span className="font-['Inter:Regular',_sans-serif] text-[11px] text-[#9a9a9a]">
+                            <span className="font-normal text-[11px] text-[#9a9a9a]">
                               {formatWhen(event.at)}
                             </span>
                           </div>
                           {event.note && (
-                            <p className="font-['Inter:Regular',_sans-serif] text-[12px] text-[#757575] mt-0.5 leading-[17px]">
+                            <p className="font-normal text-[12px] text-muted-foreground mt-0.5 leading-[17px]">
                               {event.note}
                             </p>
                           )}
@@ -444,8 +444,8 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute css-a0byvc font-['SF_Pro_Display:Bold',_sans-serif] h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
-          <p className="adjustLetterSpacing block leading-[22px]">9:41</p>
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+          <p className="block leading-[22px]">9:41</p>
         </div>
       </div>
     </div>
@@ -507,10 +507,10 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
       <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
         <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
         <div
-          className="absolute flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+          className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
         >
-          <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+          <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
         </div>
 
         {/* Cart Icon */}
@@ -523,11 +523,11 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
             </svg>
           </div>
           {cartCount > 0 && (
-            <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+            <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                    <p className="adjustLetterSpacing block leading-none whitespace-pre">{cartCount}</p>
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <p className="block leading-none whitespace-pre">{cartCount}</p>
                   </div>
                 </div>
               </div>
@@ -556,12 +556,12 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
         <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
           <div className="relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-              <div className="basis-0 flex flex-col font-['Newsreader:Regular',_sans-serif] grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
+              <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
                 <p className="block leading-[32px] text-[24px]">{title}</p>
               </div>
               <button
                 onClick={onShop}
-                className="cursor-pointer flex items-center font-['Inter:Regular',_sans-serif] not-italic relative shrink-0 text-[#426b1f] text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
+                className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"
               >
                 <div className="flex flex-row items-center gap-1">
                   <div className="w-3 h-3">
@@ -569,7 +569,7 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
                       <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <p className="adjustLetterSpacing block leading-[24px] whitespace-pre">Shop</p>
+                  <p className="block leading-[24px] whitespace-pre">Shop</p>
                 </div>
               </button>
             </div>
@@ -590,11 +590,11 @@ function Footer({ onShop }: FooterProps) {
       {/* Continue Shopping Button */}
       <button
         onClick={onShop}
-        className="absolute left-6 right-6 rounded-lg top-6 bg-[#426b1f] cursor-pointer"
+        className="absolute left-6 right-6 rounded-lg top-6 bg-brand cursor-pointer"
       >
         <div className="flex flex-row items-center relative size-full">
           <div className="box-border content-stretch flex flex-row gap-2 items-center justify-center pl-6 pr-6 py-2 relative w-full">
-            <div className="flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative text-[#ffffff] text-[16px] text-center tracking-[-0.16px]">
+            <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative text-[#ffffff] text-[16px] text-center tracking-[-0.16px]">
               <p className="block leading-[24px]">Continue shopping</p>
             </div>
           </div>

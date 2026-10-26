@@ -18,18 +18,18 @@ import { formatUgx } from '../lib/currency';
 
 const STATUS_TONE: Record<OrderStatus, string> = {
   pending: 'bg-[#b07d2b]/12 text-[#b07d2b] border-[#b07d2b]/25',
-  processing: 'bg-[#426b1f]/10 text-[#426b1f] border-[#426b1f]/20',
+  processing: 'bg-brand/10 text-brand border-brand/20',
   shipped: 'bg-[#2b6cb0]/10 text-[#2b6cb0] border-[#2b6cb0]/20',
   delivered: 'bg-[#2f855a]/10 text-[#2f855a] border-[#2f855a]/20',
-  cancelled: 'bg-neutral-100 text-[#757575] border-neutral-200',
+  cancelled: 'bg-neutral-100 text-muted-foreground border-neutral-200',
 };
 
 const MONEY_TONE: Record<MoneyState, string> = {
-  unpaid: 'bg-neutral-100 text-[#757575] border-neutral-200',
+  unpaid: 'bg-neutral-100 text-muted-foreground border-neutral-200',
   cod_due: 'bg-[#b07d2b]/12 text-[#b07d2b] border-[#b07d2b]/25',
   paid: 'bg-[#2f855a]/10 text-[#2f855a] border-[#2f855a]/20',
   part_refunded: 'bg-[#2b6cb0]/10 text-[#2b6cb0] border-[#2b6cb0]/20',
-  refunded: 'bg-neutral-100 text-[#757575] border-neutral-200',
+  refunded: 'bg-neutral-100 text-muted-foreground border-neutral-200',
   refund_due: 'bg-red-50 text-red-700 border-red-200',
 };
 
@@ -203,10 +203,10 @@ export default function OrderQueue({
       >
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[16px] font-['Newsreader:Medium',_sans-serif] text-[#426b1f] leading-[22px]">
+            <p className="text-[16px] font-serif font-medium text-brand leading-[22px]">
               Orders
             </p>
-            <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="text-[11px] font-normal text-muted-foreground">
               {meta ? `${meta.total} total` : 'Loading'}
               {live ? ' · live' : ' · refreshing every 30s'}
             </p>
@@ -219,7 +219,7 @@ export default function OrderQueue({
             {onBack && (
               <button
                 onClick={onBack}
-                className="text-[12px] font-['Inter:Medium',_sans-serif] text-[#426b1f]"
+                className="text-[12px] font-medium text-brand"
               >
                 Back
               </button>
@@ -234,7 +234,7 @@ export default function OrderQueue({
             setOffset(0);
           }}
           placeholder="Search reference, name or phone"
-          className="mt-2 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-['Inter:Regular',_sans-serif]"
+          className="mt-2 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-normal"
         />
 
         <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1">
@@ -272,19 +272,19 @@ export default function OrderQueue({
 
       <div className="p-4 space-y-2">
         {error && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-['Inter:Regular',_sans-serif]">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-normal">
             {error}
           </p>
         )}
 
         {loading && (
-          <p className="py-6 text-center text-[13px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+          <p className="py-6 text-center text-[13px] font-normal text-muted-foreground">
             Loading orders…
           </p>
         )}
 
         {!loading && orders.length === 0 && (
-          <p className="py-6 text-center text-[13px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+          <p className="py-6 text-center text-[13px] font-normal text-muted-foreground">
             No orders match these filters.
           </p>
         )}
@@ -295,40 +295,40 @@ export default function OrderQueue({
             onClick={() => openOrder(order)}
             className={`w-full text-left rounded-xl border bg-white p-3 ${
               flash.includes(order.reference)
-                ? 'border-[#426b1f] ring-1 ring-[#426b1f]/30'
+                ? 'border-brand ring-1 ring-brand/30'
                 : 'border-neutral-200'
             }`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+                <p className="text-[14px] font-medium text-[#000000]">
                   {order.customerName ?? 'Unknown customer'}
                   {flash.includes(order.reference) && (
-                    <span className="ml-2 text-[10px] font-['Inter:Regular',_sans-serif] text-[#426b1f]">
+                    <span className="ml-2 text-[10px] font-normal text-brand">
                       new
                     </span>
                   )}
                 </p>
-                <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                <p className="text-[12px] font-normal text-muted-foreground">
                   {order.reference} · {order.phone ?? 'no phone'}
                 </p>
-                <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+                <p className="text-[11px] font-normal text-[#9a9a9a]">
                   {[order.district, order.region].filter(Boolean).join(', ')} ·{' '}
                   {order.itemCount} line{order.itemCount === 1 ? '' : 's'}, {order.unitCount} unit
                   {order.unitCount === 1 ? '' : 's'}
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-[14px] font-['Inter:Medium',_sans-serif] text-[#426b1f]">
+                <p className="text-[14px] font-medium text-brand">
                   {formatUgx(order.total)}
                 </p>
                 <span
-                  className={`inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full border font-['Inter:Medium',_sans-serif] ${STATUS_TONE[order.status]}`}
+                  className={`inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full border font-medium ${STATUS_TONE[order.status]}`}
                 >
                   {order.status}
                 </span>
                 <span
-                  className={`inline-block mt-1 ml-1 text-[10px] px-2 py-0.5 rounded-full border font-['Inter:Medium',_sans-serif] ${MONEY_TONE[order.money.state]}`}
+                  className={`inline-block mt-1 ml-1 text-[10px] px-2 py-0.5 rounded-full border font-medium ${MONEY_TONE[order.money.state]}`}
                 >
                   {MONEY_LABELS[order.money.state]}
                 </span>
@@ -342,17 +342,17 @@ export default function OrderQueue({
             <button
               onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
               disabled={offset === 0}
-              className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-['Inter:Medium',_sans-serif] disabled:opacity-40"
+              className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-medium disabled:opacity-40"
             >
               Previous
             </button>
-            <span className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <span className="text-[11px] font-normal text-muted-foreground">
               {offset + 1}–{Math.min(offset + PAGE_SIZE, meta.total)} of {meta.total}
             </span>
             <button
               onClick={() => setOffset(offset + PAGE_SIZE)}
               disabled={offset + PAGE_SIZE >= meta.total}
-              className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-['Inter:Medium',_sans-serif] disabled:opacity-40"
+              className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-medium disabled:opacity-40"
             >
               Next
             </button>
@@ -375,9 +375,9 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`shrink-0 text-[11px] px-2.5 py-1 rounded-full border font-['Inter:Regular',_sans-serif] transition-colors ${
+      className={`shrink-0 text-[11px] px-2.5 py-1 rounded-full border font-normal transition-colors ${
         active
-          ? 'bg-[#426b1f] text-white border-[#426b1f]'
+          ? 'bg-brand text-white border-brand'
           : 'bg-white text-[#000000] border-neutral-300'
       }`}
     >
@@ -437,12 +437,12 @@ function OrderDetailPanel({
       <div className="sticky top-0 z-10 bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between gap-3">
         <button
           onClick={onBack}
-          className="text-[12px] font-['Inter:Medium',_sans-serif] text-[#426b1f]"
+          className="text-[12px] font-medium text-brand"
         >
           &larr; All orders
         </button>
         <span
-          className={`text-[11px] px-2 py-0.5 rounded-full border font-['Inter:Medium',_sans-serif] ${STATUS_TONE[order.status]}`}
+          className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${STATUS_TONE[order.status]}`}
         >
           {order.status}
         </span>
@@ -450,27 +450,27 @@ function OrderDetailPanel({
 
       <div className="p-4 space-y-3">
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
-          <p className="text-[15px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+          <p className="text-[15px] font-medium text-[#000000]">
             {order.customerName ?? 'Unknown customer'}
           </p>
-          <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+          <p className="text-[12px] font-normal text-muted-foreground">
             {order.reference} · {order.phone ?? 'no phone'}
           </p>
           {address && (
-            <p className="mt-1 text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="mt-1 text-[12px] font-normal text-muted-foreground">
               {[address.address, address.district, address.region].filter(Boolean).join(', ')}
             </p>
           )}
-          <p className="mt-2 text-[16px] font-['Inter:Medium',_sans-serif] text-[#426b1f]">
+          <p className="mt-2 text-[16px] font-medium text-brand">
             {formatUgx(order.total)}
           </p>
         </div>
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">Money</p>
+            <p className="text-[13px] font-medium text-[#000000]">Money</p>
             <span
-              className={`text-[10px] px-2 py-0.5 rounded-full border font-['Inter:Medium',_sans-serif] ${MONEY_TONE[order.money.state]}`}
+              className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${MONEY_TONE[order.money.state]}`}
             >
               {MONEY_LABELS[order.money.state]}
             </span>
@@ -487,7 +487,7 @@ function OrderDetailPanel({
           </div>
 
           {order.money.refundDue && (
-            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-2 py-1.5 text-[11px] text-red-700 font-['Inter:Regular',_sans-serif]">
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-2 py-1.5 text-[11px] text-red-700 font-normal">
               This order was cancelled, but {formatUgx(order.money.refundable)} has not been paid
               back yet.
             </p>
@@ -497,7 +497,7 @@ function OrderDetailPanel({
             <button
               onClick={collect}
               disabled={collecting}
-              className="mt-2 w-full rounded-lg bg-[#426b1f] text-white py-2 text-[12px] font-['Inter:Medium',_sans-serif] disabled:opacity-50"
+              className="mt-2 w-full rounded-lg bg-brand text-white py-2 text-[12px] font-medium disabled:opacity-50"
             >
               {collecting ? 'Recording…' : `Collect ${formatUgx(order.money.codDue)} in cash`}
             </button>
@@ -506,14 +506,14 @@ function OrderDetailPanel({
 
         {order.nextStatuses.length > 0 ? (
           <div className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2">
-            <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+            <p className="text-[13px] font-medium text-[#000000]">
               Move this order on
             </p>
             <input
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Note for the timeline (optional)"
-              className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-['Inter:Regular',_sans-serif]"
+              className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-normal"
             />
             <div className="flex flex-wrap gap-1.5">
               {order.nextStatuses.map((next) => {
@@ -526,7 +526,7 @@ function OrderDetailPanel({
                     onClick={() => act(next)}
                     disabled={busy !== null || blocked}
                     title={blocked ? 'Collect the cash first' : undefined}
-                    className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-['Inter:Medium',_sans-serif] disabled:opacity-40"
+                    className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-medium disabled:opacity-40"
                   >
                     {busy === next ? 'Moving…' : `Mark ${next}`}
                   </button>
@@ -534,28 +534,28 @@ function OrderDetailPanel({
               })}
             </div>
             {order.money.codDue > 0 && (
-              <p className="text-[11px] text-[#757575] font-['Inter:Regular',_sans-serif]">
+              <p className="text-[11px] text-muted-foreground font-normal">
                 Collect the cash before marking this order delivered.
               </p>
             )}
           </div>
         ) : (
-          <p className="rounded-xl border border-neutral-200 bg-white p-3 text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+          <p className="rounded-xl border border-neutral-200 bg-white p-3 text-[12px] font-normal text-muted-foreground">
             This order has reached {order.status} and cannot change.
           </p>
         )}
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
-          <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000] mb-2">
+          <p className="text-[13px] font-medium text-[#000000] mb-2">
             Items
           </p>
           <div className="space-y-1.5">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-baseline justify-between gap-2">
-                <span className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#000000]">
+                <span className="text-[12px] font-normal text-[#000000]">
                   {item.quantity} × {item.name}
                 </span>
-                <span className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                <span className="text-[12px] font-normal text-muted-foreground">
                   {formatUgx(item.lineTotal)}
                 </span>
               </div>
@@ -571,23 +571,23 @@ function OrderDetailPanel({
 
         {order.payments.length > 0 && (
           <div className="rounded-xl border border-neutral-200 bg-white p-3">
-            <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000] mb-2">
+            <p className="text-[13px] font-medium text-[#000000] mb-2">
               Payment
             </p>
             <div className="space-y-1.5">
               {order.payments.map((payment) => (
                 <div key={payment.id}>
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#000000]">
+                    <span className="text-[12px] font-normal text-[#000000]">
                       {payment.provider}
                       {payment.maskedCard ? ` ${payment.maskedCard}` : ''}
                     </span>
-                    <span className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                    <span className="text-[12px] font-normal text-muted-foreground">
                       {payment.status} · {formatUgx(payment.amount)}
                     </span>
                   </div>
                   {payment.settledByEmail && (
-                    <p className="text-[10px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+                    <p className="text-[10px] font-normal text-[#9a9a9a]">
                       Cash taken by {payment.settledByEmail} · {payment.settledAt}
                     </p>
                   )}
@@ -599,10 +599,10 @@ function OrderDetailPanel({
 
         {canRefund && order.money.refundable > 0 && (
           <div className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2">
-            <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+            <p className="text-[13px] font-medium text-[#000000]">
               Record a refund
             </p>
-            <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+            <p className="text-[11px] font-normal text-muted-foreground">
               Pay the customer back first, then log it here. At most{' '}
               {formatUgx(order.money.refundable)} on this order.
             </p>
@@ -612,25 +612,25 @@ function OrderDetailPanel({
 
         {order.refunds.length > 0 && (
           <div className="rounded-xl border border-neutral-200 bg-white p-3">
-            <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000] mb-2">
+            <p className="text-[13px] font-medium text-[#000000] mb-2">
               Refunds
             </p>
             <div className="space-y-2">
               {order.refunds.map((refund) => (
                 <div key={refund.id}>
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[12px] font-['Inter:Medium',_sans-serif] text-[#000000]">
+                    <span className="text-[12px] font-medium text-[#000000]">
                       {refund.reference}
                     </span>
-                    <span className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                    <span className="text-[12px] font-normal text-muted-foreground">
                       {formatUgx(refund.amount)}
                     </span>
                   </div>
-                  <p className="text-[10px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+                  <p className="text-[10px] font-normal text-[#9a9a9a]">
                     {refund.method.replace('_', ' ')} · {refund.createdByEmail ?? 'system'} ·{' '}
                     {refund.createdAt}
                   </p>
-                  <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                  <p className="text-[11px] font-normal text-muted-foreground">
                     {refund.reason}
                   </p>
                 </div>
@@ -640,23 +640,23 @@ function OrderDetailPanel({
         )}
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
-          <p className="text-[13px] font-['Inter:Medium',_sans-serif] text-[#000000] mb-2">
+          <p className="text-[13px] font-medium text-[#000000] mb-2">
             Timeline
           </p>
           <ol className="space-y-2">
             {order.timeline.map((entry) => (
               <li key={entry.id} className="flex gap-2">
-                <span className="mt-1 size-2 shrink-0 rounded-full bg-[#426b1f]" />
+                <span className="mt-1 size-2 shrink-0 rounded-full bg-brand" />
                 <div className="min-w-0">
-                  <p className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#000000]">
+                  <p className="text-[12px] font-normal text-[#000000]">
                     {entry.fromStatus ? `${entry.fromStatus} → ` : ''}
                     {entry.toStatus}
                   </p>
-                  <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#9a9a9a]">
+                  <p className="text-[11px] font-normal text-[#9a9a9a]">
                     {entry.changedByEmail ?? 'system'} · {entry.createdAt}
                   </p>
                   {entry.note && (
-                    <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+                    <p className="text-[11px] font-normal text-muted-foreground">
                       {entry.note}
                     </p>
                   )}
@@ -709,22 +709,22 @@ function RefundForm({
 
   return (
     <form onSubmit={submit} className="space-y-2">
-      <label className="block text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+      <label className="block text-[11px] font-normal text-muted-foreground">
         Amount
         <input
           value={amount}
           onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ''))}
           inputMode="numeric"
-          className="mt-1 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-['Inter:Regular',_sans-serif]"
+          className="mt-1 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-normal"
         />
       </label>
 
-      <label className="block text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+      <label className="block text-[11px] font-normal text-muted-foreground">
         Paid back by
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value as RefundDraft['method'])}
-          className="mt-1 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-['Inter:Regular',_sans-serif] bg-white"
+          className="mt-1 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-normal bg-white"
         >
           <option value="cash">Cash</option>
           <option value="mobile_money">Mobile money</option>
@@ -732,24 +732,24 @@ function RefundForm({
         </select>
       </label>
 
-      <label className="block text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575]">
+      <label className="block text-[11px] font-normal text-muted-foreground">
         Reason
         <input
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder="e.g. damaged tomatoes, customer cancelled"
-          className="mt-1 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-['Inter:Regular',_sans-serif]"
+          className="mt-1 w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] font-normal"
         />
       </label>
 
       {problem && (
-        <p className="text-[11px] text-red-700 font-['Inter:Regular',_sans-serif]">{problem}</p>
+        <p className="text-[11px] text-red-700 font-normal">{problem}</p>
       )}
 
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded-lg border border-[#426b1f] text-[#426b1f] py-2 text-[12px] font-['Inter:Medium',_sans-serif] disabled:opacity-50"
+        className="w-full rounded-lg border border-brand text-brand py-2 text-[12px] font-medium disabled:opacity-50"
       >
         {busy ? 'Recording…' : 'Record this refund'}
       </button>
@@ -770,10 +770,10 @@ function MoneyRow({
 }) {
   return (
     <div className="flex items-baseline justify-between">
-      <span className="text-[12px] font-['Inter:Regular',_sans-serif] text-[#757575]">{label}</span>
+      <span className="text-[12px] font-normal text-muted-foreground">{label}</span>
       <span
-        className={`text-[12px] font-['Inter:Regular',_sans-serif] ${
-          strong ? 'text-[#426b1f] font-semibold' : 'text-[#000000]'
+        className={`text-[12px] font-normal ${
+          strong ? 'text-brand font-semibold' : 'text-[#000000]'
         }`}
       >
         {value === 0 ? zeroLabel : formatUgx(value)}

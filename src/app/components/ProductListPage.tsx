@@ -107,10 +107,10 @@ function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChang
       <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
         <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
         <div
-          className="absolute css-v5bt0j flex flex-col font-['Newsreader:Medium',_sans-serif] font-medium justify-center leading-[0] text-[#426b1f] text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
+          className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
         >
-          <p className="adjustLetterSpacing block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+          <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
         </div>
         
         {/* Cart Icon */}
@@ -126,11 +126,11 @@ function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChang
             </svg>
           </div>
           {cartCount > 0 && (
-            <div className="absolute bg-[#426b1f] left-[17px] rounded-lg size-4 top-[-1px]">
+            <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="css-78fix6 flex flex-col font-['Inter:Medium',_sans-serif] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                    <p className="adjustLetterSpacing block leading-none whitespace-pre">{cartCount}</p>
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <p className="block leading-none whitespace-pre">{cartCount}</p>
                   </div>
                 </div>
               </div>
@@ -161,15 +161,15 @@ function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChang
           <div className="relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row items-start justify-start p-0 relative w-full">
               <div className="basis-0 grow min-h-px min-w-px relative shrink-0">
-                <div className="box-border content-stretch flex flex-row font-['Newsreader:Regular',_sans-serif] font-normal gap-0.5 items-start justify-start leading-[0] p-0 relative text-[24px] text-left text-nowrap tracking-[-0.48px] w-full">
-                  <div className="css-eomsl1 flex flex-col justify-center relative shrink-0 text-[#757575]">
-                    <p className="adjustLetterSpacing block leading-[32px] text-nowrap whitespace-pre text-[24px]">All Aisles</p>
+                <div className="box-border content-stretch flex flex-row font-serif font-normal gap-0.5 items-start justify-start leading-[0] p-0 relative text-[24px] text-left text-nowrap tracking-[-0.48px] w-full">
+                  <div className="flex flex-col justify-center relative shrink-0 text-muted-foreground">
+                    <p className="block leading-[32px] text-nowrap whitespace-pre text-[24px]">All Aisles</p>
                   </div>
-                  <div className="css-eomsl1 flex flex-col justify-center relative shrink-0 text-[#757575]">
-                    <p className="adjustLetterSpacing block leading-[32px] text-nowrap whitespace-pre text-[24px]">/</p>
+                  <div className="flex flex-col justify-center relative shrink-0 text-muted-foreground">
+                    <p className="block leading-[32px] text-nowrap whitespace-pre text-[24px]">/</p>
                   </div>
-                  <div className="css-ip39ex flex flex-col justify-center relative shrink-0 text-[#000000]">
-                    <p className="adjustLetterSpacing block leading-[32px] text-nowrap whitespace-pre text-[24px]">Produce</p>
+                  <div className="flex flex-col justify-center relative shrink-0 text-[#000000]">
+                    <p className="block leading-[32px] text-nowrap whitespace-pre text-[24px]">Produce</p>
                   </div>
                 </div>
               </div>
@@ -196,15 +196,15 @@ function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChang
                 onClick={() => onSortChange('default')}
                 className={clsx(
                   "relative rounded-xl shrink-0",
-                  sortOption === 'default' ? "bg-[#426b1f]" : "border border-[#e1e1e1] border-solid"
+                  sortOption === 'default' ? "bg-brand" : "border border-[#e1e1e1] border-solid"
                 )}
               >
                 <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start px-4 py-2 relative">
                   <div className={clsx(
-                    "css-79j43w flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
+                    "flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
                     sortOption === 'default' ? "text-[#ffffff]" : "text-[#000000]"
                   )}>
-                    <p className="adjustLetterSpacing block leading-[1.3] whitespace-pre">Default</p>
+                    <p className="block leading-[1.3] whitespace-pre">Default</p>
                   </div>
                 </div>
               </button>
@@ -213,15 +213,15 @@ function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChang
                 onClick={() => onSortChange('a-z')}
                 className={clsx(
                   "relative rounded-xl shrink-0",
-                  sortOption === 'a-z' ? "bg-[#426b1f]" : "border border-[#e1e1e1] border-solid"
+                  sortOption === 'a-z' ? "bg-brand" : "border border-[#e1e1e1] border-solid"
                 )}
               >
                 <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start px-4 py-2 relative">
                   <div className={clsx(
-                    "css-k6fayy flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
+                    "flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
                     sortOption === 'a-z' ? "text-[#ffffff]" : "text-[#000000]"
                   )}>
-                    <p className="adjustLetterSpacing block leading-[1.3] whitespace-pre">A-Z</p>
+                    <p className="block leading-[1.3] whitespace-pre">A-Z</p>
                   </div>
                 </div>
               </button>
@@ -230,15 +230,15 @@ function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChang
                 onClick={() => onSortChange('price')}
                 className={clsx(
                   "relative rounded-xl shrink-0",
-                  sortOption === 'price' ? "bg-[#426b1f]" : "border border-[#e1e1e1] border-solid"
+                  sortOption === 'price' ? "bg-brand" : "border border-[#e1e1e1] border-solid"
                 )}
               >
                 <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start px-4 py-2 relative">
                   <div className={clsx(
-                    "css-k6fayy flex flex-col font-['Inter:Regular',_sans-serif] font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
+                    "flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
                     sortOption === 'price' ? "text-[#ffffff]" : "text-[#000000]"
                   )}>
-                    <p className="adjustLetterSpacing block leading-[1.3] whitespace-pre">{`$ -> $$`}</p>
+                    <p className="block leading-[1.3] whitespace-pre">{`$ -> $$`}</p>
                   </div>
                 </div>
               </button>
@@ -317,15 +317,15 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
           <div className="flex flex-col justify-center relative size-full">
             <div className="box-border content-stretch flex flex-col gap-1 items-start justify-center pl-4 pr-8 py-4 relative size-full">
               <div className="relative shrink-0 w-full">
-                <div className="box-border content-stretch flex flex-col font-['Inter:Regular',_sans-serif] font-normal gap-2 items-start justify-start leading-[0] not-italic p-0 relative text-left w-full">
-                  <div className="css-w9luqw flex flex-col justify-center relative shrink-0 text-[#000000] text-[0px] w-[173px]">
+                <div className="box-border content-stretch flex flex-col font-normal gap-2 items-start justify-start leading-[0] not-italic p-0 relative text-left w-full">
+                  <div className="flex flex-col justify-center relative shrink-0 text-[#000000] text-[0px] w-[173px]">
                     <p className="leading-[16px] text-[14px]">
                       {product.name}
                       <br />
-                      <span className="text-[#426b1f]">{product.price}</span>
+                      <span className="text-brand">{product.price}</span>
                     </p>
                   </div>
-                  <div className="css-415rgs relative shrink-0 text-[#757575] text-[12px] text-nowrap">
+                  <div className="relative shrink-0 text-muted-foreground text-[12px] text-nowrap">
                     <p className="block leading-[1.6] whitespace-pre text-[12px]">{product.farm} →</p>
                   </div>
                   <div className="pt-0.5">
@@ -335,23 +335,23 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
                     className="w-full"
                     expandLabel="More"
                     preview={
-                      <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575] leading-[16px] line-clamp-2">
+                      <p className="text-[11px] font-normal text-muted-foreground leading-[16px] line-clamp-2">
                         {product.description}
                       </p>
                     }
                     detail={
                       <div className="space-y-2">
-                        <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#000000] leading-[16px]">
+                        <p className="text-[11px] font-normal text-[#000000] leading-[16px]">
                           {product.description}
                         </p>
-                        <p className="text-[11px] font-['Inter:Regular',_sans-serif] text-[#757575] leading-[16px]">
+                        <p className="text-[11px] font-normal text-muted-foreground leading-[16px]">
                           {product.location}
                         </p>
                         <div className="flex flex-wrap gap-1">
                           {product.dietary.map((tag) => (
                             <span
                               key={tag}
-                              className="text-[10px] font-medium text-[#426b1f] bg-[#426b1f]/10 border border-[#426b1f]/20 rounded px-1.5 py-0.5"
+                              className="text-[10px] font-medium text-brand bg-brand/10 border border-brand/20 rounded px-1.5 py-0.5"
                             >
                               {tag}
                             </span>
@@ -391,7 +391,7 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
               ? 'bg-neutral-200 cursor-not-allowed'
               : lowStock
                 ? 'bg-[#b07d2b] hover:bg-[#96691f]'
-                : 'bg-[#426b1f] hover:bg-[#355214]'
+                : 'bg-brand hover:bg-[#355214]'
           }`}
         >
           {soldOut ? <SoldOutIcon /> : <PlusIcon />}
