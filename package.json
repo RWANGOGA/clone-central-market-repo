@@ -3,11 +3,15 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "vite build",
     "dev": "node scripts/dev.mjs",
     "dev:web": "vite",
-    "dev:api": "npm run dev --prefix api"
+    "dev:api": "npm run dev --prefix api",
+    "setup": "npm install && npm install --prefix api"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
