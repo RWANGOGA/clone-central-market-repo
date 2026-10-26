@@ -125,6 +125,42 @@ its build context has to be the repository root. Clear the root directory for a
 Docker service, or go back to the Node runtime, where `api` is the correct value
 because the build and start commands simply run inside it.
 
+### If the log ends in `sh: 1: next: not found` and `exited with code 127`
+
+The service is running **`npm run dev`**, and it is running it from the **repo
+root**. Render's Node runtime falls back to `npm run dev` when no start command is
+given, and the root's `dev` script is `scripts/dev.mjs` — the local launcher that
+starts Vite and `next dev` side by side. Two things go wrong at once: the API's
+dependencies live in `api/node_modules` and were never installed, so `next` is not
+on the path; and even if they were, a dev server on port 3001 is not what a deploy
+should be running. This is the signature of a service created with **New → Web
+Service** rather than from `render.yaml`, which declares `npm start`.
+
+`scripts/dev.mjs` now refuses to start when `RENDER=true` and prints these values
+as the first lines of the log, so the settings are named rather than a 127. Set
+them in service → **Settings**:
+
+| Field | Value |
+| --- | --- |
+| Root Directory | `api` |
+| Build Command | `npm ci --include=dev && npm run build` |
+| Start Command | `npm start` |
+| Health Check Path | `/api/health` |
+| Environment | `NODE_VERSION`, `DATABASE_URL` (Neon pooled, `?sslmode=require`), `TRUST_PROXY=true`, `WEB_ORIGINS=https://rwangoga.github.io`, `UPLOAD_DIR`, `PAYMENT_WEBHOOK_SECRET` |
+
+`npm start` runs `next start`, which binds the `$PORT` Render assigns. Never pin a
+port in a deploy — the launcher's 3000/3001 are local conventions only.
+
+### A second service does not move the shop
+
+The Pages bundle is compiled with one API origin baked in
+(`API_BASE_URL` in `.github/workflows/deploy-pages.yml`, overridable by a
+repository variable of the same name). Creating another Render service gives you a
+second URL that nothing is pointing at. To move the shop, bring the new service up
+healthy first — `/api/health` must return `{"status":"ok"}` — then set the
+`API_BASE_URL` variable to it and re-run the Pages workflow. To fix the existing
+service, edit the fields above instead of adding another one.
+
 If a deploy fails during the build with a JSON list of missing keys, that is
 `api/src/lib/env.ts` doing its job: `next build` imports every route to collect
 page data, and the environment is validated as those modules load. It means a

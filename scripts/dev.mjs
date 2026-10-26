@@ -12,10 +12,48 @@
  */
 
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/**
+ * A deploy must never be running this file.
+ *
+ * Render's default start command is `npm run dev` at the repository root, and
+ * `dev` is this script — Vite plus `next dev` on ports of their own choosing,
+ * with dev-only code paths. On Render `next` is not even installed, because the
+ * root package does not carry the API's dependencies, so the pair dies with
+ * `sh: 1: next: not found` and exit 127, and the deploy log looks like a Node
+ * problem rather than a settings problem. Say it in the first line instead:
+ * the values that work are in render.yaml and DEPLOYING.md.
+ */
+if (process.env.RENDER === 'true') {
+  process.stderr.write(
+    [
+      '',
+      'refusing to start: this is the local dev launcher, and Render is asking for it.',
+      'A deploy must run the production build. In the Render service settings:',
+      '  Root Directory   api',
+      '  Build Command    npm ci --include=dev && npm run build',
+      '  Start Command    npm start',
+      '  Health Check     /api/health',
+      'render.yaml declares exactly these; a service created with New > Web Service',
+      'ignores that file, which is how a deploy ends up here. See DEPLOYING.md.',
+      '',
+    ].join('\n'),
+  );
+  process.exit(1);
+}
+
+// The ordinary local failure: a fresh clone where only the root was installed.
+// npm answers with a wall of 127s from inside the API package, which reads like
+// a broken script rather than a missing install.
+if (!existsSync(path.join(root, 'api', 'node_modules', '.bin', 'next'))) {
+  process.stderr.write('\napi/node_modules is missing. Run `npm run setup` first.\n\n');
+  process.exit(1);
+}
 
 const RESET = '\x1b[0m';
 const services = [
