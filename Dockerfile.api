@@ -27,6 +27,9 @@ RUN npm config set fetch-timeout 300000 && \
 ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 ENV PAYMENT_WEBHOOK_SECRET=build-time-placeholder
 ENV UPLOAD_DIR=/app/data/uploads
+# Ask for the standalone output this image's runner stage copies and boots with
+# `node server.js`. Render omits this and gets the default output for `next start`.
+ENV NEXT_STANDALONE=1
 
 RUN npm run build
 
