@@ -1,4 +1,5 @@
 import { apiUrl } from './apiBase';
+import { withActiveMarket } from './activeMarket';
 
 const BASE = apiUrl('/api/admin');
 
@@ -16,6 +17,8 @@ export type AdminIdentity = {
   email: string;
   name: string;
   role: AdminRole;
+  /** Null means the platform tier: this account sees every market. */
+  marketId?: number | null;
 };
 
 export type AdminProduct = {
@@ -59,7 +62,11 @@ type Result<T> = { ok: true; data: T } | { ok: false; error: string; status: num
 /** Sends a request to the staff API and hands back the body untouched. */
 async function request(path: string, init?: RequestInit) {
   try {
-    const response = await fetch(`${BASE}${path}`, {
+    // A read carries the market the console is showing, so a platform account
+    // browsing Mbarara cannot be served Kampala rows by accident. Writes name
+    // the market in the body instead, where each route decides who may set it.
+    const reads = !init?.method || init.method === 'GET';
+    const response = await fetch(`${BASE}${reads ? withActiveMarket(path) : path}`, {
       ...init,
       credentials: 'include',
       headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
@@ -643,6 +650,8 @@ export type AdminAccount = {
   name: string;
   email: string;
   role: AdminRole;
+  /** Which market this account belongs to; null is the platform tier. */
+  marketId?: number | null;
   active: boolean;
   createdAt: string;
   lastLoginAt: string | null;
@@ -654,9 +663,13 @@ export type AdminDraft = {
   email: string;
   role: AdminRole;
   password: string;
+  /** Only a platform owner may choose this; anyone else is pinned to their own. */
+  marketId?: number | null;
 };
 
 export type AdminChange = {
+  /** Move the account to another market, or to none (platform). */
+  marketId?: number | null;
   name?: string;
   role?: AdminRole;
   active?: boolean;
@@ -683,3 +696,92 @@ export async function updateAdmin(
   });
 }
 
+
+/**
+ * Markets and the people who work in them.
+ */
+
+export type MarketRow = {
+  id: number;
+  name: string;
+  slug: string;
+  district: string | null;
+  region: string | null;
+  active: boolean;
+  /** Per-market counters, so the platform can see weight at a glance. */
+  products?: number;
+  deliveriesInProgress?: number;
+  workers?: number;
+};
+
+export type MarketDraft = {
+  name: string;
+  slug?: string;
+  district?: string;
+  region?: string;
+};
+
+export type WorkerKind = 'deliverer' | 'trader' | 'picker' | 'driver';
+
+export const WORKER_KINDS: WorkerKind[] = ['deliverer', 'trader', 'picker', 'driver'];
+
+export type WorkerRow = {
+  id: number;
+  marketId: number;
+  name: string;
+  phone: string | null;
+  kind: WorkerKind;
+  available: boolean;
+  active: boolean;
+  createdAt: string;
+};
+
+export type WorkerDraft = {
+  name: string;
+  phone?: string;
+  kind: WorkerKind;
+  marketId?: number | null;
+};
+
+/** Every market for a platform account, and only its own for a market account. */
+export async function listMarkets(): Promise<{ rows: MarketRow[]; platform: boolean } | null> {
+  const result = await callEnvelope<{ data: MarketRow[]; meta: { total: number; platform: boolean } }>(
+    '/markets',
+  );
+  if (!result?.ok) return null;
+  return { rows: result.data.data, platform: result.data.meta.platform };
+}
+
+export async function createMarket(draft: MarketDraft): Promise<Result<MarketRow>> {
+  return call<MarketRow>('/markets', { method: 'POST', body: JSON.stringify(draft) });
+}
+
+export async function listWorkers(
+  filters: { kind?: string; available?: boolean; marketId?: number | null } = {},
+): Promise<Result<WorkerRow[]>> {
+  const params = new URLSearchParams();
+  if (filters.kind) params.set('kind', filters.kind);
+  // One market's roster, asked for by id — used when the order on screen
+  // belongs to a different market from the one the switcher is showing.
+  if (filters.marketId != null) params.set('marketId', String(filters.marketId));
+  if (filters.available !== undefined) params.set('available', String(filters.available));
+  const qs = params.toString();
+  return call<WorkerRow[]>(`/workers${qs ? `?${qs}` : ''}`);
+}
+
+export async function createWorker(draft: WorkerDraft): Promise<Result<WorkerRow>> {
+  return call<WorkerRow>('/workers', { method: 'POST', body: JSON.stringify(draft) });
+}
+
+export async function updateWorker(
+  id: number,
+  change: { name?: string; phone?: string; kind?: WorkerKind; available?: boolean; active?: boolean },
+): Promise<Result<WorkerRow>> {
+  return call<WorkerRow>(`/workers/${id}`, { method: 'PATCH', body: JSON.stringify(change) });
+}
+
+/** The deliverers a market can hand a basket to right now. */
+export async function delivererOptions(): Promise<WorkerRow[]> {
+  const result = await listWorkers({ kind: 'deliverer', available: true });
+  return result?.ok ? result.data : [];
+}

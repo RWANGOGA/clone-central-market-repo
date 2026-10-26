@@ -1,4 +1,5 @@
 import { apiUrl } from './apiBase';
+import { withActiveMarket } from './activeMarket';
 
 const BASE = apiUrl('/api/admin');
 
@@ -53,6 +54,10 @@ export type OrderRow = {
   currency: string;
   itemCount: number;
   unitCount: number;
+  marketId?: number | null;
+  delivererId?: number | null;
+  /** The person the market gave the basket to, when it has. */
+  deliverer?: string | null;
   money: OrderMoney;
   createdAt: string;
   updatedAt: string;
@@ -179,11 +184,11 @@ export async function listOrders(
     if (value !== undefined && value !== '' && value !== null) params.set(key, String(value));
   }
   const qs = params.toString();
-  return call<{ data: OrderRow[]; meta: OrderListMeta }>(`/orders${qs ? `?${qs}` : ''}`);
+  return call<{ data: OrderRow[]; meta: OrderListMeta }>(withActiveMarket(`/orders${qs ? `?${qs}` : ''}`));
 }
 
 export async function getOrder(idOrRef: string | number): Promise<Result<{ data: OrderDetail }>> {
-  return call<{ data: OrderDetail }>(`/orders/${encodeURIComponent(String(idOrRef))}`);
+  return call<{ data: OrderDetail }>(withActiveMarket(`/orders/${encodeURIComponent(String(idOrRef))}`));
 }
 
 export async function setOrderStatus(
@@ -278,4 +283,20 @@ export function subscribeToOrders(
       source = null;
     }
   };
+}
+/**
+ * Hand the basket to one of the market's own people.
+ *
+ * `null` gives the order back to the market unassigned. The server refuses a
+ * deliverer from another market, one who has left the roster, and a trader or
+ * picker who does not carry baskets.
+ */
+export async function assignDeliverer(
+  idOrRef: string | number,
+  delivererId: number | null,
+): Promise<Result<{ id: number; reference: string; delivererId: number | null; deliverer?: string }>> {
+  return call<{ id: number; reference: string; delivererId: number | null; deliverer?: string }>(
+    `/orders/${encodeURIComponent(String(idOrRef))}/assign`,
+    { method: 'POST', body: JSON.stringify({ delivererId }) },
+  );
 }

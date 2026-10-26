@@ -7,8 +7,10 @@ import {
   createAdmin,
   createProduct,
   createPromo,
+  createMarket,
   createPurchaseOrder,
   createSupplier,
+  createWorker,
   currentAdmin,
   deactivateCustomer,
   fileToDataUrl,
@@ -19,6 +21,8 @@ import {
   listAdmins,
   listCustomers,
   listInventoryMovements,
+  listMarkets,
+  listWorkers,
   listProductPerformance,
   listPromos,
   listPurchaseOrders,
@@ -30,6 +34,7 @@ import {
   signOut,
   updateProduct,
   updateAdmin,
+  updateWorker,
   type ActivityLogRow,
   type AdminAccount,
   type AdminIdentity,
@@ -39,6 +44,9 @@ import {
   type AnalyticsOverview,
   type CustomerRow,
   type ForecastResult,
+  type MarketRow,
+  type WorkerKind,
+  type WorkerRow,
   type ProductDraft,
   type ProductPerformanceRow,
   type PromoDraft,
@@ -47,7 +55,9 @@ import {
   type SalesTrendPoint,
   type StockMovementRow,
   type SupplierRow,
+  WORKER_KINDS,
 } from '../lib/adminApi';
+import { getActiveMarket, setActiveMarket } from '../lib/activeMarket';
 import AdminGate from './AdminGate';
 import OrderQueue from './OrderQueue';
 import StockBadge from './StockBadge';
@@ -67,7 +77,9 @@ type Tab =
   | 'analytics'
   | 'activity'
   | 'admins'
-  | 'customers';
+  | 'customers'
+  | 'markets'
+  | 'people';
 
 const EMPTY_DRAFT: ProductDraft = {
   name: '',
@@ -133,8 +145,25 @@ function StaffShell({
   onClose?: () => void;
 }) {
   const [tab, setTab] = useState<Tab>(admin.role === 'staff' ? 'orders' : 'catalogue');
+  const [markets, setMarkets] = useState<MarketRow[]>([]);
+  // Which market the console is reading. Null is the platform view of all of
+  // them, and only a platform account can ever change it.
+  const [market, setMarket] = useState<number | null>(getActiveMarket());
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const refreshMarkets = useCallback(() => {
+    listMarkets().then((result) => {
+      if (result) setMarkets(result.rows);
+    });
+  }, []);
+
+  const chooseMarket = useCallback((value: number | null) => {
+    setMarket(value);
+    // The staff and order clients read this on every request, so a panel that
+    // fetches later cannot slip back to another market.
+    setActiveMarket(value);
+  }, []);
 
   const flash = useCallback((message: string) => {
     setNotice(message);
@@ -151,6 +180,23 @@ function StaffShell({
   // Shop assistants only fulfil orders, so the write-heavy tabs are not shown
   // to them at all. The server enforces the same matrix regardless.
   const isStaff = admin.role === 'staff';
+  const isPlatform = admin.marketId == null;
+  const marketName = isPlatform
+    ? null
+    : (markets.find((item) => item.id === admin.marketId)?.name ?? 'My market');
+
+  useEffect(() => {
+    // Small, and needed in three places — the switcher, the badge under the
+    // name, and the Markets tab — so it is fetched once here rather than by
+    // each panel that shows a market name.
+    let cancelled = false;
+    listMarkets().then((result) => {
+      if (!cancelled && result) setMarkets(result.rows);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const tabs: { value: Tab; label: string; disabled?: boolean }[] = [
     { value: 'orders', label: 'Orders' },
@@ -163,7 +209,9 @@ function StaffShell({
           { value: 'suppliers' as const, label: 'Suppliers' },
           { value: 'promotions' as const, label: 'Promotions' },
           { value: 'analytics' as const, label: 'Analytics' },
+          { value: 'people' as const, label: 'People' },
         ]),
+    ...(isPlatform ? [{ value: 'markets' as const, label: 'Markets' }] : []),
     { value: 'activity', label: 'Activity log' },
     { value: 'customers', label: 'Customers' },
     ...(canManageAdmins ? [{ value: 'admins' as const, label: 'Admins' }] : []),
@@ -182,6 +230,30 @@ function StaffShell({
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {isPlatform && markets.length > 1 && (
+              <label className="flex items-center gap-1.5">
+                <span className="text-[11px] text-muted-foreground">Market</span>
+                <select
+                  value={market === null ? '' : String(market)}
+                  onChange={(event) =>
+                    chooseMarket(event.target.value === '' ? null : Number(event.target.value))
+                  }
+                  className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-[12px]"
+                >
+                  <option value="">All markets</option>
+                  {markets.map((item) => (
+                    <option key={item.id} value={String(item.id)}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {!isPlatform && (
+              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand">
+                {marketName}
+              </span>
+            )}
             {onClose && (
               <button
                 onClick={onClose}
@@ -234,7 +306,9 @@ function StaffShell({
         )}
       </div>
 
-      <div className={tab === 'orders' ? '' : 'p-4'}>
+      {/* Changing market remounts the panel, so nothing cached from the
+          previous market is left on screen while the new one loads. */}
+      <div key={market ?? 'all'} className={tab === 'orders' ? '' : 'p-4'}>
         {tab === 'orders' && <OrderQueue canRefund={!isStaff} embedded />}
         {tab === 'catalogue' && <CataloguePanel admin={admin} flash={flash} fail={fail} />}
         {tab === 'inventory' && <InventoryPanel flash={flash} fail={fail} />}
@@ -244,7 +318,13 @@ function StaffShell({
         {tab === 'analytics' && <AnalyticsPanel flash={flash} fail={fail} />}
         {tab === 'activity' && <ActivityPanel fail={fail} />}
         {tab === 'customers' && <CustomersPanel flash={flash} fail={fail} />}
-        {tab === 'admins' && canManageAdmins && <AdminsPanel admin={admin} flash={flash} fail={fail} />}
+        {tab === 'admins' && canManageAdmins && (
+          <AdminsPanel admin={admin} markets={markets} flash={flash} fail={fail} />
+        )}
+        {tab === 'people' && <PeoplePanel marketId={market} flash={flash} fail={fail} />}
+        {tab === 'markets' && isPlatform && (
+          <MarketsPanel markets={markets} reload={refreshMarkets} flash={flash} fail={fail} />
+        )}
       </div>
     </div>
   );
@@ -964,6 +1044,306 @@ function SuppliersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
   );
 }
 
+/* ---------------- Markets ---------------- */
+
+function MarketsPanel({
+  markets,
+  reload,
+  flash,
+  fail,
+}: {
+  markets: MarketRow[];
+  reload: () => void;
+  flash: (m: string) => void;
+  fail: (m: string) => void;
+}) {
+  const [name, setName] = useState('');
+  const [district, setDistrict] = useState('');
+  const [region, setRegion] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setBusy(true);
+    const result = await createMarket({
+      name: name.trim(),
+      district: district.trim() || undefined,
+      region: region.trim() || undefined,
+    });
+    setBusy(false);
+    if (!result) return fail('Could not reach the service.');
+    if (!result.ok) return fail(result.error);
+    setName('');
+    setDistrict('');
+    setRegion('');
+    flash(`${result.data.name} is open.`);
+    reload();
+  };
+
+  return (
+    <div className="space-y-3">
+      <SectionTitle size="small" family="label">
+        Markets on the platform
+      </SectionTitle>
+      <p className="text-[13px] text-muted-foreground">
+        Each market keeps its own catalogue, orders, staff and roster. Opening one here does not
+        move anything between them.
+      </p>
+
+      <form onSubmit={submit} className="grid gap-2 sm:grid-cols-[1fr_140px_140px_auto]">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Market name"
+          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
+        />
+        <input
+          value={district}
+          onChange={(e) => setDistrict(e.target.value)}
+          placeholder="District"
+          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
+        />
+        <input
+          value={region}
+          onChange={(e) => setRegion(e.target.value)}
+          placeholder="Region"
+          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
+        />
+        <button
+          disabled={busy || !name.trim()}
+          className="bg-brand text-white rounded-lg px-3 py-2 text-[13px] disabled:opacity-50"
+        >
+          Open market
+        </button>
+      </form>
+
+      <table className="w-full text-left border-collapse text-[13px]">
+        <thead>
+          <tr className="border-b border-neutral-200">
+            <th className="pb-2 text-muted-foreground">Market</th>
+            <th className="pb-2 text-muted-foreground">Sells</th>
+            <th className="pb-2 text-muted-foreground">Out now</th>
+            <th className="pb-2 text-muted-foreground">People</th>
+          </tr>
+        </thead>
+        <tbody>
+          {markets.map((item) => (
+            <tr key={item.id} className="border-b border-neutral-100">
+              <td className="py-2">
+                {item.name}
+                <span className="text-muted-foreground">
+                  {item.district ? ` · ${item.district}` : ''}
+                  {item.region ? `, ${item.region}` : ''}
+                </span>
+              </td>
+              <td className="py-2">{item.products ?? 0} products</td>
+              <td className="py-2">{item.deliveriesInProgress ?? 0} deliveries</td>
+              <td className="py-2">{item.workers ?? 0} on the roster</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ---------------- People ---------------- */
+
+const WORKER_KIND_LABELS: Record<WorkerKind, string> = {
+  deliverer: 'Deliverer',
+  trader: 'Trader',
+  picker: 'Picker',
+  driver: 'Driver',
+};
+
+function PeoplePanel({
+  marketId,
+  flash,
+  fail,
+}: {
+  marketId: number | null;
+  flash: (m: string) => void;
+  fail: (m: string) => void;
+}) {
+  const [rows, setRows] = useState<WorkerRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  // An empty kind is the filter 'everyone', not a kind of worker.
+  const [kind, setKind] = useState<WorkerKind | ''>('deliverer');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState<WorkerKind>('deliverer');
+  const [busyId, setBusyId] = useState<number | null>(null);
+
+  const load = useCallback(async () => {
+    const result = await listWorkers();
+    setLoading(false);
+    if (!result) return fail('Could not reach the service.');
+    if (!result.ok) return fail(result.error);
+    setRows(result.data);
+  }, [fail]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    const result = await createWorker({
+      name: name.trim(),
+      phone: phone.trim() || undefined,
+      kind: role,
+      // A platform account has to say where the person works; a market account
+      // is pinned by the server, which ignores this.
+      marketId: marketId ?? undefined,
+    });
+    if (!result) return fail('Could not reach the service.');
+    if (!result.ok) return fail(result.error);
+    setName('');
+    setPhone('');
+    flash(`${result.data.name} is on the roster.`);
+    await load();
+  };
+
+  const patch = async (
+    id: number,
+    change: { name?: string; phone?: string; kind?: WorkerKind; available?: boolean; active?: boolean },
+  ) => {
+    setBusyId(id);
+    const result = await updateWorker(id, change);
+    setBusyId(null);
+    if (!result) return fail('Could not reach the service.');
+    if (!result.ok) return fail(result.error);
+    await load();
+  };
+
+  const shown = kind ? rows.filter((row) => row.kind === kind) : rows;
+
+  return (
+    <div className="space-y-3">
+      <SectionTitle size="small" family="label">
+        The market's people
+      </SectionTitle>
+      <p className="text-[13px] text-muted-foreground">
+        Deliverers, traders, pickers and drivers are a roster, not logins. Adding somebody here is
+        what makes them assignable to a delivery.
+      </p>
+
+      <form onSubmit={submit} className="grid gap-2 sm:grid-cols-[1fr_140px_140px_auto]">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Name"
+          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
+        />
+        <input
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Phone"
+          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
+        />
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value as WorkerKind)}
+          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px] bg-white"
+        >
+          {WORKER_KINDS.map((item) => (
+            <option key={item} value={item}>
+              {WORKER_KIND_LABELS[item]}
+            </option>
+          ))}
+        </select>
+        <button
+          disabled={!name.trim()}
+          className="bg-brand text-white rounded-lg px-3 py-2 text-[13px] disabled:opacity-50"
+        >
+          Add
+        </button>
+      </form>
+
+      <div className="flex gap-1.5 flex-wrap">
+        {(
+          [{ value: '', label: 'Everyone' }, ...WORKER_KINDS.map((item) => ({
+            value: item,
+            label: WORKER_KIND_LABELS[item],
+          }))] as { value: string; label: string }[]
+        ).map((item) => (
+          <button
+            key={item.value || 'all'}
+            onClick={() => setKind(item.value as WorkerKind | '')}
+            className={`px-3 py-1 rounded-full text-[12px] font-medium ${
+              kind === item.value ? 'bg-brand text-white' : 'bg-neutral-100 text-[#000000]'
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
+      ) : shown.length === 0 ? (
+        <p className="text-[13px] text-muted-foreground py-4 text-center">Nobody on the roster yet.</p>
+      ) : (
+        <table className="w-full text-left border-collapse text-[13px]">
+          <thead>
+            <tr className="border-b border-neutral-200">
+              <th className="pb-2 text-muted-foreground">Name</th>
+              <th className="pb-2 text-muted-foreground">Works as</th>
+              <th className="pb-2 text-muted-foreground">Phone</th>
+              <th className="pb-2 text-muted-foreground">Today</th>
+              <th className="pb-2 text-muted-foreground" />
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map((row) => (
+              <tr key={row.id} className="border-b border-neutral-100">
+                <td className="py-2">{row.name}</td>
+                <td className="py-2">{WORKER_KIND_LABELS[row.kind] ?? row.kind}</td>
+                <td className="py-2">{row.phone ?? '—'}</td>
+                <td className="py-2">
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                      !row.active
+                        ? 'bg-neutral-100 text-neutral-500'
+                        : row.available
+                          ? 'bg-brand/10 text-brand'
+                          : 'bg-amber-50 text-amber-700'
+                    }`}
+                  >
+                    {!row.active ? 'Left' : row.available ? 'Available' : 'Off'}
+                  </span>
+                </td>
+                <td className="py-2 text-right whitespace-nowrap">
+                  {row.active && (
+                    <button
+                      disabled={busyId === row.id}
+                      onClick={() => patch(row.id, { available: !row.available })}
+                      className="text-[12px] font-medium text-brand disabled:opacity-50"
+                    >
+                      {row.available ? 'Mark off' : 'Mark available'}
+                    </button>
+                  )}
+                  {row.active && (
+                    <button
+                      disabled={busyId === row.id}
+                      onClick={() => patch(row.id, { active: false })}
+                      className="ml-3 text-[12px] text-red-600 disabled:opacity-50"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
 /* ---------------- Promotions ---------------- */
 
 const EMPTY_PROMO: PromoDraft = {
@@ -1637,13 +2017,20 @@ const ADMIN_ROLE_HINTS: Record<AdminRole, string> = {
 
 function AdminsPanel({
   admin,
+  markets,
   flash,
   fail,
 }: {
   admin: AdminIdentity;
+  markets: MarketRow[];
   flash: (m: string) => void;
   fail: (m: string) => void;
 }) {
+  // A platform owner names the market an account belongs to. A market owner
+  // sees only their own team and is never offered the choice.
+  const asPlatform = admin.marketId == null;
+  const marketLabel = (id: number | null | undefined) =>
+    id == null ? 'All markets' : (markets.find((item) => item.id === id)?.name ?? `Market ${id}`);
   const [accounts, setAccounts] = useState<AdminAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingId, setPendingId] = useState<number | null>(null);
@@ -1651,6 +2038,7 @@ function AdminsPanel({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<AdminRole>('staff');
+  const [marketId, setMarketId] = useState('');
   const [password, setPassword] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -1692,18 +2080,25 @@ function AdminsPanel({
       email: email.trim(),
       role,
       password,
+      ...(asPlatform ? { marketId: marketId === '' ? null : Number(marketId) } : {}),
     });
     setCreating(false);
     if (!result) return fail('Could not reach the service.');
     if (!result.ok) return fail(result.error);
-    setName(''); setEmail(''); setRole('staff'); setPassword('');
+    setName(''); setEmail(''); setRole('staff'); setPassword(''); setMarketId('');
     flash(`${result.data.name} can now sign in.`);
     await load();
   };
 
   const change = async (
     account: AdminAccount,
-    patch: { role?: AdminRole; active?: boolean; password?: string; revokeSessions?: boolean },
+    patch: {
+      role?: AdminRole;
+      active?: boolean;
+      password?: string;
+      revokeSessions?: boolean;
+      marketId?: number | null;
+    },
   ) => {
     setPendingId(account.id);
     const result = await updateAdmin(account.id, patch);
@@ -1723,7 +2118,8 @@ function AdminsPanel({
       <div>
         <SectionTitle size="small" family="label">Staff accounts</SectionTitle>
         <p className="text-[11px] font-normal text-muted-foreground">
-          Owners manage accounts. Managers run the shop. Shop assistants only move orders.
+          Owners manage accounts. Managers run the shop. Shop assistants only move orders. An
+          account pinned to a market cannot see another market's data.
         </p>
       </div>
 
@@ -1749,15 +2145,18 @@ function AdminsPanel({
                       {account.email}
                     </p>
                   </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                      account.active
-                        ? 'bg-brand/10 text-brand'
-                        : 'bg-neutral-100 text-neutral-500'
-                    }`}
-                  >
-                    {account.active ? 'Active' : 'Disabled'}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-600">
+                      {marketLabel(account.marketId)}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                        account.active ? 'bg-brand/10 text-brand' : 'bg-neutral-100 text-neutral-500'
+                      }`}
+                    >
+                      {account.active ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
                 </div>
 
                 <p className="text-[11px] font-normal text-muted-foreground"> {account.activeSessions} open session{account.activeSessions === 1 ? '' : 's'} ·{' '}
@@ -1767,6 +2166,27 @@ function AdminsPanel({
                 </p>
 
                 <div className="flex flex-wrap items-center gap-1.5">
+                  {asPlatform && (
+                    <select
+                      value={account.marketId == null ? '' : String(account.marketId)}
+                      disabled={pending}
+                      onChange={(e) =>
+                        change(account, {
+                          marketId: e.target.value === '' ? null : Number(e.target.value),
+                        })
+                      }
+                      title="Which market this account works in"
+                      className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-[11px] font-medium disabled:bg-neutral-100 disabled:text-neutral-400"
+                    >
+                      <option value="">All markets</option>
+                      {markets.map((item) => (
+                        <option key={item.id} value={String(item.id)}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
                   <select
                     value={account.role}
                     disabled={self || pending}
@@ -1894,6 +2314,25 @@ function AdminsPanel({
             {ADMIN_ROLE_HINTS[role]}
           </p>
         </Field>
+        {asPlatform && (
+          <Field label="Market">
+            <select
+              value={marketId}
+              onChange={(e) => setMarketId(e.target.value)}
+              className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px] w-full bg-white"
+            >
+              <option value="">All markets (platform)</option>
+              {markets.map((item) => (
+                <option key={item.id} value={String(item.id)}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+              A platform account sees every market. Pin somebody to one and they see only that one.
+            </p>
+          </Field>
+        )}
         <Field label="Temporary password (min 10)">
           <input
             type="password"

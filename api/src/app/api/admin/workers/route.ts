@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { marketWorkers } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
-import { marketScope, targetMarket } from '@/lib/marketScope';
+import { marketScope, requestedMarket, targetMarket } from '@/lib/marketScope';
 import { recordActivity } from '@/lib/activity';
 import { error, json } from '@/lib/http';
 import { csrfCheck } from '@/lib/security';
@@ -40,7 +40,17 @@ export async function GET(request: Request) {
   const kind = url.searchParams.get('kind');
   const onlyAvailable = url.searchParams.get('available') === 'true';
 
-  const filters = [marketScope(admin, marketWorkers.marketId)];
+  // The console may be showing one market, in which case the roster asked for
+  // is that market's. A market account asking for somebody else's is refused by
+  // `requestedMarket`, so this cannot be pointed at a rival.
+  const market = requestedMarket(admin, url.searchParams.get('marketId'));
+  if (!market.ok) return error(market.message, 403);
+
+  const filters = [
+    market.marketId === null
+      ? marketScope(admin, marketWorkers.marketId)
+      : eq(marketWorkers.marketId, market.marketId),
+  ];
   if (kind && (KINDS as readonly string[]).includes(kind)) {
     filters.push(eq(marketWorkers.kind, kind as (typeof KINDS)[number]));
   }

@@ -1,8 +1,8 @@
-import { and, count, eq, gt } from 'drizzle-orm';
+import { and, count, eq, gt, sql } from 'drizzle-orm';
 import { marketScope } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
-import { adminSessions, admins, nowText } from '@/db/schema';
+import { adminSessions, admins, markets, nowText } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
 import { adminDto } from '@/lib/adminAccounts';
 import { hashPassword } from '@/lib/password';
@@ -28,6 +28,8 @@ const patchSchema = z
     active: z.boolean().optional(),
     password: z.string().min(10).max(200).optional(),
     revokeSessions: z.boolean().optional(),
+    /** Moving an account between markets. Only a platform account may. */
+    marketId: z.number().int().positive().nullish(),
   })
   .refine((value) => Object.values(value).some((item) => item !== undefined), {
     message: 'Nothing to change.',
@@ -64,13 +66,36 @@ export async function PATCH(request: Request, { params }: Ctx) {
     }
   }
 
+  // Moving an account from one market to another is a platform decision: an
+  // owner of one market must not be able to lend their team to a rival, nor
+  // pull in somebody else's staff.
+  let movesTo: number | null | undefined;
+  if (parsed.data.marketId !== undefined) {
+    if (admin.marketId !== null) {
+      return error('Only a platform owner can move an account between markets.', 403);
+    }
+    movesTo = parsed.data.marketId ?? null;
+    if (movesTo !== null) {
+      const destination = await db.query.markets.findFirst({ where: eq(markets.id, movesTo) });
+      if (!destination) return error(`Market ${movesTo} is not on the platform`, 404);
+    }
+  }
+
   const demoting = target.role === 'owner' && role !== undefined && role !== 'owner';
   const deactivating = target.role === 'owner' && active === false;
   if (demoting || deactivating) {
     const [owners] = await db
       .select({ n: count() })
       .from(admins)
-      .where(and(eq(admins.role, 'owner'), eq(admins.active, true)));
+      .where(
+        and(
+          eq(admins.role, 'owner'),
+          eq(admins.active, true),
+          target.marketId === null
+            ? sql`${admins.marketId} IS NULL`
+            : eq(admins.marketId, target.marketId),
+        ),
+      );
     if (Number(owners?.n ?? 0) <= 1) {
       return error('At least one active owner must remain.', 409);
     }
@@ -85,6 +110,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     ...(role !== undefined ? { role } : {}),
     ...(active !== undefined ? { active } : {}),
     ...(passwordHash ? { passwordHash } : {}),
+    ...(movesTo !== undefined ? { marketId: movesTo } : {}),
   };
 
   const updated = await db.transaction(async (tx) => {
@@ -114,7 +140,8 @@ export async function PATCH(request: Request, { params }: Ctx) {
     name === undefined &&
     role === undefined &&
     active === undefined &&
-    password === undefined;
+    password === undefined &&
+    parsed.data.marketId === undefined;
 
   await recordActivity({
     action: onlyRevoked ? 'admin.revoke' : 'admin.update',

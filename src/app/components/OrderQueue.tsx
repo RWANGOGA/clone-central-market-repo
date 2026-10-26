@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { listWorkers, type WorkerRow } from '../lib/adminApi';
 import {
   ORDER_STATUSES,
+  assignDeliverer,
   collectCash,
   getOrder,
   listOrders,
@@ -191,6 +193,13 @@ export default function OrderQueue({
         onMove={(next) => move(selected, next)}
         onCollect={() => settle(selected)}
         onRefund={(draft) => refund(selected, draft)}
+        onAssigned={(assigned) =>
+          setSelected((current) =>
+            current
+              ? { ...current, delivererId: assigned.delivererId, deliverer: assigned.deliverer ?? null }
+              : current,
+          )
+        }
         onError={setError}
       />
     );
@@ -316,6 +325,7 @@ export default function OrderQueue({
                   {[order.district, order.region].filter(Boolean).join(', ')} ·{' '}
                   {order.itemCount} line{order.itemCount === 1 ? '' : 's'}, {order.unitCount} unit
                   {order.unitCount === 1 ? '' : 's'}
+                  {order.deliverer ? ` · with ${order.deliverer}` : ' · nobody named yet'}
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -393,6 +403,7 @@ function OrderDetailPanel({
   onMove,
   onCollect,
   onRefund,
+  onAssigned,
   onError,
 }: {
   order: OrderDetail;
@@ -401,6 +412,7 @@ function OrderDetailPanel({
   onMove: (next: string) => void;
   onCollect: () => Promise<void>;
   onRefund: (draft: RefundDraft) => Promise<void>;
+  onAssigned: (assigned: { delivererId: number | null; deliverer: string | null }) => void;
   onError: (message: string | null) => void;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
@@ -465,6 +477,8 @@ function OrderDetailPanel({
             {formatUgx(order.total)}
           </p>
         </div>
+
+        <DelivererCard order={order} onAssigned={onAssigned} onError={onError} />
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
           <div className="flex items-center justify-between gap-2">
@@ -778,6 +792,86 @@ function MoneyRow({
       >
         {value === 0 ? zeroLabel : formatUgx(value)}
       </span>
+    </div>
+  );
+}
+/**
+ * Who is carrying this basket.
+ *
+ * The roster shown is the order's own market, not whatever the switcher happens
+ * to be on: handing a Kampala order to an Mbarara deliverer is refused by the
+ * server, and the console should not offer it in the first place.
+ */
+function DelivererCard({
+  order,
+  onAssigned,
+  onError,
+}: {
+  order: OrderDetail;
+  onAssigned: (assigned: { delivererId: number | null; deliverer: string | null }) => void;
+  onError: (message: string | null) => void;
+}) {
+  const [options, setOptions] = useState<WorkerRow[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    listWorkers({ kind: 'deliverer', available: true, marketId: order.marketId ?? undefined }).then(
+      (result) => {
+        if (cancelled || !result?.ok) return;
+        setOptions(result.data);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [order.marketId]);
+
+  const choose = async (value: string) => {
+    setBusy(true);
+    onError(null);
+    const result = await assignDeliverer(order.id, value === '' ? null : Number(value));
+    setBusy(false);
+    if (!result) return onError('Could not reach the service.');
+    if (!result.ok) return onError(result.error);
+    onAssigned({
+      delivererId: result.data.delivererId,
+      deliverer: result.data.deliverer ?? null,
+    });
+  };
+
+  const closed = order.status === 'delivered' || order.status === 'cancelled';
+
+  return (
+    <div className="rounded-xl border border-neutral-200 bg-white p-3">
+      <p className="text-[12px] font-medium text-[#000000]">Deliverer</p>
+      {closed ? (
+        <p className="mt-1 text-[12px] font-normal text-muted-foreground">
+          {order.deliverer ? `Carried by ${order.deliverer}.` : 'Nobody was named for this one.'}
+        </p>
+      ) : (
+        <>
+          <select
+            value={order.delivererId == null ? '' : String(order.delivererId)}
+            disabled={busy}
+            onChange={(event) => choose(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-[12px] disabled:bg-neutral-100"
+          >
+            <option value="">Nobody yet</option>
+            {options.map((worker) => (
+              <option key={worker.id} value={String(worker.id)}>
+                {worker.name}
+                {worker.phone ? ` · ${worker.phone}` : ''}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-[11px] font-normal text-muted-foreground">
+            {options.length === 0
+              ? 'No deliverer on this market’s roster is available. Add one under People.'
+              : 'Naming who is out with the basket is what puts a delivery on the board.'}
+          </p>
+        </>
+      )}
     </div>
   );
 }

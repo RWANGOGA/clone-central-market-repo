@@ -1,7 +1,7 @@
 import { and, asc, count, desc, eq, gte, inArray, like, lte, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/db';
-import { orderItems, orders, payments, refunds } from '@/db/schema';
+import { marketWorkers, orderItems, orders, payments, refunds } from '@/db/schema';
 import { requireAdmin } from '@/lib/catalogue';
 import { marketScope } from '@/lib/marketScope';
 import { ORDER_FLOW } from '@/lib/orderFlow';
@@ -110,7 +110,7 @@ export async function GET(request: Request) {
   // Line counts for the list, in one query rather than one per order.
   const orderIds = rows.map((row) => row.id);
 
-  const [lineCounts, paymentRows, refundRows] = await Promise.all([
+  const [lineCounts, paymentRows, refundRows, delivererRows] = await Promise.all([
     rows.length
       ? db
           .select({
@@ -145,7 +145,15 @@ export async function GET(request: Request) {
           .from(refunds)
           .where(inArray(refunds.orderId, orderIds))
       : Promise.resolve([]),
+    // Names of the market's people, so the queue can say who is out with a
+    // basket. One small query instead of a join per row.
+    db
+      .select({ id: marketWorkers.id, name: marketWorkers.name })
+      .from(marketWorkers)
+      .where(marketScope(admin, marketWorkers.marketId)),
   ]);
+
+  const workerNames = new Map(delivererRows.map((row) => [row.id, row.name]));
 
   const byOrder = new Map(lineCounts.map((row) => [row.orderId, row]));
 
@@ -181,6 +189,8 @@ export async function GET(request: Request) {
       itemCount: byOrder.get(row.id)?.lines ?? 0,
       unitCount: byOrder.get(row.id)?.units ?? 0,
       marketId: row.marketId,
+      delivererId: row.delivererId,
+      deliverer: row.delivererId ? (workerNames.get(row.delivererId) ?? null) : null,
       money: summariseMoney(
         paymentsByOrder.get(row.id) ?? [],
         refundsByOrder.get(row.id) ?? [],

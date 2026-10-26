@@ -14,6 +14,8 @@ export type AdminAccountDto = {
   name: string;
   email: string;
   role: AdminRow['role'];
+  /** Null is the platform tier: the whole console rather than one market. */
+  marketId: number | null;
   active: boolean;
   createdAt: string;
   lastLoginAt: string | null;
@@ -26,6 +28,7 @@ export function adminDto(row: AdminRow, activeSessions: number): AdminAccountDto
     name: row.name,
     email: row.email,
     role: row.role,
+    marketId: row.marketId ?? null,
     active: row.active,
     createdAt: row.createdAt,
     lastLoginAt: row.lastLoginAt,
