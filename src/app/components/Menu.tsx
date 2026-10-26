@@ -66,6 +66,18 @@ export default function Menu({ isOpen, onClose, onNavigate, isLoggedIn = false }
             {/* Menu Items */}
             <MenuItems onNavigate={handleNavigation} items={menuItems} />
 
+            {/* Staff door. The admin console is a separate, email-based login at
+                /staff, not the shopper phone login. Reached by client-side
+                navigation so it works without typing a deep link (which on
+                GitHub Pages leans on a fragile 404 fallback). Kept discreet so
+                shoppers don't mistake it for their own account. */}
+            <button
+              onClick={() => handleNavigation('staff')}
+              className="absolute bottom-6 left-4 font-sans text-[13px] tracking-wide text-white/60 hover:text-white transition-colors"
+            >
+              Staff sign in
+            </button>
+
             {/* Close Button */}
             <CloseButton onClick={onClose} />
           </motion.div>
