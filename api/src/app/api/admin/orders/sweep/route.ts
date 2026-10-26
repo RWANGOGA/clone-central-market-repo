@@ -1,4 +1,5 @@
 import { and, eq, inArray, lt, sql } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { db } from '@/db';
 import { orders, payments, nowText } from '@/db/schema';
 import { json } from '@/lib/http';
@@ -25,7 +26,13 @@ export async function POST(request: Request) {
   const stale = await db
     .select()
     .from(orders)
-    .where(and(eq(orders.status, 'pending'), lt(orders.createdAt, cutoff as any)))
+    // A market sweeps its own unpaid orders; another market's pending order is
+    // not ours to cancel.
+    .where(and(
+      eq(orders.status, 'pending'),
+      lt(orders.createdAt, cutoff as any),
+      marketScope(admin, orders.marketId),
+    ))
     .limit(500);
 
   let cancelled = 0;

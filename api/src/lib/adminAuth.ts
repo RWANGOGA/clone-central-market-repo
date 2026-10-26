@@ -31,6 +31,8 @@ export type AdminIdentity = {
   email: string;
   name: string;
   role: AdminRole;
+  /** Null is the platform tier. See `lib/marketScope`. */
+  marketId: number | null;
 };
 
 function readCookie(header: string | null, name: string): string | null {
@@ -97,7 +99,13 @@ export async function login(
     ok: true,
     token,
     expiresAt,
-    admin: { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
+    admin: {
+      id: admin.id,
+      email: admin.email,
+      name: admin.name,
+      role: admin.role,
+      marketId: admin.marketId ?? null,
+    },
   };
 }
 
@@ -153,7 +161,13 @@ export async function authenticate(request: Request): Promise<AdminIdentity | nu
   const admin = await db.query.admins.findFirst({ where: eq(admins.id, row.adminId) });
   if (!admin || !admin.active) return null;
 
-  return { id: admin.id, email: admin.email, name: admin.name, role: admin.role };
+  return {
+    id: admin.id,
+    email: admin.email,
+    name: admin.name,
+    role: admin.role,
+    marketId: admin.marketId ?? null,
+  };
 }
 
 export async function logout(request: Request): Promise<void> {

@@ -1,4 +1,5 @@
 import { and, eq, inArray } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { db } from '@/db';
 import { purchaseOrders } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
@@ -17,7 +18,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
   if (!Number.isInteger(key) || key <= 0) return error('A purchase order id is required', 400);
 
   const order = await db.query.purchaseOrders.findFirst({
-    where: eq(purchaseOrders.id, key),
+    where: and(eq(purchaseOrders.id, key), marketScope(admin, purchaseOrders.marketId)),
   });
   if (!order) return error(`Purchase order ${id} not found`, 404);
 

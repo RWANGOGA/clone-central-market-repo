@@ -1,4 +1,5 @@
 import { asc, count, eq, gt } from 'drizzle-orm';
+import { marketScope, targetMarket } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { adminSessions, admins, nowText } from '@/db/schema';
@@ -21,14 +22,19 @@ const createSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(160),
   role: z.enum(['owner', 'manager', 'staff']),
   password: z.string().min(10).max(200),
+  /** Ignored for a market admin, which can only staff its own market. */
+  marketId: z.number().int().positive().optional(),
 });
 
 export async function GET(request: Request) {
   const guard = await guardAdmin(request, 'admins.write');
   if (!guard.ok) return error(guard.message, guard.status);
+  const admin = guard.admin;
 
   const [rows, sessions] = await Promise.all([
-    db.select().from(admins).orderBy(asc(admins.id)),
+    // A market's staff list is its own. Platform accounts, and every other
+    // market's team, are not visible here.
+    db.select().from(admins).where(marketScope(admin, admins.marketId)).orderBy(asc(admins.id)),
     db
       .select({ adminId: adminSessions.adminId, n: count() })
       .from(adminSessions)
@@ -53,13 +59,16 @@ export async function POST(request: Request) {
 
   const { name, email, role, password } = parsed.data;
 
+  const marketId = targetMarket(admin, parsed.data.marketId ?? null);
+  if (!marketId.ok) return error(marketId.message, 422);
+
   const existing = await db.query.admins.findFirst({ where: eq(admins.email, email) });
   if (existing) return error('An account with that email already exists.', 409);
 
   const passwordHash = await hashPassword(password);
   const [created] = await db
     .insert(admins)
-    .values({ name, email, passwordHash, role })
+    .values({ name, email, passwordHash, role, marketId: marketId.marketId })
     .returning();
 
   await recordActivity({
@@ -68,6 +77,7 @@ export async function POST(request: Request) {
     entityId: created.id,
     after: { name: created.name, email: created.email, role: created.role },
     adminId: admin.id,
+    marketId: created.marketId,
     adminEmail: admin.email,
   });
 

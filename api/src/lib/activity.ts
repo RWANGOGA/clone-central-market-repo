@@ -2,6 +2,8 @@ import { and, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { adminActivityLog, admins, nowText } from '@/db/schema';
 import { requireAdmin } from '@/lib/catalogue';
+import { marketScope } from '@/lib/marketScope';
+import type { AdminIdentity } from '@/lib/adminAuth';
 import { error, json } from '@/lib/http';
 
 export type ActivityAction =
@@ -25,7 +27,12 @@ export type ActivityAction =
   | 'admin.create'
   | 'admin.update'
   | 'admin.revoke'
-  | 'admin.password_change';
+  | 'admin.password_change'
+  | 'market.create'
+  | 'market.update'
+  | 'worker.create'
+  | 'worker.update'
+  | 'order.assign';
 
 export type ActivityInput = {
   action: ActivityAction;
@@ -35,6 +42,12 @@ export type ActivityInput = {
   after?: Record<string, unknown> | null;
   adminId?: number | null;
   adminEmail?: string | null;
+  /**
+   * Which market the event concerns, taken from the caller. Recorded rather
+   * than derived so a market's trail survives the account that wrote it being
+   * moved to another market later.
+   */
+  marketId?: number | null;
 };
 
 export async function recordActivity(input: ActivityInput) {
@@ -45,6 +58,7 @@ export async function recordActivity(input: ActivityInput) {
     before: input.before ?? null,
     after: input.after ?? null,
     adminId: input.adminId ?? null,
+    marketId: input.marketId ?? null,
   };
 
   await db.insert(adminActivityLog).values(payload);
@@ -58,6 +72,8 @@ export async function listActivity(filters: {
   to?: string;
   limit?: number;
   offset?: number;
+  /** The caller, when the trail must be narrowed to one market. */
+  admin?: AdminIdentity;
 }) {
   const limit = filters.limit ?? 50;
   const offset = filters.offset ?? 0;
@@ -68,6 +84,12 @@ export async function listActivity(filters: {
   if (filters.entity) where.push(sql`${adminActivityLog.entity} = ${filters.entity}`);
   if (filters.from) where.push(sql`${adminActivityLog.createdAt} >= ${filters.from}`);
   if (filters.to) where.push(sql`${adminActivityLog.createdAt} <= ${filters.to}`);
+  // `undefined` for the platform tier, which `and()` drops — so the platform
+  // owner reads every market's trail and no one else reads any but their own.
+  if (filters.admin) {
+    const scope = marketScope(filters.admin, adminActivityLog.marketId);
+    if (scope) where.push(scope);
+  }
 
   const rows = await db
     .select({

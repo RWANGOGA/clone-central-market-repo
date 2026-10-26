@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { requireAdmin } from '@/lib/catalogue';
 import { listActivity } from '@/lib/activity';
+import { requestedMarket } from '@/lib/marketScope';
 import { error, json } from '@/lib/http';
 
 const listSchema = z.object({
@@ -16,8 +17,10 @@ const listSchema = z.object({
 export async function GET(request: Request) {
   const admin = await requireAdmin(request);
   if (!admin) return error('Not signed in', 401);
-
   const url = new URL(request.url);
+
+  const market = requestedMarket(admin, url.searchParams.get('marketId'));
+  if (!market.ok) return error(market.message, 403);
   const parsed = listSchema.safeParse({
     adminId: url.searchParams.get('adminId') ?? undefined,
     action: url.searchParams.get('action') ?? undefined,
@@ -29,7 +32,7 @@ export async function GET(request: Request) {
   });
   if (!parsed.success) return error(parsed.error.issues[0]?.message ?? 'Invalid query', 422);
 
-  const { rows, total } = await listActivity(parsed.data);
+  const { rows, total } = await listActivity({ ...parsed.data, admin });
 
   return json({
     data: rows,

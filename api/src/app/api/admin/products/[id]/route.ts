@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { productPriceHistory, products, nowText } from '@/db/schema';
 import { priceLabelFor, productUpdateSchema } from '@/lib/catalogue';
 import { guardAdmin } from '@/lib/adminAuth';
+import { marketScope, type AdminIdentity } from '@/lib/marketScope';
 import { describeStock, stockState } from '@/lib/stock';
 import { storeProductImage } from '@/lib/uploads';
 import { error, json } from '@/lib/http';
@@ -24,10 +25,20 @@ import { recordActivity } from '@/lib/activity';
 
 type Ctx = { params: Promise<{ id: string }> };
 
-async function findProduct(id: string) {
+/**
+ * The product as this account is allowed to see it.
+ *
+ * A product belonging to another market is answered with 404 rather than 403,
+ * because 403 confirms it exists — and the id was the only thing the caller had
+ * to guess.
+ */
+async function findProduct(id: string, admin: AdminIdentity) {
   const key = Number(id);
   return db.query.products.findFirst({
-    where: Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+    where: and(
+      Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+      marketScope(admin, products.marketId),
+    ),
   });
 }
 
@@ -46,7 +57,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
   const admin = guard.admin;
 
   const { id } = await params;
-  const existing = await findProduct(id);
+  const existing = await findProduct(id, admin);
   if (!existing) return error(`Product "${id}" not found`, 404);
 
   const parsed = productUpdateSchema.safeParse(await request.json().catch(() => null));
@@ -55,6 +66,10 @@ export async function PATCH(request: Request, { params }: Ctx) {
   }
 
   const input = parsed.data;
+
+  // `marketId` is present on the input schema for creation, and deliberately
+  // not applied here: moving stock between markets is a reassignment, not an
+  // edit, and it is not this route's job to decide who may do it.
 
   if (input.slug && input.slug !== existing.slug) {
     const clash = await db.query.products.findFirst({ where: sql`${products.slug} = ${input.slug}` });
@@ -145,6 +160,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     },
     adminId: admin.id,
     adminEmail: admin.email,
+    marketId: existing.marketId,
   });
 
   return json({ data: present(updated), meta: { updatedBy: admin.email, priceChanged, unitChanged } });
@@ -156,7 +172,7 @@ export async function DELETE(request: Request, { params }: Ctx) {
   const admin = guard.admin;
 
   const { id } = await params;
-  const existing = await findProduct(id);
+  const existing = await findProduct(id, admin);
   if (!existing) return error(`Product "${id}" not found`, 404);
 
   const [withdrawn] = await db
@@ -173,6 +189,7 @@ export async function DELETE(request: Request, { params }: Ctx) {
     after: { active: false },
     adminId: admin.id,
     adminEmail: admin.email,
+    marketId: withdrawn.marketId,
   });
 
   return json({

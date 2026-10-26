@@ -98,12 +98,23 @@ export async function POST(request: Request) {
         priceValue: products.priceValue,
         name: products.name,
         active: products.active,
+        marketId: products.marketId,
       }).from(cartItems)
         .innerJoin(products, eq(products.id, cartItems.productId))
         .where(eq(cartItems.cartId, cartId));
       if (items.length === 0) throw new Error('CART_EMPTY');
       const inactive = items.find((item) => !item.active);
       if (inactive) throw new Error(`PRODUCT_INACTIVE:${inactive.name}`);
+
+      // One order, one market. The alternative is a single reference whose
+      // money, stock and delivery belong to two markets at once, and neither
+      // market's admin could then be shown a complete picture of it.
+      const inMarkets = [...new Set(items.map((item) => item.marketId))];
+      if (inMarkets.length > 1) throw new Error('MIXED_MARKETS');
+      // A product with no market is a row the seeder has not claimed yet; it
+      // cannot be sold, because nobody would be responsible for delivering it.
+      const [marketId] = inMarkets;
+      if (marketId == null) throw new Error('UNCLAIMED_PRODUCT');
 
       const subtotal = items.reduce((sum, item) => sum + item.priceValue * item.quantity, 0);
 
@@ -114,6 +125,11 @@ export async function POST(request: Request) {
       if (promoCode) {
         const promo = await findPromoForUpdate(tx, promoCode);
         if (!promo) throw new PromoError('That promo code was not found.');
+        // A market's discount is its own to give. Null is a platform code, which
+        // any market may honour because the platform paid for it.
+        if (promo.marketId !== null && promo.marketId !== marketId) {
+          throw new PromoError('That promo code is not valid in the market you are ordering from.');
+        }
         const evaluation = evaluatePromo(promo, subtotal);
         if ('reason' in evaluation) throw new PromoError(evaluation.reason);
         await claimPromo(tx, promo, customer?.id ?? null, address.phone);
@@ -143,6 +159,7 @@ export async function POST(request: Request) {
         reference,
         customerId: customer?.id ?? null,
         cartId,
+        marketId,
         trackingTokenHash: guestTracking ? hashToken(guestTracking) : null,
         status: 'pending',
         updatedAt: nowText,
@@ -197,6 +214,14 @@ export async function POST(request: Request) {
     }
     if (err instanceof Error && err.message === 'CART_ALREADY_USED') return error('Cart is no longer active', 409);
     if (err instanceof Error && err.message === 'CART_EMPTY') return error('Cart is empty', 422);
+    if (err instanceof Error && err.message === 'MIXED_MARKETS') {
+      return error('One order can only come from one market. Empty the basket and order them separately.', 422);
+    }
+    if (err instanceof Error && err.message === 'UNCLAIMED_PRODUCT') {
+      // Never shown to a customer in practice; said plainly in case it is,
+      // because "unavailable" would send them looking for a different shop.
+      return error('One of the items in your basket is not on sale yet. Remove it and try again.', 409);
+    }
     if (err instanceof Error && err.message.startsWith('PRODUCT_INACTIVE:')) {
       return error(`${err.message.slice('PRODUCT_INACTIVE:'.length)} is no longer available`, 409);
     }

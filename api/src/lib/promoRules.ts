@@ -101,6 +101,8 @@ export const promoInputSchema = z.object({
   endsAt: stampInput.nullish(),
   usageLimit: z.number().int().positive().max(1_000_000).nullish(),
   perCustomerLimit: z.number().int().positive().max(100).nullish(),
+  /** Null means a platform-wide code. Only a platform admin may create one. */
+  marketId: z.number().int().positive().nullish(),
 }).strict().superRefine((value, ctx) => {
   if (value.kind === 'percent' && value.value > 100) {
     ctx.addIssue({ code: 'custom', path: ['value'], message: 'A percentage cannot exceed 100.' });

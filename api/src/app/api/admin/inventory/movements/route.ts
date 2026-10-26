@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, count, desc, eq, gte, lte, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/db';
 import { admins, products, stockMovements, nowText } from '@/db/schema';
@@ -59,6 +59,13 @@ export async function GET(request: Request) {
   const { productId, reason, reference, from, to, limit, offset } = parsed.data;
 
   const filters = [];
+
+  // The ledger stores a product id, not a market, so the boundary is the
+  // product's. Written as a subquery rather than a join because the summary
+  // below runs the same filter without joining products at all.
+  if (admin.marketId !== null) {
+    filters.push(sql`${stockMovements.productId} IN (SELECT id FROM products WHERE market_id = ${admin.marketId})`);
+  }
   if (productId) filters.push(eq(stockMovements.productId, productId));
   if (reason) filters.push(eq(stockMovements.reason, reason));
 

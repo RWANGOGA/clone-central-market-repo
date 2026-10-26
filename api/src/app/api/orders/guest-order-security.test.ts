@@ -74,7 +74,7 @@ describe('guest order ownership', () => {
         select: () => ({
           from: () => ({
             innerJoin: () => ({
-              where: async () => [{ productId: 4, quantity: 2, priceValue: 6000, name: 'Tomato', active: true }],
+              where: async () => [{ productId: 4, quantity: 2, priceValue: 6000, name: 'Tomato', active: true, marketId: 1 }],
             }),
           }),
         }),

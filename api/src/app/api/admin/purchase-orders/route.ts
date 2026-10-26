@@ -1,4 +1,5 @@
-import { eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { purchaseOrderItems, purchaseOrders, suppliers } from '@/db/schema';
@@ -41,7 +42,9 @@ export async function GET(request: Request) {
   const id = parsePositiveInt(url.searchParams.get('id'));
 
   const order = id
-    ? await db.query.purchaseOrders.findFirst({ where: eq(purchaseOrders.id, id) })
+    ? await db.query.purchaseOrders.findFirst({
+        where: and(eq(purchaseOrders.id, id), marketScope(admin, purchaseOrders.marketId)),
+      })
     : null;
 
   if (id && !order) return error(`Purchase order ${id} not found`, 404);
@@ -55,10 +58,14 @@ export async function GET(request: Request) {
 
   const rows = statusFilter
     ? await db.query.purchaseOrders.findMany({
-        where: eq(purchaseOrders.status, statusFilter as 'draft'),
+        where: and(
+        eq(purchaseOrders.status, statusFilter as 'draft'),
+        marketScope(admin, purchaseOrders.marketId),
+      ),
         orderBy: (t, { desc }) => [desc(t.createdAt)],
       })
     : await db.query.purchaseOrders.findMany({
+        where: marketScope(admin, purchaseOrders.marketId),
         orderBy: (t, { desc }) => [desc(t.createdAt)],
       });
 
@@ -75,7 +82,8 @@ export async function POST(request: Request) {
   if (!parsed.success) return error(parsed.error.issues[0]?.message ?? 'Invalid payload', 422);
 
   const supplier = await db.query.suppliers.findFirst({
-    where: (t, { eq: eqOp }) => eqOp(t.id, parsed.data.supplierId),
+    where: (t, { and: andOp, eq: eqOp }) =>
+      andOp(eqOp(t.id, parsed.data.supplierId), marketScope(admin, t.marketId)),
   });
   if (!supplier) return error(`Supplier ${parsed.data.supplierId} not found`, 404);
 
@@ -84,7 +92,8 @@ export async function POST(request: Request) {
   const lines: { productId: number; quantity: number; unit: string; unitPrice: number }[] = [];
   for (const line of parsed.data.items) {
     const product = await db.query.products.findFirst({
-      where: (t, { eq: eqOp }) => eqOp(t.id, line.productId),
+      where: (t, { and: andOp, eq: eqOp }) =>
+      andOp(eqOp(t.id, line.productId), marketScope(admin, t.marketId)),
     });
     if (!product) return error(`Product ${line.productId} not found`, 404);
     lines.push({ productId: product.id, quantity: line.quantity, unit: product.unit, unitPrice: line.unitPrice });
@@ -96,6 +105,9 @@ export async function POST(request: Request) {
       .values({
         reference: makeReference(),
         supplierId: supplier.id,
+        // A replenishment belongs to the market that ordered it, copied from
+        // the farm it came from rather than from whoever pressed the button.
+        marketId: supplier.marketId,
         status: 'sent',
         expectedAt: parsed.data.expectedAt?.trim() || null,
         note: parsed.data.note?.trim() || null,
@@ -116,6 +128,7 @@ export async function POST(request: Request) {
     entityId: created.reference,
     after: { supplierId: supplier.id, status: 'sent', items: lines.length },
     adminId: admin.id,
+    marketId: created.marketId,
     adminEmail: admin.email,
   });
 

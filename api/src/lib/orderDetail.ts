@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   orderItems,
@@ -19,10 +19,18 @@ import { summariseMoney } from '@/lib/orderMoney';
  * refund all answer with the same shape; the client can then replace its
  * selected order with whatever a write returned.
  */
-export async function findOrder(id: string): Promise<Order | undefined> {
+export async function findOrder(
+  id: string,
+  marketId?: number | null,
+): Promise<Order | undefined> {
   const key = Number(id);
   return db.query.orders.findFirst({
-    where: Number.isInteger(key) ? eq(orders.id, key) : eq(orders.reference, id),
+    where: and(
+      Number.isInteger(key) ? eq(orders.id, key) : eq(orders.reference, id),
+      // A market's order is not findable by another market, at any route,
+      // because all three staff order routes come through here.
+      marketId == null ? undefined : eq(orders.marketId, marketId),
+    ),
   });
 }
 

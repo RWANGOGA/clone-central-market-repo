@@ -1,8 +1,24 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db, queryRows } from '@/db';
 import { customers, orderItems, orders, products, stockMovements } from '@/db/schema';
 
 export type Bucket = 'day' | 'week' | 'month';
+
+/**
+ * Every report window takes an optional market.
+ *
+ * `marketId` is null or absent for the platform tier, which means "every
+ * market". It is threaded into the SQL rather than applied to the rows after
+ * the fact, so a market's revenue figure is summed from its own orders and a
+ * percentage computed from two of them cannot mix one market's numerator with
+ * another's denominator.
+ */
+export type WindowFilters = { from?: string; to?: string; marketId?: number | null };
+
+/** The market clause, or `undefined` when the caller spans the platform. */
+function marketOn(column: typeof orders.marketId | typeof products.marketId, filters: WindowFilters) {
+  return filters.marketId == null ? undefined : sql`${column} = ${filters.marketId}`;
+}
 
 function bucketExpr(bucket: Bucket) {
   switch (bucket) {
@@ -23,16 +39,16 @@ const countedOrder = sql`${orders.status} <> 'cancelled' AND EXISTS (
   SELECT 1 FROM payments p WHERE p.order_id = ${orders.id} AND p.status IN ('succeeded', 'cod')
 )`;
 
-function dateRange(filters: { from?: string; to?: string }) {
+function dateRange(filters: WindowFilters) {
   const parts = [countedOrder];
   if (filters.from) parts.push(sql`${orders.createdAt} >= ${filters.from}`);
   if (filters.to) parts.push(sql`${orders.createdAt} <= ${filters.to}`);
+  const market = marketOn(orders.marketId, filters);
+  if (market) parts.push(market);
   return sql.join(parts, sql` AND `);
 }
 
-export async function salesTrend(filters: {
-  from?: string;
-  to?: string;
+export async function salesTrend(filters: WindowFilters & {
   bucket?: Bucket;
   limit?: number;
 }) {
@@ -61,7 +77,7 @@ export async function salesTrend(filters: {
   }));
 }
 
-export async function productPerformance(filters: { from?: string; to?: string; limit?: number }) {
+export async function productPerformance(filters: WindowFilters & { limit?: number }) {
   const limit = filters.limit ?? 50;
 
     const rows = await db
@@ -92,10 +108,12 @@ export async function productPerformance(filters: { from?: string; to?: string; 
 }
 
 /** Every order in the window, cancelled included. Pipeline counts need those. */
-function orderWindow(filters: { from?: string; to?: string }) {
+function orderWindow(filters: WindowFilters) {
   const parts = [sql`1 = 1`];
   if (filters.from) parts.push(sql`${orders.createdAt} >= ${filters.from}`);
   if (filters.to) parts.push(sql`${orders.createdAt} <= ${filters.to}`);
+  const market = marketOn(orders.marketId, filters);
+  if (market) parts.push(market);
   return sql.join(parts, sql` AND `);
 }
 
@@ -103,7 +121,7 @@ function orderWindow(filters: { from?: string; to?: string }) {
  * One payload for the staff dashboard: money, pipeline, payment mix, promo
  * redemptions, stock risk and signups, all over the same window.
  */
-export async function overview(filters: { from?: string; to?: string }) {
+export async function overview(filters: WindowFilters) {
   const [totalsRow] = await db
     .select({
       orders: sql<number>`count(*)`,
@@ -146,6 +164,10 @@ export async function overview(filters: { from?: string; to?: string }) {
     .orderBy(sql`count(*) DESC`)
     .limit(5);
 
+  // Signups are deliberately NOT narrowed by market. A customer is one account
+  // on the platform and may order from several markets, so "new signups" is a
+  // platform fact; reporting it per market would count the same person once in
+  // every market they have shopped in.
   const signupParts = [sql`1 = 1`];
   if (filters.from) signupParts.push(sql`${customers.createdAt} >= ${filters.from}`);
   if (filters.to) signupParts.push(sql`${customers.createdAt} <= ${filters.to}`);
@@ -160,7 +182,7 @@ export async function overview(filters: { from?: string; to?: string }) {
       threshold: sql<number>`coalesce(${products.lowStockThreshold}, 10)`,
     })
     .from(products)
-    .where(eq(products.active, true));
+    .where(and(eq(products.active, true), marketOn(products.marketId, filters)));
 
   const ordersCount = Number(totalsRow?.orders ?? 0);
   const revenue = Number(totalsRow?.revenue ?? 0);
@@ -193,10 +215,13 @@ export async function overview(filters: { from?: string; to?: string }) {
       outOfStock: stockRows.filter((row) => Number(row.stock) <= 0).length,
     },
     newCustomers: Number(signupsRow?.total ?? 0),
+    // Said out loud so the console can label the one number that is not the
+    // market's own.
+    marketId: filters.marketId ?? null,
   };
 }
 
-export async function regionalDemand(filters: { from?: string; to?: string }) {
+export async function regionalDemand(filters: WindowFilters) {
   const rows = await queryRows<{ region: string | null; district: string | null; orders: string; revenue: string; units: string }>(sql`
     SELECT ${orders.region} AS region,
            ${orders.district} AS district,
@@ -219,19 +244,21 @@ export async function regionalDemand(filters: { from?: string; to?: string }) {
   }));
 }
 
-export async function forecast() {
+export async function forecast(filters: WindowFilters = {}) {
   const last7 = sql`to_char((now() at time zone 'utc') - interval '7 days', 'YYYY-MM-DD HH24:MI:SS')`;
   const last30 = sql`to_char((now() at time zone 'utc') - interval '30 days', 'YYYY-MM-DD HH24:MI:SS')`;
+  const market = marketOn(orders.marketId, filters);
+  const productsHere = marketOn(products.marketId, filters);
 
   const [revenue7, revenue30] = await Promise.all([
     db
       .select({ revenue: sql<number>`coalesce(sum(${orders.total}), 0)` })
       .from(orders)
-      .where(sql`${orders.createdAt} >= ${last7} AND ${countedOrder}`),
+      .where(sql`${orders.createdAt} >= ${last7} AND ${countedOrder}${market ? sql` AND ${market}` : sql``}`),
     db
       .select({ revenue: sql<number>`coalesce(sum(${orders.total}), 0)` })
       .from(orders)
-      .where(sql`${orders.createdAt} >= ${last30} AND ${countedOrder}`),
+      .where(sql`${orders.createdAt} >= ${last30} AND ${countedOrder}${market ? sql` AND ${market}` : sql``}`),
   ]);
 
   const inventory = await db
@@ -243,7 +270,7 @@ export async function forecast() {
       threshold: sql<number>`coalesce(${products.lowStockThreshold}, 10)`,
     })
     .from(products)
-    .where(eq(products.active, true));
+    .where(and(eq(products.active, true), productsHere));
 
   const salesByProduct = await db
     .select({
@@ -252,7 +279,9 @@ export async function forecast() {
     })
     .from(orderItems)
     .innerJoin(orders, sql`${orders.id} = ${orderItems.orderId}`)
-    .where(sql`${orders.createdAt} >= ${last30} AND ${orders.status} <> 'cancelled'`)
+    .where(sql`${orders.createdAt} >= ${last30} AND ${orders.status} <> 'cancelled'${
+      market ? sql` AND ${market}` : sql``
+    }`)
     .groupBy(orderItems.productId);
 
   const salesMap = new Map<number, number>();

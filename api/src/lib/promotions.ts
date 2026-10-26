@@ -111,6 +111,7 @@ export async function insertPromo(input: PromoInput): Promise<PromoRow> {
     endsAt: input.endsAt ?? null,
     usageLimit: input.usageLimit ?? null,
     perCustomerLimit: input.perCustomerLimit ?? null,
+    marketId: input.marketId ?? null,
   }).returning();
   return created;
 }

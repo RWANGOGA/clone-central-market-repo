@@ -1,4 +1,5 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { db } from '@/db';
 import { productPriceHistory, products } from '@/db/schema';
 import { requireAdmin } from '@/lib/catalogue';
@@ -13,7 +14,10 @@ export async function GET(_request: Request, { params }: Ctx) {
   const { id } = await params;
   const key = Number(id);
   const product = await db.query.products.findFirst({
-    where: Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+    where: and(
+      Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+      marketScope(admin, products.marketId),
+    ),
   });
   if (!product) return error(`Product "${id}" not found`, 404);
 

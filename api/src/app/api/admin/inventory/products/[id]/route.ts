@@ -1,4 +1,5 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { products } from '@/db/schema';
@@ -64,7 +65,10 @@ export async function PATCH(request: Request, { params }: Ctx) {
   const key = Number(id);
 
   const product = await db.query.products.findFirst({
-    where: Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+    where: and(
+      Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+      marketScope(admin, products.marketId),
+    ),
   });
   if (!product) return error(`Product "${id}" not found`, 404);
 

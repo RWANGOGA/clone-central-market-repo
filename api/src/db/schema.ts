@@ -32,6 +32,14 @@ export const products = pgTable('products', {
   supplierId: integer('supplier_id').references(() => suppliers.id, {
     onDelete: 'set null',
   }),
+  /**
+   * The market selling this. Null is a row from before the platform had
+   * markets; the migration assigns each one to the first market rather than
+   * leaving it visible to every admin.
+   */
+  marketId: integer('market_id').references(() => markets.id, {
+    onDelete: 'set null',
+  }),
   active: boolean('active').notNull().default(true),
   createdAt: text('created_at')
     .notNull()
@@ -182,6 +190,62 @@ export const cartItems = pgTable('cart_items', {
 });
 
 /**
+ * One central market on the platform.
+ *
+ * The shop is not one stall; it is a system for many markets, and the whole
+ * point of the admin console is that the person running Kampala Central must
+ * not be able to see or change what belongs to Mbarara. A market is therefore
+ * not a label on a page — it is the boundary every admin query is filtered by.
+ *
+ * Rows carry `marketId` rather than a market name so that renaming a market is
+ * one update, and so an order keeps pointing at the market it was placed in
+ * even if that market is later closed.
+ */
+export const markets = pgTable('markets', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  /** Where it sits, so the delivery map and the market list agree. */
+  district: text('district'),
+  region: text('region'),
+  active: boolean('active').notNull().default(true),
+  createdAt: text('created_at')
+    .notNull()
+    .default(nowText),
+});
+
+/**
+ * A person who works at a market, in a role the shop needs to name.
+ *
+ * Distinct from `admins`, which is an account that can sign in. A deliverer
+ * does not need a login; the market needs to know who is out with a basket and
+ * whether that person is available, so this is a directory rather than an
+ * identity. Nobody here is authenticated by anything.
+ *
+ * `trader` is the stall holding stock, `supplier` is the farm it comes from;
+ * they are different because one order is bought from a farm and sold by a
+ * trader, and collapsing them loses the difference between "out of stock" and
+ * "nobody has grown it".
+ */
+export const marketWorkers = pgTable('market_workers', {
+  id: serial('id').primaryKey(),
+  marketId: integer('market_id')
+    .notNull()
+    .references(() => markets.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  phone: text('phone'),
+  kind: text('kind', { enum: ['deliverer', 'trader', 'picker', 'driver'] })
+    .notNull()
+    .default('deliverer'),
+  /** Whether they can be given work today. Not the same as being employed. */
+  available: boolean('available').notNull().default(true),
+  active: boolean('active').notNull().default(true),
+  createdAt: text('created_at')
+    .notNull()
+    .default(nowText),
+});
+
+/**
  * Staff accounts. Separate from customers: an admin can change the catalogue
  * and adjust stock, so the credential is stored apart and never returned by
  * any endpoint.
@@ -195,6 +259,12 @@ export const admins = pgTable('admins', {
   name: text('name').notNull(),
   passwordHash: text('password_hash').notNull(),
   role: text('role', { enum: ['owner', 'manager', 'staff'] }).notNull().default('manager'),
+  /**
+   * The market this account runs. Null means no market, which is the platform
+   * tier: the account that can see every market and create the others. Role
+   * says what an account may do; this says where it may do it.
+   */
+  marketId: integer('market_id').references(() => markets.id, { onDelete: 'set null' }),
   active: boolean('active').notNull().default(true),
   createdAt: text('created_at')
     .notNull()
@@ -244,6 +314,14 @@ export const adminLoginAttempts = pgTable('admin_login_attempts', {
 export const adminActivityLog = pgTable('admin_activity_log', {
   id: serial('id').primaryKey(),
   adminId: integer('admin_id').references(() => admins.id, { onDelete: 'set null' }),
+  /**
+   * Copied from the admin at write time rather than joined through `admins`.
+   * A market owner has to be able to read the record of what happened in their
+   * market, and a join would answer that question only until the account's
+   * market assignment changed — the audit trail must not be rewritable by a
+   * later reassignment.
+   */
+  marketId: integer('market_id').references(() => markets.id, { onDelete: 'set null' }),
   action: text('action').notNull(),
   entity: text('entity').notNull(),
   entityId: text('entity_id'),
@@ -255,6 +333,8 @@ export const adminActivityLog = pgTable('admin_activity_log', {
 }, (table) => [
   index('idx_activity_admin').on(table.adminId, table.createdAt),
   index('idx_activity_entity').on(table.entity, table.entityId),
+  // The console's default question is "what happened in my market lately".
+  index('idx_activity_market').on(table.marketId, table.createdAt),
 ]);
 
 export const customerPreferences = pgTable('customer_preferences', {
@@ -311,6 +391,12 @@ export const promoCodes = pgTable('promo_codes', {
   usedCount: integer('used_count').notNull().default(0),
   /** Redemptions per customer or phone number; null means unlimited. */
   perCustomerLimit: integer('per_customer_limit'),
+  /**
+   * Which market issued the code. Null is deliberate and means a platform-wide
+   * promotion, honourable in every market because the platform is paying for it.
+   * A market admin can only ever make a code for its own market.
+   */
+  marketId: integer('market_id').references(() => markets.id, { onDelete: 'set null' }),
   createdAt: text('created_at').notNull().default(nowText),
 });
 
@@ -320,6 +406,14 @@ export const orders = pgTable('orders', {
   /** Null for guest orders; guests prove ownership with the tracking token instead. */
   customerId: integer('customer_id').references(() => customers.id),
   cartId: integer('cart_id').references(() => carts.id, { onDelete: 'set null' }),
+  /**
+   * Copied from the basket at write time, the same way the delivery address is
+   * copied. An order must keep answering "which market took this" even after
+   * the product is relisted elsewhere or the market is renamed.
+   */
+  marketId: integer('market_id').references(() => markets.id, {
+    onDelete: 'set null',
+  }),
   /** SHA-256 of the one-time guest tracking token. */
   trackingTokenHash: text('tracking_token_hash'),
   /**
@@ -331,6 +425,13 @@ export const orders = pgTable('orders', {
   })
     .notNull()
     .default('pending'),
+  /**
+   * Who is bringing this order. Set by the console when a deliverer is given
+   * the job; the worker is not an account and never signs in to say so.
+   */
+  delivererId: integer('deliverer_id').references(() => marketWorkers.id, {
+    onDelete: 'set null',
+  }),
   subtotal: integer('subtotal').notNull(),
   /** Promo discount resolved at order time; the rule is kept on promo_codes. */
   discount: integer('discount').notNull().default(0),
@@ -432,6 +533,10 @@ export const suppliers = pgTable('suppliers', {
   phone: text('phone'),
   district: text('district'),
   region: text('region'),
+  /** Which market buys from this farm. */
+  marketId: integer('market_id').references(() => markets.id, {
+    onDelete: 'set null',
+  }),
   active: boolean('active').notNull().default(true),
   createdAt: text('created_at')
     .notNull()
@@ -444,6 +549,15 @@ export const purchaseOrders = pgTable('purchase_orders', {
   supplierId: integer('supplier_id')
     .notNull()
     .references(() => suppliers.id),
+  /**
+   * Copied from the supplier when the order is raised. Joining through
+   * `suppliers` would work today and quietly break the moment a farm is moved
+   * to another market: the replenishment a market already promised its supplier
+   * stays its own business.
+   */
+  marketId: integer('market_id').references(() => markets.id, {
+    onDelete: 'set null',
+  }),
   status: text('status', { enum: ['draft', 'sent', 'received', 'cancelled'] })
     .notNull()
     .default('draft'),

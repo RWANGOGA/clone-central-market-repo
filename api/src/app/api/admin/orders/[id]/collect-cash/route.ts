@@ -22,7 +22,7 @@ export async function POST(request: Request, { params }: Ctx) {
   const admin = guard.admin;
 
   const { id } = await params;
-  const order = await findOrder(id);
+  const order = await findOrder(id, admin.marketId);
   if (!order) return error(`Order "${id}" not found`, 404);
   if (order.status === 'cancelled') {
     return error('This order was cancelled, so there is no cash to collect.', 409);

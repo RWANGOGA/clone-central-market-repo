@@ -20,7 +20,12 @@ export async function GET(request: Request) {
   const admin = await requireAdmin(request);
   if (!admin) return json({ error: 'Not signed in' }, { status: 401 });
 
-  const [low, drift] = await Promise.all([lowStockProducts(), reconcileStock()]);
+  // One market's shelf, not the platform's, unless the caller spans the
+  // platform. A low-stock list is a competitor's inventory sheet.
+  const [low, drift] = await Promise.all([
+    lowStockProducts(admin.marketId),
+    reconcileStock(admin.marketId),
+  ]);
 
   return json({
     data: {

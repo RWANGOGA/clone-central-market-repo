@@ -1,4 +1,5 @@
 import { and, count, eq, gt } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { adminSessions, admins, nowText } from '@/db/schema';
@@ -48,7 +49,9 @@ export async function PATCH(request: Request, { params }: Ctx) {
 
   const { name, role, active, password, revokeSessions } = parsed.data;
 
-  const target = await db.query.admins.findFirst({ where: eq(admins.id, key) });
+  const target = await db.query.admins.findFirst({
+    where: and(eq(admins.id, key), marketScope(admin, admins.marketId)),
+  });
   if (!target) return error('Account not found', 404);
 
   if (target.id === admin.id) {

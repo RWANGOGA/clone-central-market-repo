@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { products, nowText } from '@/db/schema';
 import { productInputSchema, priceLabelFor, requireAdmin, slugify } from '@/lib/catalogue';
 import { guardAdmin } from '@/lib/adminAuth';
+import { requestedMarket, targetMarket } from '@/lib/marketScope';
 import { describeStock, stockState } from '@/lib/stock';
 import { storeProductImage } from '@/lib/uploads';
 import { error, json } from '@/lib/http';
@@ -16,6 +17,10 @@ import { recordActivity } from '@/lib/activity';
  * `active` rather than dropping the row. That matters because order_items and
  * order history reference products, and a hard delete would either break those
  * references or quietly rewrite what a past order said it contained.
+ *
+ * The whole list is filtered by market before it is sorted, counted or
+ * returned, so a market admin's `meta.total` is the size of their shelf and not
+ * the platform's.
  */
 
 export async function GET(request: Request) {
@@ -26,7 +31,17 @@ export async function GET(request: Request) {
   // Admins see withdrawn products too, otherwise they could never restore one.
   const includeInactive = url.searchParams.get('includeInactive') !== 'false';
 
-  const rows = await db.select().from(products).orderBy(asc(products.name));
+  const market = requestedMarket(admin, url.searchParams.get('marketId'));
+  if (!market.ok) return error(market.message, 403);
+
+  // The switcher on the console can ask for one market even when the caller
+  // spans all of them; a market admin is pinned to its own either way.
+  const scope =
+    market.marketId === null
+      ? undefined
+      : sql`${products.marketId} = ${market.marketId}`;
+
+  const rows = await db.select().from(products).where(scope).orderBy(asc(products.name));
   const filtered = includeInactive ? rows : rows.filter((r) => r.active);
 
   return json({
@@ -47,9 +62,14 @@ export async function GET(request: Request) {
       dietary: row.dietary,
       images: row.imageFiles.map((file) => `/api/assets/${file}`),
       active: row.active,
+      marketId: row.marketId,
       createdAt: row.createdAt,
     })),
-    meta: { total: filtered.length, active: filtered.filter((r) => r.active).length },
+    meta: {
+      total: filtered.length,
+      active: filtered.filter((r) => r.active).length,
+      marketId: market.marketId,
+    },
   });
 }
 
@@ -64,6 +84,12 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data;
+
+  // A product with no market is a product no market admin can find, so the
+  // market is decided here rather than left to a default.
+  const marketId = targetMarket(admin, input.marketId ?? null);
+  if (!marketId.ok) return error(marketId.message, 422);
+
   const slug = input.slug ?? slugify(input.name);
   if (!slug) return error('Could not derive a slug from that name. Supply one.', 422);
 
@@ -95,6 +121,7 @@ export async function POST(request: Request) {
       stock: input.stock,
       dietary: input.dietary,
       imageFiles,
+      marketId: marketId.marketId,
       active: true,
       updatedAt: nowText,
     })
@@ -107,6 +134,7 @@ export async function POST(request: Request) {
     after: { name: created.name, priceValue: created.priceValue, unit: created.unit },
     adminId: admin.id,
     adminEmail: admin.email,
+    marketId: created.marketId,
   });
 
   return json(

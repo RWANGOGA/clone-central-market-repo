@@ -148,7 +148,11 @@ export type ReconciliationRow = {
   drift: number;
 };
 
-export async function lowStockProducts(): Promise<LowStockRow[]> {
+export async function lowStockProducts(
+  marketId?: number | null,
+): Promise<LowStockRow[]> {
+  // Null is the platform's own view, which is every shelf at once.
+  const here = marketId == null ? sql`` : sql`AND p.market_id = ${marketId}`;
   return queryRows<LowStockRow>(sql`
     SELECT
       p.id,
@@ -162,6 +166,7 @@ export async function lowStockProducts(): Promise<LowStockRow[]> {
     FROM products p
     WHERE p.active = true
       AND p.stock <= COALESCE(p.low_stock_threshold, ${LOW_STOCK_THRESHOLD})
+      ${here}
     ORDER BY
       CAST(p.stock AS REAL) / NULLIF(COALESCE(p.low_stock_threshold, ${LOW_STOCK_THRESHOLD}), 0) ASC,
       p.name ASC
@@ -174,7 +179,10 @@ export async function lowStockProducts(): Promise<LowStockRow[]> {
  * Should always be empty. Anything listed is a bug or a write that bypassed
  * recordMovement, which is exactly what this is for.
  */
-export async function reconcileStock(): Promise<ReconciliationRow[]> {
+export async function reconcileStock(
+  marketId?: number | null,
+): Promise<ReconciliationRow[]> {
+  const here = marketId == null ? sql`` : sql`AND p.market_id = ${marketId}`;
   return queryRows<ReconciliationRow>(sql`
     SELECT
       p.id,
@@ -185,6 +193,7 @@ export async function reconcileStock(): Promise<ReconciliationRow[]> {
       (p.stock - COALESCE(SUM(m.delta), 0))::int AS drift
     FROM products p
     LEFT JOIN stock_movements m ON m.product_id = p.id
+    WHERE TRUE ${here}
     GROUP BY p.id
     HAVING p.stock <> COALESCE(SUM(m.delta), 0)
     ORDER BY ABS(p.stock - COALESCE(SUM(m.delta), 0)) DESC

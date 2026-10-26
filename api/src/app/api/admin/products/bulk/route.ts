@@ -1,4 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { productPriceHistory, products, nowText } from '@/db/schema';
@@ -31,7 +32,8 @@ export async function PATCH(request: Request) {
   const { ids, priceValue, unit, lowStockThreshold, reorderQuantity, supplierId } = parsed.data;
 
   const rows = await db.query.products.findMany({
-    where: (t, { inArray: inArrayOp }) => inArrayOp(t.id, ids),
+    where: (t, { and: andOp, inArray: inArrayOp }) =>
+      andOp(inArrayOp(t.id, ids), marketScope(admin, t.marketId)),
   });
   const byId = new Map(rows.map((row) => [row.id, row]));
 

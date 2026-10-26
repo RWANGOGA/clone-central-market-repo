@@ -43,7 +43,7 @@ export async function POST(request: Request, { params }: Ctx) {
 
   const { amount, method, reason, paymentId } = parsed.data;
   const { id } = await params;
-  const order = await findOrder(id);
+  const order = await findOrder(id, admin.marketId);
   if (!order) return error(`Order "${id}" not found`, 404);
 
   const [orderPayments, orderRefunds] = await Promise.all([

@@ -1,8 +1,9 @@
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { promoCodes } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
+import { marketScope } from '@/lib/marketScope';
 import { recordActivity } from '@/lib/activity';
 import { error, json } from '@/lib/http';
 import { csrfCheck } from '@/lib/security';
@@ -29,7 +30,9 @@ export async function PATCH(request: Request, { params }: Ctx) {
 
   const [updated] = await db.update(promoCodes)
     .set({ active: parsed.data.active })
-    .where(eq(promoCodes.id, key))
+    // Strictly the caller's own market: a market may pause the code it issued,
+    // and a platform code it can see stays the platform's to pause.
+    .where(and(eq(promoCodes.id, key), marketScope(admin, promoCodes.marketId)))
     .returning();
   if (!updated) return error('Promo not found', 404);
 
@@ -38,6 +41,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     entity: 'promo',
     entityId: updated.id,
     adminId: admin.id,
+    marketId: updated.marketId,
     after: { code: updated.code, active: updated.active },
   });
 

@@ -35,7 +35,7 @@ export async function GET(request: Request, { params }: Ctx) {
   if (!admin) return error('Not signed in', 401);
 
   const { id } = await params;
-  const order = await findOrder(id);
+  const order = await findOrder(id, admin.marketId);
   if (!order) return error(`Order "${id}" not found`, 404);
 
   return json({ data: await orderDetail(order) });
@@ -51,7 +51,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
 
   const { status, note } = parsed.data;
   const { id } = await params;
-  const existing = await findOrder(id);
+  const existing = await findOrder(id, admin.marketId);
   if (!existing) return error(`Order "${id}" not found`, 404);
 
   if (!isOrderStatus(status)) {

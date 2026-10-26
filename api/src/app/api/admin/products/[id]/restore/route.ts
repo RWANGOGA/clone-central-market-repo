@@ -1,4 +1,5 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
+import { marketScope } from '@/lib/marketScope';
 import { db } from '@/db';
 import { products, nowText } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
@@ -15,7 +16,10 @@ export async function POST(_request: Request, { params }: Ctx) {
   const { id } = await params;
   const key = Number(id);
   const existing = await db.query.products.findFirst({
-    where: Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+    where: and(
+      Number.isInteger(key) ? eq(products.id, key) : eq(products.slug, id),
+      marketScope(admin, products.marketId),
+    ),
   });
   if (!existing) return error(`Product "${id}" not found`, 404);
   if (existing.active) return error(`Product "${id}" is already active.`, 409);

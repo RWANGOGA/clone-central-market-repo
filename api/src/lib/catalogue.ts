@@ -21,6 +21,12 @@ export const productInputSchema = z.object({
   unit: z.enum(['kg', 'each', 'pint', 'bunch', 'crate']),
   stock: z.number().int().min(0).max(1_000_000).default(0),
   dietary: z.array(z.string().max(12)).max(8).default([]),
+  /**
+   * Which market is selling this. Required from a platform admin, whose account
+   * spans every market and therefore has to choose one; irrelevant for a market
+   * admin, whose rows belong to its own market whether or not it says so.
+   */
+  marketId: z.number().int().positive().optional(),
   /** Base64 data URL. Stored under uploads/ and served from /api/assets. */
   imageDataUrl: z.string().max(8_000_000).optional(),
 });

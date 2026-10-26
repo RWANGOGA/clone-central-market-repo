@@ -1,5 +1,6 @@
-import { and, asc, count, desc, eq, like, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, like, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { marketScope } from '@/lib/marketScope';
 import { db } from '@/db';
 import { customers } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
@@ -16,6 +17,7 @@ export async function GET(request: Request) {
   // Any signed-in staff member may look a customer up; delivery needs it.
   const guard = await guardAdmin(request);
   if (!guard.ok) return error(guard.message, guard.status);
+  const admin = guard.admin;
 
   const url = new URL(request.url);
   const parsed = listSchema.safeParse({
@@ -29,6 +31,11 @@ export async function GET(request: Request) {
   const { q, active, limit, offset } = parsed.data;
 
   const filters = [];
+
+  // There is no customer_id column to filter on, because a customer is one
+  // account across the platform. A market is shown the people it has
+  // actually served, which is the only list it has a right to read.
+  if (admin.marketId !== null) filters.push(sql`(SELECT 1 FROM orders o WHERE o.customer_id = ${customers.id} AND o.market_id = ${admin.marketId} LIMIT 1) IS NOT NULL`);
   if (active !== undefined) filters.push(eq(customers.active, active === 'true'));
 
   if (q && q.trim()) {

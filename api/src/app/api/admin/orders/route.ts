@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { orderItems, orders, payments, refunds } from '@/db/schema';
 import { requireAdmin } from '@/lib/catalogue';
+import { marketScope } from '@/lib/marketScope';
 import { ORDER_FLOW } from '@/lib/orderFlow';
 import { summariseMoney } from '@/lib/orderMoney';
 import { error, json } from '@/lib/http';
@@ -64,6 +65,11 @@ export async function GET(request: Request) {
   const { status, region, q, from, to, limit, offset } = parsed.data;
 
   const filters = [];
+
+  // First, before anything the caller can influence: a market's queue is only
+  // ever its own orders. `undefined` for the platform tier.
+  const scope = marketScope(admin, orders.marketId);
+  if (scope) filters.push(scope);
 
   if (status) filters.push(eq(orders.status, status));
   if (region) filters.push(eq(orders.region, region));
@@ -174,6 +180,7 @@ export async function GET(request: Request) {
       currency: row.currency,
       itemCount: byOrder.get(row.id)?.lines ?? 0,
       unitCount: byOrder.get(row.id)?.units ?? 0,
+      marketId: row.marketId,
       money: summariseMoney(
         paymentsByOrder.get(row.id) ?? [],
         refundsByOrder.get(row.id) ?? [],
@@ -188,10 +195,13 @@ export async function GET(request: Request) {
       offset,
       returned: rows.length,
       // Distinct regions for the filter, so the UI does not need its own list.
+      // Restricted to the caller's market, otherwise the filter itself leaks
+      // which parts of the country another market is delivering to.
       regions: (
         await db
           .selectDistinct({ region: orders.region })
           .from(orders)
+          .where(scope)
           .orderBy(asc(orders.region))
       )
         .map((row) => row.region)

@@ -1,5 +1,6 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db } from '@/db';
+import { marketScope } from '@/lib/marketScope';
 import { customers } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
 import { error, json } from '@/lib/http';
@@ -17,7 +18,11 @@ export async function PATCH(request: Request, { params }: Ctx) {
   if (!Number.isInteger(key) || key <= 0) return error('A customer id is required', 400);
 
   const existing = await db.query.customers.findFirst({
-    where: eq(customers.id, key),
+    where: and(
+      eq(customers.id, key),
+      // Only someone this market has served can be deactivated by it.
+      sql`(SELECT 1 FROM orders o WHERE o.customer_id = ${customers.id} AND o.market_id = ${admin.marketId} LIMIT 1) IS NOT NULL`,
+    ),
   });
   if (!existing) return error(`Customer ${id} not found`, 404);
 
