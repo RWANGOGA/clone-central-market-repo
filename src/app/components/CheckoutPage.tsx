@@ -5,6 +5,8 @@ import GeoCascade from './GeoCascade';
 import { isValidUgandanPhone, normalizeUgandanPhone } from '../lib/uganda';
 import { fetchHierarchy, validateSelection, type GeoNode } from '../lib/geoApi';
 import { fetchCustomerAddresses, type CustomerAddress } from '../lib/customerApi';
+import { PageTitle } from './shared/PageTitle';
+import ScreenHeader from './shared/ScreenHeader';
 
 interface CheckoutPageProps {
   cartCount: number;
@@ -152,43 +154,36 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="relative flex h-full flex-col bg-[#ffffff]">
       {/* Status Bar */}
       <StatusBar />
       
-      {/* Header */}
-      <Header 
+      <Header
         cartCount={cartCount}
         onBack={onBack}
         onMenuClick={onMenuClick}
       />
       
-      {/* Progress Indicators */}
-      <ProgressIndicators />
-      
-      {/* Divider Line */}
-      <div className="absolute h-0 left-6 right-6 top-[222px]">
-        <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 327 1">
-            <line stroke="var(--stroke-0, #E5E5E5)" x2="327" y1="0.5" y2="0.5" />
-          </svg>
+      {/* Step one of the checkout. The exported version pinned the dot at
+          top-[174px] and the label at left-[72px] against a 393px canvas, so
+          the pair could not move when the copy under it wrapped. */}
+      <div className="shrink-0 px-6 pt-5">
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-3">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
+              1
+            </span>
+            <h2 className="font-serif leading-tight text-brand text-display">Shipping</h2>
+          </div>
+          <p className="text-center text-base text-muted-foreground">
+            Where in Uganda should we deliver?
+          </p>
         </div>
+        <div className="mt-4 h-px bg-neutral-200" />
       </div>
       
-      {/* Shipping Label */}
-      <div className="absolute flex flex-col font-serif font-normal justify-center leading-[0] left-[72px] text-brand text-[24px] text-left top-[190px] tracking-[-0.48px] translate-y-[-50%] w-[138.5px]">
-        <p className="block leading-[32px] text-[24px]">Shipping</p>
-      </div>
-      
-      {/* Shipping Description */}
-      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-6 not-italic text-[#000000] text-[16px] text-left text-nowrap top-[258px] translate-y-[-50%]">
-        <p className="block leading-[1.5] whitespace-pre text-[16px]">
-          Where in Uganda should we deliver?
-        </p>
-      </div>
-      
-{/* Form Fields */}
-      <div className="absolute left-0 right-0 top-[286px] bottom-[124px] overflow-y-auto">
+      {/* Form Fields */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="px-6 pb-6 pt-1">
           <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start p-0 relative w-full">
 
@@ -315,41 +310,7 @@ function FormField({ label, children }: FormFieldProps) {
   );
 }
 
-function ProgressIndicators() {
-  return (
-    <>
-      {/* Step 1 - Active */}
-      <div className="absolute left-6 top-[174px] size-8">
-        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 32 32">
-          <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">1</span>
-        </div>
-      </div>
-      
-      {/* Step 2 - Inactive */}
-      <div className="absolute size-8 top-[174px]" style={{ left: "calc(50% + 93.5px)" }}>
-        <svg fill="none" preserveAspectRatio="none" viewBox="0 0 32 32" className="block size-full">
-          <circle cx="16" cy="16" fill="var(--fill-0, #757575)" r="16" />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">2</span>
-        </div>
-      </div>
-      
-      {/* Step 3 - Inactive */}
-      <div className="absolute size-8 top-[174px]" style={{ left: "calc(50% + 131.5px)" }}>
-        <svg fill="none" preserveAspectRatio="none" viewBox="0 0 32 32" className="block size-full">
-          <circle cx="16" cy="16" fill="var(--fill-0, #757575)" r="16" />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">3</span>
-        </div>
-      </div>
-    </>
-  );
-}
+
 
 function StatusBar() {
   return (
@@ -440,83 +401,12 @@ interface HeaderProps {
 
 function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
   return (
-    <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0">
-      <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
-      
-      {/* Mobile Nav */}
-      <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-        <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
-        <div
-          className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
-          style={{ left: "calc(50% - 0.5px)" }}
-        >
-          <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
-        </div>
-        
-        {/* Cart Icon */}
-        <div className="absolute right-5 rounded-2xl size-8 top-[18px]">
-          <div className="size-8">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 32 32">
-              <g>
-                <path d={svgPaths.p2003cd00} fill="var(--fill-0, black)" />
-              </g>
-            </svg>
-          </div>
-          {cartCount > 0 && (
-            <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
-              <div className="flex flex-col items-center justify-center relative size-full">
-                <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                    <p className="block leading-none whitespace-pre">{cartCount}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* Menu Icon */}
-        <button 
-          onClick={onMenuClick}
-          className="absolute left-5 rounded-2xl size-8 top-[18px] flex items-center justify-center"
-        >
-          <div className="h-1.5 w-[18px]">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 8">
-              <g>
-                <line stroke="var(--stroke-0, black)" strokeWidth="1.5" x2="18" y1="1.25" y2="1.25" />
-                <line stroke="var(--stroke-0, black)" strokeWidth="1.5" x2="18" y1="7.25" y2="7.25" />
-              </g>
-            </svg>
-          </div>
-        </button>
-      </div>
-      
-      {/* Sub Nav */}
-      <div className="absolute left-6 right-6 top-[103px]">
-        <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
-          <div className="relative shrink-0 w-full">
-            <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-              <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
-                <p className="block leading-[32px] text-[24px]">Checkout</p>
-              </div>
-              <button 
-                onClick={onBack}
-                className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px]"
-              >
-                <div className="flex flex-row items-center gap-2">
-                  <div className="w-3 h-3">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                      <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <p className="block leading-[24px] whitespace-pre">Back</p>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ScreenHeader
+      title="Checkout"
+      cartCount={cartCount}
+      onMenuClick={onMenuClick}
+      back={{ onClick: onBack }}
+    />
   );
 }
 
@@ -527,29 +417,21 @@ interface FooterProps {
 
 function Footer({ isFormValid, onProceedToPayment }: FooterProps) {
   return (
-    <div className="absolute bg-[#ffffff] bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
-      {/* Proceed to Payment Button */}
+    <div className="shrink-0 border-t border-neutral-200 bg-white px-6 py-4">
       <button
-        onClick={isFormValid ? onProceedToPayment : undefined}
+        onClick={onProceedToPayment}
         disabled={!isFormValid}
-        className={`absolute left-6 right-6 rounded-lg top-6 ${
-          isFormValid ? 'bg-brand cursor-pointer' : 'bg-neutral-200 cursor-not-allowed'
+        aria-disabled={!isFormValid}
+        className={`flex w-full items-center justify-between rounded-lg py-3 pl-6 pr-3 ${
+          isFormValid ? 'cursor-pointer bg-brand text-white' : 'cursor-not-allowed bg-neutral-200 text-neutral-500'
         }`}
       >
-        <div className="flex flex-row items-center relative size-full">
-          <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start pl-6 pr-4 py-2 relative w-full">
-            <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left tracking-[-0.16px]">
-              <p className="block leading-[24px]">Proceed to payment</p>
-            </div>
-            <div className="size-8 relative shrink-0">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 32 32">
-                <g>
-                  <path d={svgPaths.p3d7c1f80} fill="var(--fill-0, white)" />
-                </g>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <span className="text-base leading-relaxed">Proceed to payment</span>
+        <span className="size-8 shrink-0">
+          <svg className="block size-full" fill="none" viewBox="0 0 32 32">
+            <path d={svgPaths.p3d7c1f80} fill="currentColor" />
+          </svg>
+        </span>
       </button>
     </div>
   );

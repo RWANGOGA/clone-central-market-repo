@@ -3,7 +3,11 @@ import svgPaths from "../../imports/svg-s5y93igtx2";
 
 export default function StatusBar() {
   return (
-    <div className="absolute h-[47px] left-0 overflow-clip right-0 top-0">
+    // The phone chrome is part of the layout, not a decal on top of it. It used
+    // to be absolutely positioned, which meant every screen had to know its
+    // height and start its own content 47px down; anything that forgot slid
+    // under the clock.
+    <div className="relative h-[47px] shrink-0 overflow-clip">
       <Notch />
       <LeftSide />
       <RightSide />

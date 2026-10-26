@@ -10,10 +10,10 @@
 | 04a-basket-empty.png | `/basket` | Empty basket with the way back to the shop |
 | 05-basket.png | `/basket` | Basket with lines, totals and delivery fee |
 | 06-checkout.png | `/checkout` | Checkout: delivery details and payment choice |
-| 07-order-confirmation.png | `/order/GRC-F3F32D03A9` | Order confirmation after checkout |
-| 08-payment.png | `/pay/GRC-F3F32D03A9` | Payment: mobile money or cash on delivery |
-| 08b-payment-number-entered.png | `/pay/GRC-F3F32D03A9` | Payment ready: number accepted, Pay now live |
-| 09-order-tracking-timeline.png | `/order/GRC-F3F32D03A9` | Tracking with staff-entered timeline and delivery status |
+| 07-order-confirmation.png | `/order/GRC-31590D199E` | Order confirmation after checkout |
+| 08-payment.png | `/pay/GRC-31590D199E` | Payment: mobile money or cash on delivery |
+| 08b-payment-number-entered.png | `/pay/GRC-31590D199E` | Payment ready: number accepted, Pay now live |
+| 09-order-tracking-timeline.png | `/order/GRC-31590D199E` | Tracking with staff-entered timeline and delivery status |
 | 10-account-overview.png | `/profile` | Account overview: totals and recent activity |
 | 11-account-orders.png | `/profile` | Orders tab — Order history list with money states |
 | 12-account-details.png | `/profile` | Details tab — Editable profile details |
@@ -38,4 +38,4 @@
 | 48-staff-admins.png | `/staff` | Staff accounts and roles |
 
 Captured at 393x852 with a 2x scale factor, so each PNG is 786x1704 and drops into a Figma phone frame at exactly 393x852.
-Order used for the live states: `GRC-F3F32D03A9`.
+Order used for the live states: `GRC-31590D199E`.

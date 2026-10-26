@@ -4,6 +4,7 @@ import svgPaths from "../imports/svg-s5y93igtx2";
 import { formatUgx } from "../lib/currency";
 import { fetchCustomerProfile, updateCustomerProfile, fetchCustomerOrders, fetchCustomerPreferences, updateCustomerPreferences, fetchCustomerNotifications, markCustomerNotificationsRead, fetchCustomerAddresses, createCustomerAddress, updateCustomerAddress, deleteCustomerAddress, type CustomerProfile, type CustomerOrder, type CustomerNotification, type CustomerAddress, type CustomerPreferenceFlags } from '../lib/customerApi';
 import type { ReorderOutcome } from '../lib/cartProvider';
+import { PageTitle } from './shared/PageTitle';
 
 interface ProfilePageProps {
   customerInfo: {
@@ -586,9 +587,7 @@ export default function ProfilePage({
         {/* Sub Nav */}
         <div className="absolute left-6 right-6 top-[103px]">
           <div className="box-border content-stretch flex flex-col font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-            <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
-              <p className="block leading-[32px] text-[24px]">My Page</p>
-            </div>
+            <PageTitle>My Page</PageTitle>
             <div className="flex gap-3">
               <button
                 onClick={onBack}

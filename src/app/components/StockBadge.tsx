@@ -88,12 +88,10 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
   }
 
   return (
-    <span className="inline-flex items-center gap-1">
-      <span
-        className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${tone.chip}`}
-      >
-        {level.remaining}
-      </span>
+    <span
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium leading-tight ${tone.chip}`}
+    >
+      {level.remaining}
     </span>
   );
 }

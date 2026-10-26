@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DeliveryMap from './DeliveryMap';
 import svgPaths from '../imports/svg-s5y93igtx2';
 import type { GeoNode } from '../lib/geoApi';
+import { PageTitle } from './shared/PageTitle';
 
 interface MapPageProps {
   cartCount: number;
@@ -81,9 +82,7 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
 
       <div className="absolute left-6 right-6 top-[103px]">
         <div className="flex flex-row font-normal items-center justify-start w-full">
-          <div className="flex flex-col font-serif font-normal grow justify-center text-[#000000] text-[24px] tracking-[-0.48px]">
-            <p className="block leading-[32px] text-[24px]">Coverage</p>
-          </div>
+          <PageTitle>Coverage</PageTitle>
           <button
             onClick={onBack}
             className="cursor-pointer flex items-center font-normal not-italic shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"

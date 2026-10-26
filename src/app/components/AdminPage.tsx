@@ -53,6 +53,7 @@ import OrderQueue from './OrderQueue';
 import StockBadge from './StockBadge';
 import { describeStockOf } from '../lib/stockApi';
 import { formatUgx } from '../lib/currency';
+import { SectionTitle } from './shared/PageTitle';
 
 const UNITS = ['kg', 'each', 'pint', 'bunch', 'crate'] as const;
 
@@ -173,9 +174,9 @@ function StaffShell({
       <div className="sticky top-0 bg-white border-b border-neutral-200 px-4 py-3 z-10">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[16px] font-serif font-medium text-brand leading-[22px]">
+            <h1 className="text-[16px] font-serif font-medium text-brand leading-[22px]">
               Staff
-            </p>
+            </h1>
             <p className="text-[11px] font-normal text-muted-foreground">
               {admin.name} · {ADMIN_ROLE_LABELS[admin.role] ?? admin.role}
             </p>
@@ -334,12 +335,14 @@ function CataloguePanel({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[14px] font-medium text-[#000000]">
+                {/* A row label, not a section heading: it names one product in
+                    a list and must stay with the left edge of the row. */}
+                <h3 className="text-sm font-medium text-foreground">
                   {product.name}
                   {!product.active && (
-                    <span className="ml-2 text-[11px] text-[#9a9a9a]">withdrawn</span>
+                    <span className="ml-2 text-[11px] font-normal text-muted-foreground">withdrawn</span>
                   )}
-                </p>
+                </h3>
                 <p className="text-[12px] text-muted-foreground">
                   {product.price} · {product.farm}
                 </p>
@@ -428,7 +431,7 @@ function ProductForm({
 
   return (
     <form onSubmit={submit} className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2.5">
-      <p className="text-[14px] font-medium text-[#000000]">New product</p>
+      <SectionTitle size="small" family="label">New product</SectionTitle>
 
       <Field label="Name">
         <input
@@ -583,7 +586,7 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
   return (
     <div className="space-y-3">
-      <p className="text-[14px] font-medium text-[#000000]">Stock movements</p>
+      <SectionTitle size="small" family="label">Stock movements</SectionTitle>
       {/* The table is the latest window while the ledger holds more, and the net
           is counted over all of it — so both numbers are named for what they are. */}
       {!loading && movements.length > 0 && totals && (
@@ -921,7 +924,7 @@ function SuppliersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
   return (
     <div className="space-y-3">
-      <p className="text-[14px] font-medium text-[#000000]">Suppliers</p>
+      <SectionTitle size="small" family="label">Suppliers</SectionTitle>
       <form onSubmit={submit} className="flex gap-2">
         <input
           value={name}
@@ -1042,7 +1045,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[14px] font-medium text-[#000000]">Promo codes</p>
+        <SectionTitle size="small" family="label">Promo codes</SectionTitle>
         <button
           onClick={() => setAdding((open) => !open)}
           className="rounded-lg bg-brand px-3 py-1.5 text-[12px] text-white"
@@ -1514,7 +1517,7 @@ function ActivityPanel({ fail }: { fail: (m: string) => void }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-[14px] font-medium text-[#000000]">Activity log</p>
+      <SectionTitle size="small" family="label">Activity log</SectionTitle>
       {loading ? (
         <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : logs.length === 0 ? (
@@ -1718,7 +1721,7 @@ function AdminsPanel({
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-[14px] font-medium text-[#000000]">Staff accounts</p>
+        <SectionTitle size="small" family="label">Staff accounts</SectionTitle>
         <p className="text-[11px] font-normal text-muted-foreground">
           Owners manage accounts. Managers run the shop. Shop assistants only move orders.
         </p>
@@ -1916,7 +1919,7 @@ function AdminsPanel({
       </form>
 
       <form onSubmit={submit} className="space-y-2">
-        <p className="text-[14px] font-medium text-[#000000]">Change your password</p>
+        <SectionTitle size="small" family="label">Change your password</SectionTitle>
         <Field label="Current password">
           <input
             type="password"

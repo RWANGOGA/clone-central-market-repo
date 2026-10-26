@@ -2,6 +2,7 @@ import React from 'react';
 import StatusBar from './shared/StatusBar';
 import ExpandableCard from './shared/ExpandableCard';
 import svgPaths from "../imports/svg-s5y93igtx2";
+import { PageTitle } from './shared/PageTitle';
 
 interface AboutPageProps {
   onBack: () => void;
@@ -138,9 +139,7 @@ export default function AboutPage({ onBack, onMenuClick, onCartClick, cartCount 
           <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
             <div className="relative shrink-0 w-full">
               <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-                <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
-                  <p className="block leading-[32px] text-[24px]">Who we are</p>
-                </div>
+                <PageTitle>Who we are</PageTitle>
                 <button
                   onClick={onBack}
                   className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"

@@ -4,6 +4,7 @@ import StatusBar from './shared/StatusBar';
 import clsx from "clsx";
 import { formatUgx } from '../lib/currency';
 import { assetUrl } from '../lib/apiBase';
+import { PageTitle } from './shared/PageTitle';
 
 interface CartItem {
   id: number;
@@ -63,8 +64,8 @@ export default function ConfirmationPage({
       </div>
       
       {/* Confirmation Label */}
-      <div className="absolute flex flex-col font-serif font-normal justify-center leading-[0] left-[72px] text-brand text-[24px] text-left top-[190px] tracking-[-0.48px] translate-y-[-50%] w-[138.5px]">
-        <p className="block leading-[32px] text-[24px]">Confirmation</p>
+      <div className="absolute flex flex-col font-serif font-normal justify-center leading-[0] left-[72px] text-brand text-display text-left top-[190px] translate-y-[-50%] w-[138.5px]">
+        <h2 className="leading-tight">Confirmation</h2>
       </div>
       
       {/* Product List and Order Summary */}
@@ -367,9 +368,7 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
         <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
           <div className="relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-              <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
-                <p className="block leading-[32px] text-[24px]">Checkout</p>
-              </div>
+              <PageTitle>Checkout</PageTitle>
               <button 
                 onClick={onBack}
                 className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px]"

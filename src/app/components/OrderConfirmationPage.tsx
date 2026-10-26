@@ -3,6 +3,7 @@ import svgPaths from "../imports/svg-x4vilrsbuo";
 import DeliveryLocationMap from './DeliveryLocationMap';
 import { fetchOrder, type TrackedOrder } from '../lib/customerApi';
 import { formatUgx } from '../lib/currency';
+import { PageTitle } from './shared/PageTitle';
 
 interface OrderConfirmationPageProps {
   cartCount: number;
@@ -190,13 +191,15 @@ export default function OrderConfirmationPage({
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h1
-                    className={`font-serif font-normal text-[24px] tracking-[-0.48px] leading-[30px] ${
+                  {/* The screen already carries an <h1>; this is the heading of
+                      the status block within it, not a second page title. */}
+                  <h2
+                    className={`font-serif font-normal text-title leading-tight ${
                       status === 'cancelled' ? 'text-red-700' : 'text-brand'
                     }`}
                   >
                     {copy.title}
-                  </h1>
+                  </h2>
                   <p className="mt-1 text-[13px] text-neutral-600 leading-[18px]">{copy.subtitle}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-neutral-500">
                     {orderReference && <span>Order {orderReference}</span>}
@@ -366,9 +369,11 @@ export default function OrderConfirmationPage({
                   <p className="font-normal text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]">
                     {order ? formatWhen(order.createdAt) : '—'}
                   </p>
-                  <p className="text-[12px] text-brand mt-2 font-medium">
-                    Standard Eco Courier • Tracking enabled
-                  </p>
+                  {/* A line here used to read "Standard Eco Courier • Tracking
+                      enabled". There is no courier partner and nothing to track
+                      against one; the order is brought by the market's own
+                      delivery person, and the updates below are the truth of
+                      where it is. */}
                 </div>
               </div>
 
@@ -556,9 +561,7 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
         <div className="box-border content-stretch flex flex-col gap-4 items-end justify-end p-0 relative w-full">
           <div className="relative shrink-0 w-full">
             <div className="box-border content-stretch flex flex-row font-normal items-center justify-start leading-[0] p-0 relative text-left w-full">
-              <div className="basis-0 flex flex-col font-serif font-normal grow justify-center min-h-px min-w-px relative shrink-0 text-[#000000] text-[24px] tracking-[-0.48px]">
-                <p className="block leading-[32px] text-[24px]">{title}</p>
-              </div>
+              <PageTitle>{title}</PageTitle>
               <button
                 onClick={onShop}
                 className="cursor-pointer flex items-center font-normal not-italic relative shrink-0 text-brand text-[14px] text-nowrap tracking-[-0.14px] hover:opacity-80 transition-opacity"

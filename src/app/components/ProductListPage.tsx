@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import ExpandableCard from './shared/ExpandableCard';
 import StockBadge from './StockBadge';
 import type { StockLevel } from '../lib/stockApi';
+import ScreenHeader from './shared/ScreenHeader';
 
 interface Product {
   id: number;
@@ -59,7 +60,7 @@ export default function ProductListPage({
   stockLive
 }: ProductListPageProps) {
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="flex h-full flex-col bg-[#ffffff]">
       {/* Status Bar */}
       <StatusBar />
       
@@ -98,155 +99,73 @@ interface HeaderProps {
   onCartClick: () => void;
 }
 
+/**
+ * The shop front bar: where you are, what you are searching, and how the
+ * aisle is ordered.
+ *
+ * The sort control used to read `$ -> $$`, which is a bargain-bin idiom from a
+ * template and says nothing to someone buying garlic by the kilo; the price
+ * field is in USh and the chip now says what it does. The search box used to be
+ * a magnifier with the field hidden inside it until focus, so nobody knew the
+ * shop could be searched at all.
+ */
+const SORTS: Array<{ key: SortOption; label: string }> = [
+  { key: 'default', label: 'Default' },
+  { key: 'a-z', label: 'A to Z' },
+  { key: 'price', label: 'Price' },
+];
+
 function Header({ cartCount, searchTerm, onSearchChange, sortOption, onSortChange, onMenuClick, onCartClick }: HeaderProps) {
   return (
-    <div className="absolute bg-[#ffffff] h-[201px] left-0 right-0 top-0">
-      <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
-      
-      {/* Mobile Nav */}
-      <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-        <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
-        <div
-          className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
-          style={{ left: "calc(50% - 0.5px)" }}
-        >
-          <p className="block leading-none whitespace-pre text-[24px]">Mu Katale</p>
+    <ScreenHeader
+      title={<><span className="text-muted-foreground">All Aisles /</span> Produce</>}
+      cartCount={cartCount}
+      onCartClick={onCartClick}
+      onMenuClick={onMenuClick}
+    >
+      <div className="flex flex-col gap-3">
+        <div className="relative">
+          <Input
+            type="search"
+            aria-label="Search produce"
+            placeholder="Search produce"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-10 rounded-xl border border-[#e1e1e1] bg-[#fafaf8] pl-9 pr-3 text-[14px]"
+          />
+          <svg
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            fill="none"
+            viewBox="0 0 20 20"
+            stroke="currentColor"
+            strokeWidth="1.6"
+          >
+            <circle cx="9" cy="9" r="6" />
+            <path d="M13.5 13.5L17 17" strokeLinecap="round" />
+          </svg>
         </div>
-        
-        {/* Cart Icon */}
-        <button 
-          onClick={onCartClick}
-          className="absolute right-5 rounded-2xl size-8 top-[18px] cursor-pointer"
-        >
-          <div className="size-8">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 32 32">
-              <g>
-                <path d={svgPaths.p2003cd00} fill="var(--fill-0, black)" />
-              </g>
-            </svg>
-          </div>
-          {cartCount > 0 && (
-            <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
-              <div className="flex flex-col items-center justify-center relative size-full">
-                <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
-                    <p className="block leading-none whitespace-pre">{cartCount}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </button>
-        
-        {/* Menu Icon */}
-        <button 
-          onClick={onMenuClick}
-          className="absolute left-5 rounded-2xl size-8 top-[18px] flex items-center justify-center"
-        >
-          <div className="h-1.5 w-[18px]">
-            <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 8">
-              <g>
-                <line stroke="var(--stroke-0, black)" strokeWidth="1.5" x2="18" y1="1.25" y2="1.25" />
-                <line stroke="var(--stroke-0, black)" strokeWidth="1.5" x2="18" y1="7.25" y2="7.25" />
-              </g>
-            </svg>
-          </div>
-        </button>
-      </div>
-      
-      {/* Sub Nav */}
-      <div className="absolute left-6 right-4 top-[103px]">
-        <div className="box-border content-stretch flex flex-col gap-4 items-start justify-start p-0 relative w-full">
-          {/* Breadcrumb and Search */}
-          <div className="relative shrink-0 w-full">
-            <div className="box-border content-stretch flex flex-row items-start justify-start p-0 relative w-full">
-              <div className="basis-0 grow min-h-px min-w-px relative shrink-0">
-                <div className="box-border content-stretch flex flex-row font-serif font-normal gap-0.5 items-start justify-start leading-[0] p-0 relative text-[24px] text-left text-nowrap tracking-[-0.48px] w-full">
-                  <div className="flex flex-col justify-center relative shrink-0 text-muted-foreground">
-                    <p className="block leading-[32px] text-nowrap whitespace-pre text-[24px]">All Aisles</p>
-                  </div>
-                  <div className="flex flex-col justify-center relative shrink-0 text-muted-foreground">
-                    <p className="block leading-[32px] text-nowrap whitespace-pre text-[24px]">/</p>
-                  </div>
-                  <div className="flex flex-col justify-center relative shrink-0 text-[#000000]">
-                    <p className="block leading-[32px] text-nowrap whitespace-pre text-[24px]">Produce</p>
-                  </div>
-                </div>
-              </div>
-              <div className="size-8 relative shrink-0">
-                <Input
-                  placeholder="Search produce..."
-                  value={searchTerm}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="absolute right-0 top-0 w-8 h-8 p-0 border-0 bg-transparent text-transparent placeholder:text-transparent focus:w-[200px] focus:text-black focus:placeholder:text-gray-400 transition-all duration-200 ease-in-out focus:bg-white focus:border focus:border-gray-200 focus:rounded-md focus:px-3"
-                />
-                <svg className="absolute inset-0 size-8 pointer-events-none" fill="none" preserveAspectRatio="none" viewBox="0 0 32 32">
-                  <g>
-                    <path d={svgPaths.p14ffce80} fill="var(--fill-0, black)" />
-                  </g>
-                </svg>
-              </div>
-            </div>
-          </div>
-          
-          {/* Sort Options */}
-          <div className="relative shrink-0">
-            <div className="box-border content-stretch flex flex-row gap-3 items-start justify-start p-0 relative">
+
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Sort products">
+          {SORTS.map(({ key, label }) => {
+            const active = sortOption === key;
+            return (
               <button
-                onClick={() => onSortChange('default')}
+                key={key}
+                type="button"
+                onClick={() => onSortChange(key)}
+                aria-pressed={active}
                 className={clsx(
-                  "relative rounded-xl shrink-0",
-                  sortOption === 'default' ? "bg-brand" : "border border-[#e1e1e1] border-solid"
+                  "cursor-pointer rounded-xl px-4 py-2 text-sm font-normal",
+                  active ? "bg-brand text-white" : "border border-[#e1e1e1] text-foreground",
                 )}
               >
-                <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start px-4 py-2 relative">
-                  <div className={clsx(
-                    "flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
-                    sortOption === 'default' ? "text-[#ffffff]" : "text-[#000000]"
-                  )}>
-                    <p className="block leading-[1.3] whitespace-pre">Default</p>
-                  </div>
-                </div>
+                {label}
               </button>
-              
-              <button
-                onClick={() => onSortChange('a-z')}
-                className={clsx(
-                  "relative rounded-xl shrink-0",
-                  sortOption === 'a-z' ? "bg-brand" : "border border-[#e1e1e1] border-solid"
-                )}
-              >
-                <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start px-4 py-2 relative">
-                  <div className={clsx(
-                    "flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
-                    sortOption === 'a-z' ? "text-[#ffffff]" : "text-[#000000]"
-                  )}>
-                    <p className="block leading-[1.3] whitespace-pre">A-Z</p>
-                  </div>
-                </div>
-              </button>
-              
-              <button
-                onClick={() => onSortChange('price')}
-                className={clsx(
-                  "relative rounded-xl shrink-0",
-                  sortOption === 'price' ? "bg-brand" : "border border-[#e1e1e1] border-solid"
-                )}
-              >
-                <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start px-4 py-2 relative">
-                  <div className={clsx(
-                    "flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-left text-nowrap tracking-[-0.14px]",
-                    sortOption === 'price' ? "text-[#ffffff]" : "text-[#000000]"
-                  )}>
-                    <p className="block leading-[1.3] whitespace-pre">{`$ -> $$`}</p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </ScreenHeader>
   );
 }
 
@@ -262,7 +181,7 @@ interface ContentProps {
 
 function Content({ products, favorites, onToggleFavorite, onAddToCart, onProductClick, stockLevels, stockLive }: ContentProps) {
   return (
-    <div className="absolute left-0 right-0 top-[225px] bottom-4 overflow-y-auto">
+    <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="box-border content-stretch flex flex-col gap-4 items-start justify-start relative w-full px-6 py-3">
         {products.map((product) => (
           <ProductCard
