@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router';
 import { CartProvider, useCart } from './lib/cartProvider';
 import { AuthProvider, useAuth, type CustomerInfo } from './lib/authProvider';

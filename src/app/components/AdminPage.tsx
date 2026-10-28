@@ -331,7 +331,6 @@ function StaffShell({
 }
 
 function CataloguePanel({
-  admin,
   flash,
   fail,
 }: {

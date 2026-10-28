@@ -1,4 +1,3 @@
-import React from 'react';
 import type { StockLevel } from '../lib/stockApi';
 
 interface StockBadgeProps {

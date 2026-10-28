@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DeliveryMap from './DeliveryMap';
 import svgPaths from '../imports/svg-s5y93igtx2';
 import type { GeoNode } from '../lib/geoApi';

@@ -5,7 +5,6 @@ import IconForward from '../imports/IconForward-2013-176';
 import { formatUgx } from '../lib/currency';
 import { assetUrl } from '../lib/apiBase';
 import { discountFor, promoShortfall, type AppliedPromo, type PromoResult } from '../lib/promoApi';
-import { PageTitle } from './shared/PageTitle';
 import ScreenHeader from './shared/ScreenHeader';
 
 interface CartItem {

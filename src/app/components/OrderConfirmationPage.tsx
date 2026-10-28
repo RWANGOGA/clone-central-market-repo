@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import svgPaths from "../imports/svg-x4vilrsbuo";
 import DeliveryLocationMap from './DeliveryLocationMap';
 import { fetchOrder, type TrackedOrder } from '../lib/customerApi';

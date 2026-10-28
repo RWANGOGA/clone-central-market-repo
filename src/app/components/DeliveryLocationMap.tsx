@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Circle, CircleMarker, GeoJSON, MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { fetchBoundaries, locatePlace, type BoundaryStatus, type LocatedPlace } from '../lib/geoApi';
@@ -217,7 +217,7 @@ export default function DeliveryLocationMap({
  * Shown when the API cannot resolve the district. Draws the country outline so
  * the card is never blank, without pretending to know where the order goes.
  */
-function FallbackMap({ region, district }: { region: string; district: string }) {
+function FallbackMap({ district }: { region: string; district: string }) {
   const [outline, setOutline] = useState<BoundaryStatus>({ state: 'loading' });
 
   useEffect(() => {

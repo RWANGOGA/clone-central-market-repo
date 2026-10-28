@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import svgPaths from "../imports/svg-42raqsyfh4";
 import footerSvgPaths from "../imports/svg-ved004mhkj";
 import clsx from "clsx";

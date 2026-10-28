@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import StatusBar from './shared/StatusBar';
 import svgPaths from "../imports/svg-s5y93igtx2";
 import { formatUgx } from "../lib/currency";
@@ -114,7 +114,6 @@ export default function ProfilePage({
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
-  const [loading, setLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -135,7 +134,6 @@ export default function ProfilePage({
   const [reorderFeedback, setReorderFeedback] = useState<{ tone: 'ok' | 'warn' | 'error'; lines: string[] } | null>(null);
 
   const loadProfile = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
       const data = await fetchCustomerProfile();
@@ -152,8 +150,6 @@ export default function ProfilePage({
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load profile');
-    } finally {
-      setLoading(false);
     }
   }, [onUpdateCustomerInfo]);
 

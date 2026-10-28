@@ -1,6 +1,4 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import imgRectangle6537 from "figma:asset/052a3ae1fed9a10fabfd3fcb18c34cbc209b9bc6.png";
 import { assetUrl } from '../lib/apiBase';
 
 interface Product {

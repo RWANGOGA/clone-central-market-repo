@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { resolveCartId, addItem as apiAddItem, updateItem, fetchCart, startFreshCart, reorderOrder, CartError, type ReorderResult } from './cartApi';
 import { toAppliedPromo, validatePromo, type AppliedPromo, type PromoResult } from './promoApi';
 import { fetchStock, applyStockDelta, type StockLevel } from './stockApi';
@@ -237,7 +237,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [overlayProduct, setOverlayProduct] = useState<OverlayProduct | null>(null);
   const [overlayQuantity, setOverlayQuantity] = useState(1);
 
-  const { products, live: catalogueLive, refresh: refreshCatalogue } = useCatalogue(FALLBACK_CATALOGUE);
+  const { products, live: catalogueLive } = useCatalogue(FALLBACK_CATALOGUE);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 

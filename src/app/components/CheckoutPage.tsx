@@ -5,7 +5,6 @@ import GeoCascade from './GeoCascade';
 import { isValidUgandanPhone, normalizeUgandanPhone } from '../lib/uganda';
 import { fetchHierarchy, validateSelection, type GeoNode } from '../lib/geoApi';
 import { fetchCustomerAddresses, type CustomerAddress } from '../lib/customerApi';
-import { PageTitle } from './shared/PageTitle';
 import ScreenHeader from './shared/ScreenHeader';
 
 interface CheckoutPageProps {

@@ -1,4 +1,3 @@
-import React from 'react';
 import StatusBar from './shared/StatusBar';
 import ExpandableCard from './shared/ExpandableCard';
 import svgPaths from "../imports/svg-s5y93igtx2";

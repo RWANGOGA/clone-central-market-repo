@@ -1,7 +1,6 @@
 import React from 'react';
-import svgPaths from "../imports/svg-v7ovcq1vez";
+import svgPaths from "../imports/svg-toln6of0ig";
 import StatusBar from './shared/StatusBar';
-import clsx from "clsx";
 import { formatUgx } from '../lib/currency';
 import { assetUrl } from '../lib/apiBase';
 import { PageTitle } from './shared/PageTitle';

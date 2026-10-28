@@ -1,4 +1,3 @@
-import React from 'react';
 import StatusBar from './shared/StatusBar';
 import svgPaths from "../imports/svg-s5y93igtx2";
 import clsx from "clsx";

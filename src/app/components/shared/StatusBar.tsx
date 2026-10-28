@@ -1,4 +1,3 @@
-import React from 'react';
 import svgPaths from "../../imports/svg-s5y93igtx2";
 
 export default function StatusBar() {

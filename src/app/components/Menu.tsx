@@ -1,6 +1,4 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import imgRectangle6537 from "figma:asset/73a0a2712c55c814e558e14ad018e308fab9b18c.png";
 
 interface MenuProps {
   isOpen: boolean;
