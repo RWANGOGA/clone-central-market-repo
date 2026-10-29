@@ -166,6 +166,17 @@ export async function withdrawProduct(id: number | string): Promise<Result<Admin
   return call<AdminProduct>(`/products/${id}`, { method: 'DELETE' });
 }
 
+/**
+ * Puts a withdrawn product back on the shelf.
+ *
+ * Separate from `updateProduct({ active: true })` because the route says what
+ * happened — it answers 409 when the row was never withdrawn, which is what
+ * stops a double click from rewriting a live product.
+ */
+export async function restoreProduct(id: number | string): Promise<Result<AdminProduct>> {
+  return call<AdminProduct>(`/products/${id}/restore`, { method: 'POST' });
+}
+
 /** Read a picked file into a data URL for the API to store. */
 export function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {

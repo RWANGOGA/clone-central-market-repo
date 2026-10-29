@@ -30,11 +30,13 @@ import {
   listSalesTrend,
   listSuppliers,
   receivePurchaseOrder,
+  restoreProduct,
   setPromoActive,
   signOut,
   updateProduct,
   updateAdmin,
   updateWorker,
+  withdrawProduct,
   type ActivityLogRow,
   type AdminAccount,
   type AdminIdentity,
@@ -66,6 +68,21 @@ import { formatUgx } from '../lib/currency';
 import { SectionTitle } from './shared/PageTitle';
 
 const UNITS = ['kg', 'each', 'pint', 'bunch', 'crate'] as const;
+
+/**
+ * Catalogue views.
+ *
+ * Withdrawn rows arrive with the rest of the list — the API keeps them, because
+ * an admin who cannot see a withdrawn line can never restore one — so this is a
+ * view over the rows already loaded rather than a second request per click.
+ */
+const CATALOGUE_VIEWS = [
+  { value: 'all', label: 'All' },
+  { value: 'active', label: 'On shelf' },
+  { value: 'withdrawn', label: 'Withdrawn' },
+] as const;
+
+type CatalogueView = (typeof CATALOGUE_VIEWS)[number]['value'];
 
 type Tab =
   | 'orders'
@@ -337,6 +354,7 @@ function StaffShell({
 }
 
 function CataloguePanel({
+  admin,
   flash,
   fail,
 }: {
@@ -347,6 +365,14 @@ function CataloguePanel({
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [view, setView] = useState<CatalogueView>('all');
+  // Which row has a write in flight. One at a time, because two writes to the
+  // same catalogue compete for `updatedAt` and the second is refused.
+  const [busyId, setBusyId] = useState<number | null>(null);
+  // Mirrors `catalogue.write` in api/src/lib/adminPermissions.ts: the routes
+  // refuse an assistant anyway, so the buttons are not drawn rather than drawn
+  // and answered with a 403.
+  const canWrite = admin.role !== 'staff';
 
   const load = useCallback(async () => {
     const result = await listAdminProducts();
@@ -380,20 +406,54 @@ function CataloguePanel({
     const result = await updateProduct(product.id, { stock: product.stock + delta });
     if (!result) return fail('Could not reach the service.');
     if (!result.ok) return fail(result.error);
+    // Only the stock fields are taken from the response. A write route answers
+    // with the stored row, whose price arrives as `priceLabel`, so swapping the
+    // whole object in would blank the price this list prints.
     setProducts((current) =>
-      current.map((p) => (p.id === product.id ? result.data : p)),
+      current.map((p) =>
+        p.id === product.id
+          ? {
+              ...p,
+              stock: result.data.stock,
+              stockState: result.data.stockState,
+              remaining: result.data.remaining,
+            }
+          : p,
+      ),
     );
   };
 
-  const handleToggle = async (product: AdminProduct) => {
-    const result = await updateProduct(product.id, { active: !product.active });
+  // Withdraw and restore are the two named routes, not a PATCH of the `active`
+  // flag: the routes say what happened, and restore answers 409 when the row
+  // was never withdrawn, so a double click cannot rewrite a live product.
+  const handleWithdraw = async (product: AdminProduct) => {
+    setBusyId(product.id);
+    const result = await withdrawProduct(product.id);
+    setBusyId(null);
     if (!result) return fail('Could not reach the service.');
     if (!result.ok) return fail(result.error);
     setProducts((current) =>
-      current.map((p) => (p.id === product.id ? result.data : p)),
+      current.map((p) => (p.id === product.id ? { ...p, active: false } : p)),
     );
-    flash(product.active ? 'Withdrawn.' : 'Restored.');
+    flash(`${product.name} is off the shelf. Find it again under Withdrawn.`);
   };
+
+  const handleRestore = async (product: AdminProduct) => {
+    setBusyId(product.id);
+    const result = await restoreProduct(product.id);
+    setBusyId(null);
+    if (!result) return fail('Could not reach the service.');
+    if (!result.ok) return fail(result.error);
+    setProducts((current) =>
+      current.map((p) => (p.id === product.id ? { ...p, active: true } : p)),
+    );
+    flash(`${product.name} is on the shelf again.`);
+  };
+
+  const visible = products.filter((product) =>
+    view === 'all' ? true : view === 'active' ? product.active : !product.active,
+  );
+  const withdrawnCount = products.filter((product) => !product.active).length;
 
   return (
     <div className="p-4 space-y-3">
@@ -408,10 +468,44 @@ function CataloguePanel({
 
       {adding && <ProductForm onCancel={() => setAdding(false)} onSubmit={handleCreated} />}
 
+      <div className="flex items-center gap-1.5" role="group" aria-label="Catalogue filter">
+        {CATALOGUE_VIEWS.map((item) => {
+          const count =
+            item.value === 'all'
+              ? products.length
+              : item.value === 'active'
+                ? products.length - withdrawnCount
+                : withdrawnCount;
+          return (
+            <button
+              key={item.value}
+              onClick={() => setView(item.value)}
+              aria-pressed={view === item.value}
+              className={`rounded-full px-3 py-1.5 text-[12px] font-medium ${
+                view === item.value ? 'bg-brand text-white' : 'bg-neutral-100 text-black'
+              }`}
+            >
+              {item.label}
+              <span className={view === item.value ? 'ml-1.5 opacity-70' : 'ml-1.5 text-muted-foreground'}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {loading ? (
         <p className="text-[13px] text-muted-foreground py-4 text-center">Loading the catalogue…</p>
+      ) : visible.length === 0 ? (
+        <p className="text-[13px] text-muted-foreground py-4 text-center">
+          {view === 'withdrawn'
+            ? 'Nothing is withdrawn.'
+            : view === 'active'
+              ? 'Nothing is on the shelf right now.'
+              : 'The catalogue is empty for this market.'}
+        </p>
       ) : (
-        products.map((product) => (
+        visible.map((product) => (
           <div
             key={product.id}
             className={`rounded-xl border bg-white p-3 ${
@@ -444,7 +538,7 @@ function CataloguePanel({
               <div className="mt-2.5 flex items-center gap-1.5">
                 <button
                   onClick={() => handleStock(product, -1)}
-                  disabled={product.stock < 1}
+                  disabled={product.stock < 1 || busyId === product.id}
                   className="px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px] disabled:opacity-40"
                 >
                   −1
@@ -454,16 +548,28 @@ function CataloguePanel({
                 </span>
                 <button
                   onClick={() => handleStock(product, 1)}
-                  className="px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px]"
+                  disabled={busyId === product.id}
+                  className="px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px] disabled:opacity-40"
                 >
                   +1
                 </button>
-                <button
-                  onClick={() => handleToggle(product)}
-                  className="ml-auto px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px] text-brand"
-                >
-                  {product.active ? 'Withdraw' : 'Restore'}
-                </button>
+                {canWrite && (
+                  <button
+                    onClick={() =>
+                      product.active ? handleWithdraw(product) : handleRestore(product)
+                    }
+                    disabled={busyId !== null}
+                    className="ml-auto px-2.5 py-1.5 rounded-lg border border-neutral-300 text-[12px] text-brand disabled:opacity-40"
+                  >
+                    {busyId === product.id
+                      ? product.active
+                        ? 'Withdrawing…'
+                        : 'Restoring…'
+                      : product.active
+                        ? 'Withdraw'
+                        : 'Restore'}
+                  </button>
+                )}
               </div>
             </div>
           </div>

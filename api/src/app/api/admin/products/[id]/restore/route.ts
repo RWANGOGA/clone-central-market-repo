@@ -5,6 +5,7 @@ import { products, nowText } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
 import { describeStock, stockState } from '@/lib/stock';
 import { error, json } from '@/lib/http';
+import { recordActivity } from '@/lib/activity';
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -29,6 +30,20 @@ export async function POST(_request: Request, { params }: Ctx) {
     .set({ active: true, updatedAt: nowText as unknown as string })
     .where(eq(products.id, existing.id))
     .returning();
+
+  // The withdraw half of this already writes to the trail, and `product.restore`
+  // has been in the action list since it was drafted without anything ever
+  // emitting it. Bringing a line back is a decision worth naming.
+  await recordActivity({
+    action: 'product.restore',
+    entity: 'product',
+    entityId: updated.id,
+    before: { active: existing.active },
+    after: { active: true },
+    adminId: admin.id,
+    adminEmail: admin.email,
+    marketId: updated.marketId,
+  });
 
   return json({
     data: {
