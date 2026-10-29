@@ -56,7 +56,7 @@ export function ScreenHeader({ title, cartCount = 0, onCartClick, onMenuClick, b
             <button
               onClick={onMenuClick}
               aria-label="Open menu"
-              className="flex size-8 cursor-pointer items-center justify-center rounded-2xl text-foreground"
+              className="flex size-11 cursor-pointer items-center justify-center rounded-2xl text-foreground"
             >
               <span className="h-1.5 w-[18px]">
                 <MenuIcon />
@@ -72,7 +72,7 @@ export function ScreenHeader({ title, cartCount = 0, onCartClick, onMenuClick, b
             <button
               onClick={onCartClick}
               aria-label={cartCount > 0 ? `Basket, ${cartCount} items` : 'Basket, empty'}
-              className="relative size-8 cursor-pointer rounded-2xl text-foreground"
+              className="relative size-11 cursor-pointer rounded-2xl text-foreground"
             >
               <CartIcon />
               {cartCount > 0 && (

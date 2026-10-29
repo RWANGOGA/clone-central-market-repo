@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router';
+import { useState, type ReactNode } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router';
 import { MotionConfig } from 'framer-motion';
 import { CartProvider, useCart } from './lib/cartProvider';
 import { AuthProvider, useAuth, type CustomerInfo } from './lib/authProvider';
@@ -119,6 +119,8 @@ export default function App() {
 
 function AppShell() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const staffConsole = location.pathname.startsWith('/staff');
   const [isNavOpen, setIsNavOpen] = useState(false);
   const openMenu = () => setIsNavOpen(true);
 
@@ -210,9 +212,7 @@ function AppShell() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#f7f7f5] p-2 sm:p-4">
-      {/* Responsive shop shell: full width on small screens, bezel frame on md+. */}
-      <div className="max-w-[430px] mx-auto bg-white relative overflow-hidden rounded-[40px] shadow-2xl md:border-8 md:border-black md:rounded-[52px] h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-2rem)] md:max-h-[900px]">
+    <ShellFrame staff={staffConsole}>
         <Routes>
           <Route
             path="/"
@@ -362,6 +362,28 @@ function AppShell() {
           onNavigate={handleMenuNavigation}
           isLoggedIn={!!customerSession}
         />
+    </ShellFrame>
+  );
+}
+
+/**
+ * Two different frames for two different audiences.
+ *
+ * The shopper app is a phone: it keeps the Figma device bezel — a 430px column
+ * centred on the page, rounded and shadowed on md+ — because that is the shape
+ * the screens were drawn for. The staff console is a working tool with wide
+ * tables, grids and analytics. Forcing it into the same 430px shell made it
+ * unusable on a tablet or laptop, so it is rendered full-bleed and fills the
+ * viewport instead, letting its own panels flow to the available width.
+ */
+function ShellFrame({ staff, children }: { staff: boolean; children: ReactNode }) {
+  if (staff) {
+    return <div className="h-dvh bg-[#f7f7f5]">{children}</div>;
+  }
+  return (
+    <div className="min-h-dvh bg-[#f7f7f5] p-2 sm:p-4">
+      <div className="max-w-[430px] mx-auto bg-white relative overflow-hidden rounded-[40px] shadow-2xl md:border-8 md:border-black md:rounded-[52px] h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-2rem)] md:max-h-[900px]">
+        {children}
       </div>
     </div>
   );
