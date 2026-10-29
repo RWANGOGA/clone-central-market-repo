@@ -20,6 +20,23 @@ jobs:
       - run: npm run typecheck
         working-directory: api
 
+  # The front end had no type gate: `vite build` runs esbuild, which strips
+  # types without checking them, so errors that fail the API were invisible in
+  # the SPA. This mirrors the api typecheck job at the repo root, where the
+  # strict tsconfig added in Phase A lives, so the design foundation can't
+  # silently rot the same way again. It inherits the workflow-level triggers
+  # below, so it runs on PRs and on pushes to main.
+  web-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - run: npm ci --prefer-offline --no-audit --maxsockets 3
+      - run: npm run typecheck
+
   tests:
     runs-on: ubuntu-latest
     steps:
