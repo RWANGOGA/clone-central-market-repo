@@ -104,6 +104,10 @@ export async function recordMovement(
   if (nextState !== 'in_stock' && previousState === 'in_stock') {
     await executor.insert(notifications).values({
       type: 'stock',
+      // Pinned to the product's market: an unaddressed alert used to reach every
+      // market on the platform, which leaked one market's supply position to
+      // its competitors.
+      marketId: updated.marketId ?? null,
       title: nextState === 'out' ? `Out of stock: ${updated.name}` : `Low stock: ${updated.name}`,
       message: `${updated.name} is at ${updated.stock}${updated.unit}. The reorder level is ${threshold}.`,
     });

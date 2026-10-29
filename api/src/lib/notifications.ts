@@ -35,6 +35,8 @@ export async function createAdminNotification(params: {
 export async function createSystemNotification(params: {
   customerId?: number;
   adminId?: number;
+  /** The market the alert concerns; omit only for a genuine platform announcement. */
+  marketId?: number | null;
   type: NotificationType;
   title: string;
   message: string;
@@ -47,6 +49,10 @@ export async function createSystemNotification(params: {
 
   if (params.customerId) values.customerId = params.customerId;
   if (params.adminId) values.adminId = params.adminId;
+  // Left unset means the platform issued it. A null here is a boundary, not an
+  // absence: a market's own alert has to name its market or it becomes
+  // platform-only and that market never sees it.
+  if (params.marketId !== undefined) values.marketId = params.marketId;
 
   await db.insert(notifications).values(values as any);
 }

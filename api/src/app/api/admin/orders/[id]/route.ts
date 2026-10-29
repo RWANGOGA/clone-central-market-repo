@@ -165,6 +165,7 @@ export async function PATCH(request: Request, { params }: Ctx) {
     to: status,
     total: updated.total,
     currency: updated.currency,
+    marketId: updated.marketId ?? null,
     region: updated.region,
     district: updated.district,
     customerName: updated.customerName,

@@ -127,6 +127,7 @@ export async function POST(request: Request) {
       // Flag it for a refund rather than silently keeping the cash.
       await db.insert(notifications).values({
         type: 'payment',
+        marketId: order.marketId ?? null,
         title: `Refund due: ${order.reference}`,
         message: `Payment ${settled.reference} for ${settled.currency} ${settled.amount.toLocaleString('en-US')} succeeded, but order ${order.reference} is ${order.status}. Refund or investigate the duplicate payment.`,
       });
@@ -152,6 +153,7 @@ export async function POST(request: Request) {
         to: 'processing',
         total: order.total,
         currency: order.currency,
+        marketId: order.marketId ?? null,
         region: order.region,
         district: order.district,
         customerName: order.customerName,

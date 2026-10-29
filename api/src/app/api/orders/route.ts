@@ -233,6 +233,7 @@ export async function POST(request: Request) {
   publishOrderEvent({
     type: 'order.created', id: created.id, reference: created.reference, from: null,
     to: created.status, total: created.total, currency: created.currency,
+    marketId: created.marketId ?? null,
     region: created.region, district: created.district, customerName: created.customerName,
     at: created.createdAt,
   });

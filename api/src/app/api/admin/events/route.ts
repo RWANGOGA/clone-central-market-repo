@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/lib/catalogue';
 import { error } from '@/lib/http';
-import { subscribe, type OrderEvent } from '@/lib/orderEvents';
+import { marketFeedFilter, subscribe, type OrderEvent } from '@/lib/orderEvents';
 
 /**
  * Live order feed over Server-Sent Events.
@@ -42,9 +42,14 @@ export async function GET(request: Request) {
       send('retry: 3000\n\n');
       send(`event: ready\ndata: ${JSON.stringify({ connected: true, at: new Date().toISOString() })}\n\n`);
 
-      const unsubscribe = subscribe((event: OrderEvent) => {
-        send(`event: order\ndata: ${JSON.stringify(event)}\n\n`);
-      });
+      // Bounded by market, so an account pinned to one market never watches
+      // another market's customers check out. The platform tier passes no filter.
+      const unsubscribe = subscribe(
+        (event: OrderEvent) => {
+          send(`event: order\ndata: ${JSON.stringify(event)}\n\n`);
+        },
+        marketFeedFilter(admin),
+      );
 
       const heartbeat = setInterval(() => {
         if (closed) return;

@@ -353,6 +353,14 @@ export const notifications = pgTable('notifications', {
   id: serial('id').primaryKey(),
   customerId: integer('customer_id').references(() => customers.id, { onDelete: 'cascade' }),
   adminId: integer('admin_id').references(() => admins.id, { onDelete: 'cascade' }),
+  /**
+   * Which market an unaddressed alert concerns. A market id pins the alert to
+   * that market; null means the platform issued it as a genuine announcement and
+   * every market may read it. The leak this column closes is that market-specific
+   * alerts — a low-stock warning at one market, say — were written with no
+   * boundary at all and so reached every other market.
+   */
+  marketId: integer('market_id').references(() => markets.id, { onDelete: 'set null' }),
   type: text('type').notNull(),
   title: text('title').notNull(),
   message: text('message').notNull(),
@@ -363,6 +371,7 @@ export const notifications = pgTable('notifications', {
 }, (table) => [
   index('idx_notifications_customer').on(table.customerId, table.createdAt),
   index('idx_notifications_admin').on(table.adminId, table.createdAt),
+  index('idx_notifications_market').on(table.marketId, table.createdAt),
 ]);
 
 /**

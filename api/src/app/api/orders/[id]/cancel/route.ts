@@ -96,6 +96,7 @@ export async function POST(request: Request, { params }: Ctx) {
     to: cancelled.status,
     total: cancelled.total,
     currency: cancelled.currency,
+    marketId: cancelled.marketId ?? null,
     region: cancelled.region,
     district: cancelled.district,
     customerName: cancelled.customerName,
