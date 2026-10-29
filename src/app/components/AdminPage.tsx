@@ -46,6 +46,7 @@ import {
 } from '../lib/adminApi';
 import { getActiveMarket, setActiveMarket } from '../lib/activeMarket';
 import AdminGate from './AdminGate';
+import AdminSidebar from './admin/AdminSidebar';
 import OrderQueue from './OrderQueue';
 import StockBadge from './StockBadge';
 import { describeStockOf } from '../lib/stockApi';
@@ -75,8 +76,11 @@ type CatalogueView = (typeof CATALOGUE_VIEWS)[number]['value'];
  * tests for all four stayed, because supplier-led inflow is still the plan, but
  * none of them is part of running a market's day and a console with twelve
  * equally-weighted tabs made that day hard to find. See ROADMAP.md.
+ *
+ * Exported because the rail groups these into sections and must cover every one:
+ * it imports the type only, so nothing here imports back at runtime.
  */
-type Tab =
+export type Tab =
   | 'orders'
   | 'catalogue'
   | 'inventory'
@@ -225,109 +229,83 @@ function StaffShell({
   ];
 
   return (
-    <div className="h-full overflow-y-auto bg-[#f7f7f5]">
-      <div className="sticky top-0 bg-white border-b border-neutral-200 px-4 py-3 z-10">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-[16px] font-serif font-medium text-brand leading-[22px]">
-              Staff
-            </h1>
-            <p className="text-[11px] font-normal text-muted-foreground">
-              {admin.name} · {ADMIN_ROLE_LABELS[admin.role] ?? admin.role}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            {isPlatform && markets.length > 1 && (
-              <label className="flex items-center gap-1.5">
-                <span className="text-[11px] text-muted-foreground">Market</span>
-                <select
-                  value={market === null ? '' : String(market)}
-                  onChange={(event) =>
-                    chooseMarket(event.target.value === '' ? null : Number(event.target.value))
-                  }
-                  className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-[12px]"
+    <div className="flex h-full bg-[#f7f7f5]">
+      <AdminSidebar
+        tabs={tabs}
+        activeTab={tab}
+        onSelectTab={setTab}
+        isPlatform={isPlatform}
+        marketName={marketName}
+        activeMarket={market}
+        markets={markets}
+        onChooseMarket={chooseMarket}
+      />
+
+      {/*
+        Rail and column scroll on their own. A long list of areas cannot push the
+        market label off the bottom of the rail, and a long table cannot take the
+        account line away with it when it scrolls. That is also why the header is
+        no longer sticky: nothing scrolls under it any more.
+      */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="shrink-0 border-b border-neutral-200 bg-white px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-[16px] font-serif font-medium text-brand leading-[22px]">
+                Staff
+              </h1>
+              <p className="text-[11px] font-normal text-muted-foreground">
+                {admin.name} · {ADMIN_ROLE_LABELS[admin.role] ?? admin.role}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {onClose && (
+                <button
+                  onClick={onClose}
+                  className="text-[12px] font-medium text-brand"
                 >
-                  <option value="">All markets</option>
-                  {markets.map((item) => (
-                    <option key={item.id} value={String(item.id)}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-            {!isPlatform && (
-              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-medium text-brand">
-                {marketName}
-              </span>
-            )}
-            {onClose && (
+                  Back to shop
+                </button>
+              )}
               <button
-                onClick={onClose}
-                className="text-[12px] font-medium text-brand"
+                onClick={onSignOut}
+                className="text-[12px] font-normal text-muted-foreground"
               >
-                Back to shop
+                Sign out
               </button>
+            </div>
+          </div>
+
+          {notice && (
+            <p className="mt-2 rounded-lg border border-brand/25 bg-brand/8 px-3 py-2 text-[13px] text-brand font-normal">
+              {notice}
+            </p>
+          )}
+          {error && (
+            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-normal">
+              {error}
+            </p>
+          )}
+        </header>
+
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {/* Changing market remounts the panel, so nothing cached from the
+              previous market is left on screen while the new one loads. */}
+          <div key={market ?? 'all'} className={tab === 'orders' ? '' : 'p-4'}>
+            {tab === 'orders' && <OrderQueue canRefund={!isStaff} embedded />}
+            {tab === 'catalogue' && <CataloguePanel admin={admin} flash={flash} fail={fail} />}
+            {tab === 'inventory' && <InventoryPanel flash={flash} fail={fail} />}
+            {tab === 'analytics' && <AnalyticsPanel flash={flash} fail={fail} />}
+            {tab === 'customers' && <CustomersPanel flash={flash} fail={fail} />}
+            {tab === 'admins' && canManageAdmins && (
+              <AdminsPanel admin={admin} markets={markets} flash={flash} fail={fail} />
             )}
-            <button
-              onClick={onSignOut}
-              className="text-[12px] font-normal text-muted-foreground"
-            >
-              Sign out
-            </button>
+            {tab === 'people' && <PeoplePanel marketId={market} flash={flash} fail={fail} />}
+            {tab === 'markets' && isSuper && (
+              <MarketsPanel markets={markets} reload={refreshMarkets} flash={flash} fail={fail} />
+            )}
           </div>
         </div>
-
-        <div className="mt-2 flex gap-1 overflow-x-auto pb-1">
-          {tabs.map((item) => (
-            <button
-              key={item.value}
-              disabled={item.disabled}
-              onClick={(event) => {
-                setTab(item.value);
-                // The strip is wider than the phone: keep the chosen pill visible.
-                event.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest' });
-              }}
-              className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[12px] font-medium ${
-                tab === item.value
-                  ? 'bg-brand text-white'
-                  : item.disabled
-                    ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                    : 'bg-neutral-100 text-black'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        {notice && (
-          <p className="mt-2 rounded-lg border border-brand/25 bg-brand/8 px-3 py-2 text-[13px] text-brand font-normal">
-            {notice}
-          </p>
-        )}
-        {error && (
-          <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-normal">
-            {error}
-          </p>
-        )}
-      </div>
-
-      {/* Changing market remounts the panel, so nothing cached from the
-          previous market is left on screen while the new one loads. */}
-      <div key={market ?? 'all'} className={tab === 'orders' ? '' : 'p-4'}>
-        {tab === 'orders' && <OrderQueue canRefund={!isStaff} embedded />}
-        {tab === 'catalogue' && <CataloguePanel admin={admin} flash={flash} fail={fail} />}
-        {tab === 'inventory' && <InventoryPanel flash={flash} fail={fail} />}
-        {tab === 'analytics' && <AnalyticsPanel flash={flash} fail={fail} />}
-        {tab === 'customers' && <CustomersPanel flash={flash} fail={fail} />}
-        {tab === 'admins' && canManageAdmins && (
-          <AdminsPanel admin={admin} markets={markets} flash={flash} fail={fail} />
-        )}
-        {tab === 'people' && <PeoplePanel marketId={market} flash={flash} fail={fail} />}
-        {tab === 'markets' && isSuper && (
-          <MarketsPanel markets={markets} reload={refreshMarkets} flash={flash} fail={fail} />
-        )}
       </div>
     </div>
   );
