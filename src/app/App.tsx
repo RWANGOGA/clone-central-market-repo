@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router';
+import { MotionConfig } from 'framer-motion';
 import { CartProvider, useCart } from './lib/cartProvider';
 import { AuthProvider, useAuth, type CustomerInfo } from './lib/authProvider';
 import { createOrder } from './lib/customerApi';
@@ -101,11 +102,17 @@ const BASENAME = import.meta.env.BASE_URL.replace(/\/+$/, '');
 export default function App() {
   return (
     <BrowserRouter basename={BASENAME || undefined}>
-      <CartProvider>
-        <AuthProvider>
-          <AppShell />
-        </AuthProvider>
-      </CartProvider>
+      {/* framer-motion drives its animations in JavaScript, setting transforms
+          frame by frame — the CSS prefers-reduced-motion block in globals.css
+          cannot reach them. This honours the same user preference for the drawer
+          and overlay motion. */}
+      <MotionConfig reducedMotion="user">
+        <CartProvider>
+          <AuthProvider>
+            <AppShell />
+          </AuthProvider>
+        </CartProvider>
+      </MotionConfig>
     </BrowserRouter>
   );
 }

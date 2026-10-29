@@ -68,37 +68,42 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
           </div>
 
           <div className="space-y-1">
-            <label className="block text-[13px] font-normal text-muted-foreground">
+            <label htmlFor="staff-email" className="block text-[13px] font-normal text-muted-foreground">
               Email
             </label>
             <input
+              id="staff-email"
               type="email"
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@market.ug"
               className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-[16px] font-normal"
+              aria-describedby={error ? 'staff-error' : undefined}
             />
           </div>
 
           <div className="space-y-1">
-            <label className="block text-[13px] font-normal text-muted-foreground">
+            <label htmlFor="staff-password" className="block text-[13px] font-normal text-muted-foreground">
               Password
             </label>
             <div className="relative">
               <input
+                id="staff-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"
                 className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 pr-10 text-[16px] font-normal"
+                aria-describedby={error ? 'staff-error' : undefined}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-pressed={showPassword}
               >
                 {showPassword ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +120,7 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
           </div>
 
           {error && (
-            <p className="text-[13px] leading-[19px] font-normal text-red-600">
+            <p id="staff-error" role="alert" className="text-[13px] leading-[19px] font-normal text-red-600">
               {error}
             </p>
           )}

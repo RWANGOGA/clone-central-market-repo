@@ -19,7 +19,7 @@ import {
 import { formatUgx } from '../lib/currency';
 
 const STATUS_TONE: Record<OrderStatus, string> = {
-  pending: 'bg-brand-gold/12 text-brand-gold border-brand-gold/25',
+  pending: 'bg-brand-gold/12 text-brand-gold-deep border-brand-gold/25',
   processing: 'bg-brand/10 text-brand border-brand/20',
   shipped: 'bg-info/10 text-info border-info/20',
   delivered: 'bg-success/10 text-success border-success/20',
@@ -28,7 +28,7 @@ const STATUS_TONE: Record<OrderStatus, string> = {
 
 const MONEY_TONE: Record<MoneyState, string> = {
   unpaid: 'bg-neutral-100 text-muted-foreground border-neutral-200',
-  cod_due: 'bg-brand-gold/12 text-brand-gold border-brand-gold/25',
+  cod_due: 'bg-brand-gold/12 text-brand-gold-deep border-brand-gold/25',
   paid: 'bg-success/10 text-success border-success/20',
   part_refunded: 'bg-info/10 text-info border-info/20',
   refunded: 'bg-neutral-100 text-muted-foreground border-neutral-200',

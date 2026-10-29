@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface MenuProps {
@@ -8,6 +9,54 @@ interface MenuProps {
 }
 
 export default function Menu({ isOpen, onClose, onNavigate, isLoggedIn = false }: MenuProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+
+  // While the drawer is open it behaves like a modal dialog: Escape closes it
+  // and Tab is kept inside so a keyboard user cannot wander into the page
+  // behind it. Focus is handed back to the opener when it closes.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    restoreFocusRef.current = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'button, a[href], input, [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+    focusables()[0]?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
+  // Return focus to whatever opened the drawer once it closes.
+  useEffect(() => {
+    if (!isOpen) restoreFocusRef.current?.focus?.();
+  }, [isOpen]);
+
   const handleNavigation = (screen: string) => {
     onNavigate(screen);
     onClose();
@@ -42,11 +91,16 @@ export default function Menu({ isOpen, onClose, onNavigate, isLoggedIn = false }
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="absolute inset-0 bg-black/50 z-40"
+            aria-hidden="true"
             onClick={onClose}
           />
 
           {/* Menu */}
           <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
             initial={{ x: "-100%" }}
             animate={{ x: "0%" }}
             exit={{ x: "-100%" }}
@@ -96,7 +150,7 @@ interface MenuItemsProps {
 
 function MenuItems({ onNavigate, items }: MenuItemsProps) {
   return (
-    <div className="absolute left-4 top-[95px]">
+    <nav aria-label="Primary" className="absolute left-4 top-[95px]">
       <div className="box-border content-stretch flex flex-col gap-8 items-start justify-start p-0 relative">
         {items.map((item) => (
           <button
@@ -110,7 +164,7 @@ function MenuItems({ onNavigate, items }: MenuItemsProps) {
           </button>
         ))}
       </div>
-    </div>
+    </nav>
   );
 }
 
@@ -122,6 +176,7 @@ function CloseButton({ onClick }: CloseButtonProps) {
   return (
     <button
       onClick={onClick}
+      aria-label="Close menu"
       className="absolute block cursor-pointer left-[14px] overflow-visible rounded-2xl size-6 top-[35px] hover:opacity-80 transition-opacity"
     >
       <div className="absolute h-[9.5px] left-[5px] top-[5px] w-[9.6px]">

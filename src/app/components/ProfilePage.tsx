@@ -869,8 +869,9 @@ export default function ProfilePage({
               {isEditing ? (
                 <div className="space-y-3 font-normal text-[14px]">
                   <div>
-                    <label className="text-[12px] text-muted-foreground block mb-1">Full Name</label>
+                    <label htmlFor="pf-name" className="text-[12px] text-muted-foreground block mb-1">Full Name</label>
                     <input
+                      id="pf-name"
                       type="text"
                       value={editedInfo.fullName}
                       onChange={(e) => setEditedInfo({ ...editedInfo, fullName: e.target.value })}
@@ -878,8 +879,9 @@ export default function ProfilePage({
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] text-muted-foreground block mb-1">Address</label>
+                    <label htmlFor="pf-address" className="text-[12px] text-muted-foreground block mb-1">Address</label>
                     <input
+                      id="pf-address"
                       type="text"
                       value={editedInfo.address}
                       onChange={(e) => setEditedInfo({ ...editedInfo, address: e.target.value })}
@@ -887,8 +889,9 @@ export default function ProfilePage({
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] text-muted-foreground block mb-1">Phone number</label>
+                    <label htmlFor="pf-phone" className="text-[12px] text-muted-foreground block mb-1">Phone number</label>
                     <input
+                      id="pf-phone"
                       type="tel"
                       value={editedInfo.phone}
                       onChange={(e) => setEditedInfo({ ...editedInfo, phone: e.target.value })}
@@ -900,8 +903,9 @@ export default function ProfilePage({
                     </p>
                   </div>
                   <div>
-                    <label className="text-[12px] text-muted-foreground block mb-1">Email (optional)</label>
+                    <label htmlFor="pf-email" className="text-[12px] text-muted-foreground block mb-1">Email (optional)</label>
                     <input
+                      id="pf-email"
                       type="email"
                       value={editedEmail}
                       onChange={(e) => setEditedEmail(e.target.value)}
@@ -911,8 +915,9 @@ export default function ProfilePage({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[12px] text-muted-foreground block mb-1">Region</label>
+                      <label htmlFor="pf-region" className="text-[12px] text-muted-foreground block mb-1">Region</label>
                       <input
+                        id="pf-region"
                         type="text"
                         value={editedInfo.region}
                         onChange={(e) => setEditedInfo({ ...editedInfo, region: e.target.value })}
@@ -921,8 +926,9 @@ export default function ProfilePage({
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-muted-foreground block mb-1">District / town</label>
+                      <label htmlFor="pf-district" className="text-[12px] text-muted-foreground block mb-1">District / town</label>
                       <input
+                        id="pf-district"
                         type="text"
                         value={editedInfo.district}
                         onChange={(e) => setEditedInfo({ ...editedInfo, district: e.target.value })}
@@ -1014,8 +1020,9 @@ export default function ProfilePage({
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[12px] text-muted-foreground block mb-1">Label</label>
+                      <label htmlFor="addr-label" className="text-[12px] text-muted-foreground block mb-1">Label</label>
                       <input
+                        id="addr-label"
                         type="text"
                         value={addressEditor.draft.label}
                         onChange={(e) => updateAddressDraft('label', e.target.value)}
@@ -1024,8 +1031,9 @@ export default function ProfilePage({
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-muted-foreground block mb-1">Full name</label>
+                      <label htmlFor="addr-name" className="text-[12px] text-muted-foreground block mb-1">Full name</label>
                       <input
+                        id="addr-name"
                         type="text"
                         value={addressEditor.draft.fullName}
                         onChange={(e) => updateAddressDraft('fullName', e.target.value)}
@@ -1034,8 +1042,9 @@ export default function ProfilePage({
                     </div>
                   </div>
                   <div>
-                    <label className="text-[12px] text-muted-foreground block mb-1">Phone number</label>
+                    <label htmlFor="addr-phone" className="text-[12px] text-muted-foreground block mb-1">Phone number</label>
                     <input
+                      id="addr-phone"
                       type="tel"
                       value={addressEditor.draft.phone}
                       onChange={(e) => updateAddressDraft('phone', e.target.value)}
@@ -1045,8 +1054,9 @@ export default function ProfilePage({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[12px] text-muted-foreground block mb-1">Region</label>
+                      <label htmlFor="addr-region" className="text-[12px] text-muted-foreground block mb-1">Region</label>
                       <input
+                        id="addr-region"
                         type="text"
                         value={addressEditor.draft.region}
                         onChange={(e) => updateAddressDraft('region', e.target.value)}
@@ -1055,8 +1065,9 @@ export default function ProfilePage({
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-muted-foreground block mb-1">District / town</label>
+                      <label htmlFor="addr-district" className="text-[12px] text-muted-foreground block mb-1">District / town</label>
                       <input
+                        id="addr-district"
                         type="text"
                         value={addressEditor.draft.district}
                         onChange={(e) => updateAddressDraft('district', e.target.value)}
@@ -1066,8 +1077,9 @@ export default function ProfilePage({
                     </div>
                   </div>
                   <div>
-                    <label className="text-[12px] text-muted-foreground block mb-1">Delivery address and landmark</label>
+                    <label htmlFor="addr-address" className="text-[12px] text-muted-foreground block mb-1">Delivery address and landmark</label>
                     <input
+                      id="addr-address"
                       type="text"
                       value={addressEditor.draft.address}
                       onChange={(e) => updateAddressDraft('address', e.target.value)}

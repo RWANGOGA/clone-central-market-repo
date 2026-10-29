@@ -107,7 +107,10 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] leading-[19px] font-normal text-red-700">
+      <div
+        role="alert"
+        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] leading-[19px] font-normal text-red-700"
+      >
         {error}
       </div>
     );
@@ -135,7 +138,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                 {level.label}
               </p>
               {parentChosen && options.length === 0 && (
-                <p className="text-[11px] font-normal text-brand-gold">
+                <p className="text-[11px] font-normal text-brand-gold-deep">
                   none recorded
                 </p>
               )}
@@ -147,6 +150,8 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                 disabled={disabled}
                 onClick={() => setOpenLevel(isOpen ? null : level.key)}
                 aria-expanded={isOpen}
+                aria-haspopup="true"
+                aria-label={level.label}
                 className={`w-full border rounded-lg px-4 py-2 text-left font-normal text-[16px] flex items-center justify-between ${
                   disabled
                     ? 'bg-neutral-100 border-neutral-200 text-caption cursor-not-allowed'

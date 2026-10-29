@@ -213,8 +213,9 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
             )}
 
             {/* Full Name */}
-            <FormField label="Full name">
+            <FormField id="checkout-name" label="Full name">
               <Input
+                id="checkout-name"
                 value={formData.fullName}
                 onChange={(e) => updateFormField('fullName', e.target.value)}
                 placeholder="e.g. Namukasa Allen"
@@ -224,9 +225,10 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
             </FormField>
 
             {/* Phone */}
-            <FormField label="Phone number">
+            <FormField id="checkout-phone" label="Phone number">
               <div className="w-full">
                 <Input
+                  id="checkout-phone"
                   value={formData.phone}
                   onChange={handlePhoneChange}
                   inputMode="tel"
@@ -235,9 +237,11 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
                   className={`bg-white border rounded-lg px-4 py-2 w-full font-normal text-[16px] text-black ${
                     showPhoneError ? 'border-red-500' : 'border-neutral-200'
                   }`}
+                  aria-invalid={showPhoneError}
+                  aria-describedby={showPhoneError ? 'checkout-phone-error' : undefined}
                 />
                 {showPhoneError && (
-                  <p className="mt-1 text-red-500 text-[12px] font-normal">
+                  <p id="checkout-phone-error" className="mt-1 text-red-500 text-[12px] font-normal">
                     Enter a Ugandan number, for example 0772 123 456
                   </p>
                 )}
@@ -264,8 +268,9 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
             />
 
             {/* Delivery address */}
-            <FormField label="Delivery address and landmark">
+            <FormField id="checkout-address" label="Delivery address and landmark">
               <Input
+                id="checkout-address"
                 value={formData.address}
                 onChange={(e) => updateFormField('address', e.target.value)}
                 placeholder="Plot number, street and nearest landmark"
@@ -292,17 +297,21 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
 }
 
 interface FormFieldProps {
+  id: string;
   label: string;
   children: React.ReactNode;
 }
 
-function FormField({ label, children }: FormFieldProps) {
+function FormField({ id, label, children }: FormFieldProps) {
   return (
     <div className="relative shrink-0 w-full">
       <div className="box-border content-stretch flex flex-col gap-1 items-start justify-start p-0 relative w-full">
-        <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-muted-foreground text-[14px] text-left tracking-[-0.14px] w-full">
-          <p className="block leading-[24px]">{label}</p>
-        </div>
+        <label
+          htmlFor={id}
+          className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-muted-foreground text-[14px] text-left tracking-[-0.14px] w-full"
+        >
+          <span className="block leading-[24px]">{label}</span>
+        </label>
         {children}
       </div>
     </div>

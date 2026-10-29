@@ -281,8 +281,9 @@ export default function PaymentPage({
               )}
 
               {channel === 'mobile_money' && (
-                <Field label="Mobile money number">
+                <Field id="pay-phone" label="Mobile money number">
                   <Input
+                    id="pay-phone"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     inputMode="tel"
@@ -314,8 +315,9 @@ export default function PaymentPage({
               )}
 
               {channel === 'wallet' && (
-                <Field label="Wallet number or address">
+                <Field id="pay-wallet" label="Wallet number or address">
                   <Input
+                    id="pay-wallet"
                     value={walletId}
                     onChange={(e) => setWalletId(e.target.value)}
                     placeholder="allen@stanbic"
@@ -464,10 +466,10 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <p className="text-[14px] font-normal text-muted-foreground">{label}</p>
+      <label htmlFor={id} className="text-[14px] font-normal text-muted-foreground">{label}</label>
       {children}
     </div>
   );
@@ -479,7 +481,10 @@ function Notice({ tone, children }: { tone: 'error' | 'success'; children: React
       ? 'border-red-200 bg-red-50 text-red-700'
       : 'border-brand/25 bg-brand/8 text-brand';
   return (
-    <div className={`rounded-lg border px-3 py-2 text-[13px] leading-[19px] font-normal ${styles}`}>
+    <div
+      role={tone === 'error' ? 'alert' : 'status'}
+      className={`rounded-lg border px-3 py-2 text-[13px] leading-[19px] font-normal ${styles}`}
+    >
       {children}
     </div>
   );
@@ -598,7 +603,7 @@ function Header({
 
       <div className="absolute left-6 right-6 top-[103px]">
         <div className="flex flex-row font-normal items-center justify-start w-full">
-          <PageTitle>Checkout</PageTitle>
+          <PageTitle>Payment</PageTitle>
           <button
             onClick={onBack}
             className="cursor-pointer flex items-center font-normal not-italic shrink-0 text-brand text-[14px] tracking-[-0.14px]"

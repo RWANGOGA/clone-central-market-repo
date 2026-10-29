@@ -16,8 +16,8 @@ const TONE = {
     label: 'In stock',
   },
   low: {
-    text: 'text-brand-gold',
-    chip: 'bg-brand-gold/12 text-brand-gold border-brand-gold/25',
+    text: 'text-brand-gold-deep',
+    chip: 'bg-brand-gold/12 text-brand-gold-deep border-brand-gold/25',
     bar: 'bg-brand-gold',
     label: 'Low stock',
   },
