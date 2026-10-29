@@ -532,3 +532,14 @@ Minimum viable and defensible:
   every order draw-down picks one.
 - **Customer accounts.** `customers` is keyed on phone with no password. Saved
   baskets and reorder history do not need one; a customer login does.
+- **Procurement, promo codes and the activity log in the staff console.** The
+  market-scoped console cut those four tabs and their panels from
+  `src/app/components/AdminPage.tsx`, and with them the client wrappers no screen
+  was left calling. Nothing else moved: `suppliers`, `purchase_orders`, `promos`
+  and `admin_activity_log` keep their tables, their `/api/admin/*` routes and
+  their tests, because this file names supplier-led inflow as what the real work
+  needs (Phase 2) and instruments every purchase order and supplier write in
+  Phase 4. The removal is presentational and deferred rather than reversed — a
+  console whose twelve tabs all weighed the same buried the day's work (orders,
+  catalogue, stock) behind screens no market is running yet. Bringing a screen
+  back means adding a tab and a panel, not rebuilding a route.

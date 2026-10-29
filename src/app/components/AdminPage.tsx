@@ -2,21 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   adjustInventory,
   analyticsExportUrl,
-  cancelPurchaseOrder,
   changePassword,
   createAdmin,
   createProduct,
-  createPromo,
   createMarket,
-  createPurchaseOrder,
-  createSupplier,
   createWorker,
   currentAdmin,
   deactivateCustomer,
   fileToDataUrl,
   getForecast,
   getAnalyticsOverview,
-  listActivityLog,
   listAdminProducts,
   listAdmins,
   listCustomers,
@@ -24,24 +19,17 @@ import {
   listMarkets,
   listWorkers,
   listProductPerformance,
-  listPromos,
-  listPurchaseOrders,
   listRegionalDemand,
   listSalesTrend,
-  listSuppliers,
-  receivePurchaseOrder,
   restoreProduct,
-  setPromoActive,
   signOut,
   updateProduct,
   updateAdmin,
   updateWorker,
   withdrawProduct,
-  type ActivityLogRow,
   type AdminAccount,
   type AdminIdentity,
   type AdminProduct,
-  type AdminPromo,
   type AdminRole,
   type AnalyticsOverview,
   type CustomerRow,
@@ -51,12 +39,9 @@ import {
   type WorkerRow,
   type ProductDraft,
   type ProductPerformanceRow,
-  type PromoDraft,
-  type PurchaseOrderRow,
   type RegionalDemandRow,
   type SalesTrendPoint,
   type StockMovementRow,
-  type SupplierRow,
   WORKER_KINDS,
 } from '../lib/adminApi';
 import { getActiveMarket, setActiveMarket } from '../lib/activeMarket';
@@ -84,15 +69,18 @@ const CATALOGUE_VIEWS = [
 
 type CatalogueView = (typeof CATALOGUE_VIEWS)[number]['value'];
 
+/**
+ * The console's eight areas. Procurement (purchase orders, suppliers), promo
+ * codes and the activity log are deliberately not here: the routes, tables and
+ * tests for all four stayed, because supplier-led inflow is still the plan, but
+ * none of them is part of running a market's day and a console with twelve
+ * equally-weighted tabs made that day hard to find. See ROADMAP.md.
+ */
 type Tab =
   | 'orders'
   | 'catalogue'
   | 'inventory'
-  | 'purchase-orders'
-  | 'suppliers'
-  | 'promotions'
   | 'analytics'
-  | 'activity'
   | 'admins'
   | 'customers'
   | 'markets'
@@ -228,14 +216,10 @@ function StaffShell({
       : [
           { value: 'catalogue' as const, label: 'Catalogue' },
           { value: 'inventory' as const, label: 'Inventory' },
-          { value: 'purchase-orders' as const, label: 'Purchase orders' },
-          { value: 'suppliers' as const, label: 'Suppliers' },
-          { value: 'promotions' as const, label: 'Promotions' },
           { value: 'analytics' as const, label: 'Analytics' },
           { value: 'people' as const, label: 'People' },
         ]),
     ...(isSuper ? [{ value: 'markets' as const, label: 'Markets' }] : []),
-    { value: 'activity', label: 'Activity log' },
     { value: 'customers', label: 'Customers' },
     ...(canManageAdmins ? [{ value: 'admins' as const, label: 'Admins' }] : []),
   ];
@@ -335,11 +319,7 @@ function StaffShell({
         {tab === 'orders' && <OrderQueue canRefund={!isStaff} embedded />}
         {tab === 'catalogue' && <CataloguePanel admin={admin} flash={flash} fail={fail} />}
         {tab === 'inventory' && <InventoryPanel flash={flash} fail={fail} />}
-        {tab === 'purchase-orders' && <PurchaseOrdersPanel flash={flash} fail={fail} />}
-        {tab === 'suppliers' && <SuppliersPanel flash={flash} fail={fail} />}
-        {tab === 'promotions' && <PromotionsPanel flash={flash} fail={fail} />}
         {tab === 'analytics' && <AnalyticsPanel flash={flash} fail={fail} />}
-        {tab === 'activity' && <ActivityPanel fail={fail} />}
         {tab === 'customers' && <CustomersPanel flash={flash} fail={fail} />}
         {tab === 'admins' && canManageAdmins && (
           <AdminsPanel admin={admin} markets={markets} flash={flash} fail={fail} />
@@ -876,285 +856,6 @@ function InventoryPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
   );
 }
 
-/* ---------------- Purchase Orders ---------------- */
-
-function PurchaseOrdersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m: string) => void }) {
-  const [orders, setOrders] = useState<PurchaseOrderRow[]>([]);
-  const [suppliers, setSuppliers] = useState<SupplierRow[]>([]);
-  const [products, setProducts] = useState<AdminProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [adding, setAdding] = useState(false);
-  const [supplierId, setSupplierId] = useState<number | null>(null);
-  const [productId, setProductId] = useState<number | null>(null);
-  const [quantity, setQuantity] = useState('1');
-  const [unitPrice, setUnitPrice] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  const load = useCallback(async () => {
-    const [po, s, p] = await Promise.all([
-      listPurchaseOrders({ status: statusFilter || undefined }),
-      listSuppliers(),
-      listAdminProducts(),
-    ]);
-    setLoading(false);
-    if (!po) return fail('Could not reach the service.');
-    if (!po.ok) return fail(po.error);
-    setOrders(po.data.data);
-    if (s && s.ok) setSuppliers(s.data.data);
-    if (p && p.ok) setProducts(p.data);
-  }, [fail, statusFilter]);
-
-  useEffect(() => { load(); }, [load]);
-
-  const create = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (supplierId == null) return fail('Choose a supplier.');
-    if (productId == null) return fail('Choose a product.');
-    const qty = Number(quantity);
-    const price = Number(unitPrice || 0);
-    if (!Number.isInteger(qty) || qty < 1) return fail('Quantity must be at least 1.');
-    if (!Number.isInteger(price) || price < 0) return fail('Unit price must be zero or more.');
-    setBusy(true);
-    const result = await createPurchaseOrder({
-      supplierId,
-      items: [{ productId, quantity: qty, unitPrice: price }],
-    });
-    setBusy(false);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    flash(`Purchase order ${result.data.reference} sent.`);
-    setAdding(false);
-    setSupplierId(null); setProductId(null); setQuantity('1'); setUnitPrice('');
-    await load();
-  };
-
-  const handleCancel = async (order: PurchaseOrderRow) => {
-    if (!window.confirm(`Cancel ${order.reference}?`)) return;
-    const result = await cancelPurchaseOrder(order.id);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    flash('Cancelled.');
-    await load();
-  };
-
-  const handleReceive = async (order: PurchaseOrderRow) => {
-    const result = await receivePurchaseOrder(order.id);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    flash(`Received ${order.reference}; stock was added.`);
-    await load();
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="flex gap-2 items-end">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
-        >
-          <option value="">All statuses</option>
-          <option>sent</option>
-          <option>received</option>
-          <option>cancelled</option>
-        </select>
-        <button
-          onClick={() => setAdding((open) => !open)}
-          className="bg-brand text-white rounded-lg px-3 py-2 text-[13px]"
-        >
-          {adding ? 'Close' : 'New'}
-        </button>
-      </div>
-
-      {adding && (
-        <form onSubmit={create} className="space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
-          <select
-            value={supplierId ?? ''}
-            onChange={(e) => setSupplierId(e.target.value ? Number(e.target.value) : null)}
-            className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] bg-white"
-          >
-            <option value="">Choose a supplier</option>
-            {suppliers.map((supplier) => (
-              <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
-            ))}
-          </select>
-          <select
-            value={productId ?? ''}
-            onChange={(e) => setProductId(e.target.value ? Number(e.target.value) : null)}
-            className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-[13px] bg-white"
-          >
-            <option value="">Choose a product</option>
-            {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name} — {product.stock} {product.unit} left
-              </option>
-            ))}
-          </select>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              min={1}
-              placeholder="Quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
-            />
-            <input
-              type="number"
-              min={0}
-              placeholder="Unit price (UGX)"
-              value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
-              className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
-            />
-          </div>
-          {suppliers.length === 0 && (
-            <p className="text-[11px] text-muted-foreground">Add a supplier first on the Suppliers tab.</p>
-          )}
-          <button
-            type="submit"
-            disabled={busy || supplierId == null || productId == null}
-            className="w-full rounded-lg bg-brand py-2 text-[13px] text-white disabled:opacity-40"
-          >
-            {busy ? 'Sending…' : 'Create purchase order'}
-          </button>
-        </form>
-      )}
-
-      {loading ? (
-        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
-      ) : orders.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground py-4 text-center">No purchase orders.</p>
-      ) : (
-        <table className="w-full text-left border-collapse text-[13px]">
-          <thead>
-            <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-muted-foreground font-normal">Order</th>
-              <th className="pb-2 text-muted-foreground font-normal">Status</th>
-              <th className="pb-2 text-muted-foreground font-normal text-right">Raised</th>
-              <th className="pb-2 text-muted-foreground font-normal text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((o) => (
-              <tr key={o.id} className="border-b border-neutral-100 align-top">
-                {/* Supplier and expected arrival are folded under the reference
-                    rather than given columns of their own: six columns at phone
-                    width squeezed the dates until "Expected" and "Created"
-                    printed on top of each other. */}
-                <td className="py-2 pr-2">
-                  <span className="block break-all">{o.reference}</span>
-                  <span className="block text-[11px] text-muted-foreground">
-                    {suppliers.find((s) => s.id === o.supplierId)?.name ?? `Supplier ${o.supplierId}`}
-                  </span>
-                  {o.expectedAt && (
-                    <span className="block text-[11px] text-muted-foreground tabular-nums">
-                      due {new Date(o.expectedAt).toLocaleDateString()}
-                    </span>
-                  )}
-                </td>
-                <td className="py-2 pr-2">{o.status}</td>
-                <td className="py-2 text-right text-[12px] text-muted-foreground whitespace-nowrap tabular-nums">
-                  {new Date(o.createdAt).toLocaleDateString()}
-                </td>
-                <td className="py-2 text-right whitespace-nowrap">
-                  {o.status === 'sent' && (
-                    <>
-                      <button
-                        onClick={() => handleReceive(o)}
-                        className="mr-2 text-[12px] text-brand underline underline-offset-2"
-                      >
-                        Receive
-                      </button>
-                      <button
-                        onClick={() => handleCancel(o)}
-                        className="text-[12px] text-red-600 underline underline-offset-2"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
-}
-
-/* ---------------- Suppliers ---------------- */
-
-function SuppliersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m: string) => void }) {
-  const [suppliers, setSuppliers] = useState<SupplierRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState('');
-
-  const load = useCallback(async () => {
-    const result = await listSuppliers();
-    setLoading(false);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    setSuppliers(result.data.data);
-  }, [fail]);
-
-  useEffect(() => { load(); }, [load]);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    const result = await createSupplier({ name: name.trim() });
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    setName('');
-    flash('Supplier added.');
-    await load();
-  };
-
-  return (
-    <div className="space-y-3">
-      <SectionTitle size="small" family="label">Suppliers</SectionTitle>
-      <form onSubmit={submit} className="flex gap-2">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Supplier name"
-          className="flex-1 border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
-        />
-        <button className="bg-brand text-white rounded-lg px-3 py-2 text-[13px]">Add</button>
-      </form>
-      {loading ? (
-        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
-      ) : suppliers.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground py-4 text-center">No suppliers.</p>
-      ) : (
-        <table className="w-full text-left border-collapse text-[13px]">
-          <thead>
-            <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-muted-foreground">Name</th>
-              <th className="pb-2 text-muted-foreground">Products</th>
-              <th className="pb-2 text-muted-foreground">Region</th>
-              <th className="pb-2 text-muted-foreground">Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            {suppliers.map((s) => (
-              <tr key={s.id} className="border-b border-neutral-100">
-                <td className="py-2">{s.name}</td>
-                <td className="py-2">{String(s.productCount ?? 0)}</td>
-                <td className="py-2">{s.region ?? '—'}</td>
-                <td className="py-2">{s.phone ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
-}
-
 /* ---------------- Markets ---------------- */
 
 function MarketsPanel({
@@ -1455,260 +1156,6 @@ function PeoplePanel({
   );
 }
 
-/* ---------------- Promotions ---------------- */
-
-const EMPTY_PROMO: PromoDraft = {
-  code: '',
-  description: '',
-  kind: 'percent',
-  value: 10,
-  minSubtotal: 0,
-  maxDiscount: null,
-  usageLimit: null,
-  perCustomerLimit: 1,
-  endsAt: null,
-};
-
-const PROMO_STATE_STYLES: Record<AdminPromo['state'], string> = {
-  live: 'bg-brand/10 text-brand',
-  scheduled: 'bg-blue-50 text-blue-700',
-  paused: 'bg-neutral-100 text-neutral-600',
-  expired: 'bg-red-50 text-red-700',
-  exhausted: 'bg-amber-50 text-amber-700',
-};
-
-function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m: string) => void }) {
-  const [promos, setPromos] = useState<AdminPromo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [adding, setAdding] = useState(false);
-  const [draft, setDraft] = useState<PromoDraft>(EMPTY_PROMO);
-  const [busyId, setBusyId] = useState<number | null>(null);
-
-  const load = useCallback(async () => {
-    const result = await listPromos();
-    setLoading(false);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    setPromos(result.data);
-  }, [fail]);
-
-  useEffect(() => { load(); }, [load]);
-
-  const update = <K extends keyof PromoDraft>(key: K, value: PromoDraft[K]) => {
-    setDraft((current) => ({ ...current, [key]: value }));
-  };
-
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!draft.code.trim()) return fail('Enter a code.');
-    if (!Number.isInteger(draft.value) || draft.value <= 0) return fail('Enter a discount greater than zero.');
-
-    const result = await createPromo({
-      ...draft,
-      code: draft.code.trim().toUpperCase(),
-      description: draft.description?.trim() || undefined,
-      minSubtotal: draft.minSubtotal ?? 0,
-      maxDiscount: draft.kind === 'percent' ? (draft.maxDiscount ?? null) : null,
-      usageLimit: draft.usageLimit ?? null,
-      perCustomerLimit: draft.perCustomerLimit ?? null,
-      endsAt: draft.endsAt || null,
-    });
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    setDraft(EMPTY_PROMO);
-    setAdding(false);
-    flash(`Code ${result.data.code} created.`);
-    await load();
-  };
-
-  const toggle = async (promo: AdminPromo) => {
-    setBusyId(promo.id);
-    const result = await setPromoActive(promo.id, !promo.active);
-    setBusyId(null);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    flash(`${promo.code} is now ${result.data.active ? 'active' : 'paused'}.`);
-    await load();
-  };
-
-  const numberOrNull = (value: string) => (value.trim() === '' ? null : Math.max(0, Math.floor(Number(value) || 0)));
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <SectionTitle size="small" family="label">Promo codes</SectionTitle>
-        <button
-          onClick={() => setAdding((open) => !open)}
-          className="rounded-lg bg-brand px-3 py-1.5 text-[12px] text-white"
-        >
-          {adding ? 'Close' : 'New code'}
-        </button>
-      </div>
-
-      {adding && (
-        <form onSubmit={submit} className="space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
-          <div className="grid grid-cols-2 gap-2">
-            <label className="col-span-2 text-[12px] text-muted-foreground">
-              Code
-              <input
-                value={draft.code}
-                onChange={(e) => update('code', e.target.value)}
-                placeholder="WELCOME10"
-                autoCapitalize="characters"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] uppercase text-black"
-              />
-            </label>
-            <label className="col-span-2 text-[12px] text-muted-foreground">
-              Description
-              <input
-                value={draft.description ?? ''}
-                onChange={(e) => update('description', e.target.value)}
-                placeholder="10% off the first basket"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-              />
-            </label>
-            <label className="text-[12px] text-muted-foreground">
-              Type
-              <select
-                value={draft.kind}
-                onChange={(e) => update('kind', e.target.value as PromoDraft['kind'])}
-                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-[13px] text-black"
-              >
-                <option value="percent">Percent off</option>
-                <option value="fixed">Shillings off</option>
-              </select>
-            </label>
-            <label className="text-[12px] text-muted-foreground">
-              {draft.kind === 'percent' ? 'Percent (1–100)' : 'Shillings off'}
-              <input
-                type="number"
-                min={1}
-                value={draft.value}
-                onChange={(e) => update('value', Math.floor(Number(e.target.value) || 0))}
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-              />
-            </label>
-            <label className="text-[12px] text-muted-foreground">
-              Minimum basket (UGX)
-              <input
-                type="number"
-                min={0}
-                value={draft.minSubtotal ?? 0}
-                onChange={(e) => update('minSubtotal', Math.max(0, Math.floor(Number(e.target.value) || 0)))}
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-              />
-            </label>
-            {draft.kind === 'percent' && (
-              <label className="text-[12px] text-muted-foreground">
-                Cap (UGX, optional)
-                <input
-                  type="number"
-                  min={1}
-                  value={draft.maxDiscount ?? ''}
-                  onChange={(e) => update('maxDiscount', numberOrNull(e.target.value))}
-                  placeholder="No cap"
-                  className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-                />
-              </label>
-            )}
-            <label className="text-[12px] text-muted-foreground">
-              Total uses (optional)
-              <input
-                type="number"
-                min={1}
-                value={draft.usageLimit ?? ''}
-                onChange={(e) => update('usageLimit', numberOrNull(e.target.value))}
-                placeholder="Unlimited"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-              />
-            </label>
-            <label className="text-[12px] text-muted-foreground">
-              Uses per customer (optional)
-              <input
-                type="number"
-                min={1}
-                value={draft.perCustomerLimit ?? ''}
-                onChange={(e) => update('perCustomerLimit', numberOrNull(e.target.value))}
-                placeholder="Unlimited"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-              />
-            </label>
-            <label className="col-span-2 text-[12px] text-muted-foreground">
-              Ends on (optional)
-              <input
-                type="date"
-                value={draft.endsAt ?? ''}
-                onChange={(e) => update('endsAt', e.target.value || null)}
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
-              />
-            </label>
-          </div>
-          <button className="w-full rounded-lg bg-brand py-2 text-[13px] text-white">Create code</button>
-        </form>
-      )}
-
-      {loading ? (
-        <p className="py-4 text-center text-[13px] text-muted-foreground">Loading…</p>
-      ) : promos.length === 0 ? (
-        <p className="py-4 text-center text-[13px] text-muted-foreground">No promo codes yet.</p>
-      ) : (
-        <div className="space-y-2">
-          {promos.map((promo) => {
-            const rule = promo.kind === 'percent'
-              ? `${promo.value}% off${promo.maxDiscount ? ` (max ${formatUgx(promo.maxDiscount)})` : ''}`
-              : `${formatUgx(promo.value)} off`;
-            return (
-              <div key={promo.id} className="rounded-xl border border-neutral-200 bg-white p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-[14px] text-black">{promo.code}</p>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${PROMO_STATE_STYLES[promo.state]}`}>
-                        {promo.state}
-                      </span>
-                    </div>
-                    {promo.description && (
-                      <p className="mt-0.5 text-[11px] leading-[16px] text-muted-foreground">{promo.description}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => toggle(promo)}
-                    disabled={busyId === promo.id}
-                    className="shrink-0 rounded-lg border border-neutral-200 px-2.5 py-1 text-[11px] text-black disabled:opacity-50"
-                  >
-                    {promo.active ? 'Pause' : 'Resume'}
-                  </button>
-                </div>
-                <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-                  <div className="flex justify-between">
-                    <dt>Rule</dt>
-                    <dd className="text-black">{rule}</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt>Min basket</dt>
-                    <dd className="text-black">{promo.minSubtotal ? formatUgx(promo.minSubtotal) : 'None'}</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt>Used</dt>
-                    <dd className="text-black">
-                      {promo.usedCount}
-                      {promo.usageLimit ? ` / ${promo.usageLimit}` : ''}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt>Per customer</dt>
-                    <dd className="text-black">{promo.perCustomerLimit ?? 'Unlimited'}</dd>
-                  </div>
-                </dl>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ---------------- Analytics ---------------- */
 
 const RANGES = [
@@ -1986,55 +1433,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
       <p className="mb-2 text-[12px] font-medium text-black">{title}</p>
       {children}
-    </div>
-  );
-}
-
-/* ---------------- Activity Log ---------------- */
-
-function ActivityPanel({ fail }: { fail: (m: string) => void }) {
-  const [logs, setLogs] = useState<ActivityLogRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    const result = await listActivityLog({ limit: 50 });
-    setLoading(false);
-    if (!result) return fail('Could not reach the service.');
-    if (!result.ok) return fail(result.error);
-    setLogs(result.data.data);
-  }, [fail]);
-
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="space-y-3">
-      <SectionTitle size="small" family="label">Activity log</SectionTitle>
-      {loading ? (
-        <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
-      ) : logs.length === 0 ? (
-        <p className="text-[13px] text-muted-foreground py-4 text-center">No activity yet.</p>
-      ) : (
-        <table className="w-full text-left border-collapse text-[13px]">
-          <thead>
-            <tr className="border-b border-neutral-200">
-              <th className="pb-2 text-muted-foreground">When</th>
-              <th className="pb-2 text-muted-foreground">Admin</th>
-              <th className="pb-2 text-muted-foreground">Action</th>
-              <th className="pb-2 text-muted-foreground">Entity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((l) => (
-              <tr key={l.id} className="border-b border-neutral-100">
-                <td className="py-2">{new Date(l.createdAt).toLocaleString()}</td>
-                <td className="py-2">{l.adminEmail ?? '—'}</td>
-                <td className="py-2">{l.action}</td>
-                <td className="py-2">{l.entity ?? '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     </div>
   );
 }
