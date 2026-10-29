@@ -16,13 +16,13 @@ const TONE = {
     label: 'In stock',
   },
   low: {
-    text: 'text-[#b07d2b]',
-    chip: 'bg-[#b07d2b]/12 text-[#b07d2b] border-[#b07d2b]/25',
-    bar: 'bg-[#b07d2b]',
+    text: 'text-brand-gold',
+    chip: 'bg-brand-gold/12 text-brand-gold border-brand-gold/25',
+    bar: 'bg-brand-gold',
     label: 'Low stock',
   },
   out: {
-    text: 'text-[#9a9a9a]',
+    text: 'text-caption',
     chip: 'bg-neutral-100 text-muted-foreground border-neutral-200',
     bar: 'bg-neutral-300',
     label: 'Sold out',
@@ -38,7 +38,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
   // No figure at all: say so rather than implying a known quantity.
   if (!level) {
     return (
-      <span className="text-[11px] font-normal text-[#9a9a9a]">
+      <span className="text-[11px] font-normal text-caption">
         {stale ? 'Stock unavailable' : 'Checking stock…'}
       </span>
     );
@@ -69,7 +69,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
                   of a whole. */}
               <div className={`h-full ${tone.bar} rounded-full`} style={{ width: level.state === 'low' ? '18%' : '62%' }} />
             </div>
-            <p className="text-[11px] font-normal text-[#9a9a9a]">
+            <p className="text-[11px] font-normal text-caption">
               {stale
                 ? 'Last known figure, the live service is unreachable.'
                 : `Counted in ${level.unit}. Orders are checked against this when you pay.`}
@@ -78,7 +78,7 @@ export default function StockBadge({ level, variant = 'inline', stale = false }:
         )}
 
         {soldOut && (
-          <p className="text-[11px] font-normal text-[#9a9a9a]">
+          <p className="text-[11px] font-normal text-caption">
             Nothing available. A delivery would be needed before this can be ordered.
           </p>
         )}

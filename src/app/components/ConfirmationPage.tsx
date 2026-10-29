@@ -39,7 +39,7 @@ export default function ConfirmationPage({
   const total = subtotal + shipping + taxes;
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       {/* Status Bar */}
       <StatusBar />
       
@@ -85,7 +85,7 @@ export default function ConfirmationPage({
         <div className="mt-[34px] pb-6">
           {/* Subtotal */}
           <div className="flex justify-between items-center mb-6">
-            <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-[#000000] text-[14px] text-left text-nowrap">
+            <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-black text-[14px] text-left text-nowrap">
               <p className="block leading-[1.45] whitespace-pre">Subtotal</p>
             </div>
             <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-muted-foreground text-[14px] text-nowrap text-right">
@@ -95,7 +95,7 @@ export default function ConfirmationPage({
           
           {/* Shipping */}
           <div className="flex justify-between items-center mb-6">
-            <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-[#000000] text-[14px] text-left text-nowrap">
+            <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-black text-[14px] text-left text-nowrap">
               <p className="block leading-[1.45] whitespace-pre">Shipping</p>
             </div>
             <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-muted-foreground text-[14px] text-nowrap text-right">
@@ -105,7 +105,7 @@ export default function ConfirmationPage({
           
           {/* Taxes */}
           <div className="flex justify-between items-center mb-[15px]">
-            <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-[#000000] text-[14px] text-left text-nowrap">
+            <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-black text-[14px] text-left text-nowrap">
               <p className="block leading-[1.45] whitespace-pre">Taxes</p>
             </div>
             <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-brand text-[14px] text-nowrap text-right">
@@ -115,7 +115,7 @@ export default function ConfirmationPage({
           
           {/* Total */}
           <div className="flex justify-between items-center">
-            <div className="flex flex-col font-bold justify-center leading-[0] not-italic text-[#000000] text-[18px] text-left text-nowrap">
+            <div className="flex flex-col font-bold justify-center leading-[0] not-italic text-black text-[18px] text-left text-nowrap">
               <p className="block leading-[1.45] whitespace-pre text-[18px] font-bold text-[18px]">Total</p>
             </div>
             <div className="flex flex-col font-bold justify-center leading-[0] not-italic text-brand text-[18px] text-nowrap text-right">
@@ -142,7 +142,7 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
   const totalPrice = item.priceValue * item.quantity;
 
   return (
-    <div className="bg-[#ffffff] h-[88px] relative shrink-0 w-[327px]">
+    <div className="bg-white h-[88px] relative shrink-0 w-[327px]">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none" />
       
       {/* Product Image */}
@@ -152,9 +152,9 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
       />
       
       {/* Product Name and Price */}
-      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[86px] not-italic text-[#000000] text-[14px] text-left top-4 translate-y-[-50%] w-[173px]">
+      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[86px] not-italic text-black text-[14px] text-left top-4 translate-y-[-50%] w-[173px]">
         <p className="leading-[16px]">
-          <span className="text-[#000000]">{item.name}</span>
+          <span className="text-black">{item.name}</span>
           <span>
             <br />
           </span>
@@ -166,9 +166,9 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
       <div className="absolute left-[86px] top-11">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="bg-[#ffffff] border border-neutral-200 rounded-lg px-2.5 py-1 flex items-center gap-2 hover:bg-neutral-50 transition-colors cursor-pointer"
+          className="bg-white border border-neutral-200 rounded-lg px-2.5 py-1 flex items-center gap-2 hover:bg-neutral-50 transition-colors cursor-pointer"
         >
-          <span className="font-normal text-[#000000] text-[14px] leading-[20px]">
+          <span className="font-normal text-black text-[14px] leading-[20px]">
             {item.quantity}
           </span>
           <div className="flex h-[4px] items-center justify-center relative shrink-0 w-[7px]">
@@ -230,7 +230,7 @@ function ProgressIndicators() {
             <circle cx="16" cy="16" fill="var(--fill-0, #757575)" r="16" />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-normal text-[#ffffff] text-[16px] leading-none">1</span>
+            <span className="font-normal text-white text-[16px] leading-none">1</span>
           </div>
         </div>
       </div>
@@ -238,10 +238,10 @@ function ProgressIndicators() {
       <div className="absolute contents left-[-40px] top-[174px]">
         <div className="absolute left-[-40px] top-[174px] size-8">
           <svg fill="none" preserveAspectRatio="none" viewBox="0 0 32 32" className="block size-full">
-            <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
+            <circle cx="16" cy="16" fill="var(--fill-0, var(--brand))" r="16" />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-normal text-[#ffffff] text-[16px] leading-none">2</span>
+            <span className="font-normal text-white text-[16px] leading-none">2</span>
           </div>
         </div>
       </div>
@@ -249,10 +249,10 @@ function ProgressIndicators() {
       {/* Step 3 - Active on the left position */}
       <div className="absolute left-6 size-8 top-[174px]">
         <svg fill="none" preserveAspectRatio="none" viewBox="0 0 32 32" className="block size-full">
-          <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
+          <circle cx="16" cy="16" fill="var(--fill-0, var(--brand))" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">3</span>
+          <span className="font-normal text-white text-[16px] leading-none">3</span>
         </div>
       </div>
     </>
@@ -265,7 +265,7 @@ interface FooterProps {
 
 function Footer({ onCompletePurchase }: FooterProps) {
   return (
-    <div className="absolute bg-[#ffffff] bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
+    <div className="absolute bg-white bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
       {/* Complete Purchase Button */}
       <button
         onClick={onCompletePurchase}
@@ -273,7 +273,7 @@ function Footer({ onCompletePurchase }: FooterProps) {
       >
         <div className="flex flex-row items-center relative size-full">
           <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start pl-6 pr-4 py-2 relative w-full">
-            <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left tracking-[-0.16px]">
+            <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-white text-[16px] text-left tracking-[-0.16px]">
               <p className="block leading-[24px]">Complete purchase</p>
             </div>
             <div className="relative shrink-0 size-8">
@@ -311,12 +311,12 @@ interface HeaderProps {
 
 function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
   return (
-    <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0">
+    <div className="absolute bg-white h-[149px] left-0 right-0 top-0">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
       
       {/* Mobile Nav */}
-      <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-        <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+      <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+        <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
         <div
           className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
@@ -337,7 +337,7 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
             <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[12px] text-center text-nowrap tracking-[-0.12px]">
                     <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                   </div>
                 </div>
@@ -375,7 +375,7 @@ function Header({ cartCount, onBack, onMenuClick }: HeaderProps) {
                 <div className="flex flex-row items-center gap-2">
                   <div className="w-3 h-3">
                     <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                      <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7.5 9L4.5 6L7.5 3" className="stroke-brand" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <p className="block leading-[24px] whitespace-pre">Back</p>

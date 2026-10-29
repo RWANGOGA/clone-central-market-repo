@@ -69,7 +69,7 @@ export default function ExpandableCard({
         >
           <path
             d="M2.5 4.5L6 8L9.5 4.5"
-            stroke="#426b1f"
+            className="stroke-brand"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"

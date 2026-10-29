@@ -11,17 +11,17 @@ interface PlaceholderPageProps {
 
 export default function PlaceholderPage({ title, onBack, onMenuClick, cartCount }: PlaceholderPageProps) {
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       {/* Status Bar */}
       <StatusBar />
       
       {/* Header */}
-      <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0">
+      <div className="absolute bg-white h-[149px] left-0 right-0 top-0">
         <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
         
         {/* Mobile Nav */}
-        <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-          <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+        <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+          <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
           <div
             className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
@@ -42,7 +42,7 @@ export default function PlaceholderPage({ title, onBack, onMenuClick, cartCount 
               <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[12px] text-center text-nowrap tracking-[-0.12px]">
                       <p className="block leading-none whitespace-pre">{cartCount}</p>
                     </div>
                   </div>
@@ -80,7 +80,7 @@ export default function PlaceholderPage({ title, onBack, onMenuClick, cartCount 
                   <div className="flex flex-row items-center gap-2">
                     <div className="w-3 h-3">
                       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                        <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M7.5 9L4.5 6L7.5 3" className="stroke-brand" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <p className="block leading-[24px] whitespace-pre">Back</p>

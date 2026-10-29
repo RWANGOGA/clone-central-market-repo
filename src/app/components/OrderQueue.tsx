@@ -19,18 +19,18 @@ import {
 import { formatUgx } from '../lib/currency';
 
 const STATUS_TONE: Record<OrderStatus, string> = {
-  pending: 'bg-[#b07d2b]/12 text-[#b07d2b] border-[#b07d2b]/25',
+  pending: 'bg-brand-gold/12 text-brand-gold border-brand-gold/25',
   processing: 'bg-brand/10 text-brand border-brand/20',
-  shipped: 'bg-[#2b6cb0]/10 text-[#2b6cb0] border-[#2b6cb0]/20',
-  delivered: 'bg-[#2f855a]/10 text-[#2f855a] border-[#2f855a]/20',
+  shipped: 'bg-info/10 text-info border-info/20',
+  delivered: 'bg-success/10 text-success border-success/20',
   cancelled: 'bg-neutral-100 text-muted-foreground border-neutral-200',
 };
 
 const MONEY_TONE: Record<MoneyState, string> = {
   unpaid: 'bg-neutral-100 text-muted-foreground border-neutral-200',
-  cod_due: 'bg-[#b07d2b]/12 text-[#b07d2b] border-[#b07d2b]/25',
-  paid: 'bg-[#2f855a]/10 text-[#2f855a] border-[#2f855a]/20',
-  part_refunded: 'bg-[#2b6cb0]/10 text-[#2b6cb0] border-[#2b6cb0]/20',
+  cod_due: 'bg-brand-gold/12 text-brand-gold border-brand-gold/25',
+  paid: 'bg-success/10 text-success border-success/20',
+  part_refunded: 'bg-info/10 text-info border-info/20',
   refunded: 'bg-neutral-100 text-muted-foreground border-neutral-200',
   refund_due: 'bg-red-50 text-red-700 border-red-200',
 };
@@ -222,7 +222,7 @@ export default function OrderQueue({
           </div>
           <div className="flex items-center gap-2">
             <span
-              className={`size-2 rounded-full ${live ? 'bg-[#2f855a]' : 'bg-neutral-300'}`}
+              className={`size-2 rounded-full ${live ? 'bg-success' : 'bg-neutral-300'}`}
               aria-label={live ? 'Live updates connected' : 'Not connected to live updates'}
             />
             {onBack && (
@@ -310,7 +310,7 @@ export default function OrderQueue({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[14px] font-medium text-[#000000]">
+                <p className="text-[14px] font-medium text-black">
                   {order.customerName ?? 'Unknown customer'}
                   {flash.includes(order.reference) && (
                     <span className="ml-2 text-[10px] font-normal text-brand">
@@ -321,7 +321,7 @@ export default function OrderQueue({
                 <p className="text-[12px] font-normal text-muted-foreground">
                   {order.reference} · {order.phone ?? 'no phone'}
                 </p>
-                <p className="text-[11px] font-normal text-[#9a9a9a]">
+                <p className="text-[11px] font-normal text-caption">
                   {[order.district, order.region].filter(Boolean).join(', ')} ·{' '}
                   {order.itemCount} line{order.itemCount === 1 ? '' : 's'}, {order.unitCount} unit
                   {order.unitCount === 1 ? '' : 's'}
@@ -388,7 +388,7 @@ function FilterChip({
       className={`shrink-0 text-[11px] px-2.5 py-1 rounded-full border font-normal transition-colors ${
         active
           ? 'bg-brand text-white border-brand'
-          : 'bg-white text-[#000000] border-neutral-300'
+          : 'bg-white text-black border-neutral-300'
       }`}
     >
       {children}
@@ -462,7 +462,7 @@ function OrderDetailPanel({
 
       <div className="p-4 space-y-3">
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
-          <p className="text-[15px] font-medium text-[#000000]">
+          <p className="text-[15px] font-medium text-black">
             {order.customerName ?? 'Unknown customer'}
           </p>
           <p className="text-[12px] font-normal text-muted-foreground">
@@ -482,7 +482,7 @@ function OrderDetailPanel({
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[13px] font-medium text-[#000000]">Money</p>
+            <p className="text-[13px] font-medium text-black">Money</p>
             <span
               className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${MONEY_TONE[order.money.state]}`}
             >
@@ -520,7 +520,7 @@ function OrderDetailPanel({
 
         {order.nextStatuses.length > 0 ? (
           <div className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2">
-            <p className="text-[13px] font-medium text-[#000000]">
+            <p className="text-[13px] font-medium text-black">
               Move this order on
             </p>
             <input
@@ -560,13 +560,13 @@ function OrderDetailPanel({
         )}
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
-          <p className="text-[13px] font-medium text-[#000000] mb-2">
+          <p className="text-[13px] font-medium text-black mb-2">
             Items
           </p>
           <div className="space-y-1.5">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-baseline justify-between gap-2">
-                <span className="text-[12px] font-normal text-[#000000]">
+                <span className="text-[12px] font-normal text-black">
                   {item.quantity} × {item.name}
                 </span>
                 <span className="text-[12px] font-normal text-muted-foreground">
@@ -585,14 +585,14 @@ function OrderDetailPanel({
 
         {order.payments.length > 0 && (
           <div className="rounded-xl border border-neutral-200 bg-white p-3">
-            <p className="text-[13px] font-medium text-[#000000] mb-2">
+            <p className="text-[13px] font-medium text-black mb-2">
               Payment
             </p>
             <div className="space-y-1.5">
               {order.payments.map((payment) => (
                 <div key={payment.id}>
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[12px] font-normal text-[#000000]">
+                    <span className="text-[12px] font-normal text-black">
                       {payment.provider}
                       {payment.maskedCard ? ` ${payment.maskedCard}` : ''}
                     </span>
@@ -601,7 +601,7 @@ function OrderDetailPanel({
                     </span>
                   </div>
                   {payment.settledByEmail && (
-                    <p className="text-[10px] font-normal text-[#9a9a9a]">
+                    <p className="text-[10px] font-normal text-caption">
                       Cash taken by {payment.settledByEmail} · {payment.settledAt}
                     </p>
                   )}
@@ -613,7 +613,7 @@ function OrderDetailPanel({
 
         {canRefund && order.money.refundable > 0 && (
           <div className="rounded-xl border border-neutral-200 bg-white p-3 space-y-2">
-            <p className="text-[13px] font-medium text-[#000000]">
+            <p className="text-[13px] font-medium text-black">
               Record a refund
             </p>
             <p className="text-[11px] font-normal text-muted-foreground">
@@ -626,21 +626,21 @@ function OrderDetailPanel({
 
         {order.refunds.length > 0 && (
           <div className="rounded-xl border border-neutral-200 bg-white p-3">
-            <p className="text-[13px] font-medium text-[#000000] mb-2">
+            <p className="text-[13px] font-medium text-black mb-2">
               Refunds
             </p>
             <div className="space-y-2">
               {order.refunds.map((refund) => (
                 <div key={refund.id}>
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[12px] font-medium text-[#000000]">
+                    <span className="text-[12px] font-medium text-black">
                       {refund.reference}
                     </span>
                     <span className="text-[12px] font-normal text-muted-foreground">
                       {formatUgx(refund.amount)}
                     </span>
                   </div>
-                  <p className="text-[10px] font-normal text-[#9a9a9a]">
+                  <p className="text-[10px] font-normal text-caption">
                     {refund.method.replace('_', ' ')} · {refund.createdByEmail ?? 'system'} ·{' '}
                     {refund.createdAt}
                   </p>
@@ -654,7 +654,7 @@ function OrderDetailPanel({
         )}
 
         <div className="rounded-xl border border-neutral-200 bg-white p-3">
-          <p className="text-[13px] font-medium text-[#000000] mb-2">
+          <p className="text-[13px] font-medium text-black mb-2">
             Timeline
           </p>
           <ol className="space-y-2">
@@ -662,11 +662,11 @@ function OrderDetailPanel({
               <li key={entry.id} className="flex gap-2">
                 <span className="mt-1 size-2 shrink-0 rounded-full bg-brand" />
                 <div className="min-w-0">
-                  <p className="text-[12px] font-normal text-[#000000]">
+                  <p className="text-[12px] font-normal text-black">
                     {entry.fromStatus ? `${entry.fromStatus} → ` : ''}
                     {entry.toStatus}
                   </p>
-                  <p className="text-[11px] font-normal text-[#9a9a9a]">
+                  <p className="text-[11px] font-normal text-caption">
                     {entry.changedByEmail ?? 'system'} · {entry.createdAt}
                   </p>
                   {entry.note && (
@@ -787,7 +787,7 @@ function MoneyRow({
       <span className="text-[12px] font-normal text-muted-foreground">{label}</span>
       <span
         className={`text-[12px] font-normal ${
-          strong ? 'text-brand font-semibold' : 'text-[#000000]'
+          strong ? 'text-brand font-semibold' : 'text-black'
         }`}
       >
         {value === 0 ? zeroLabel : formatUgx(value)}
@@ -844,7 +844,7 @@ function DelivererCard({
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
-      <p className="text-[12px] font-medium text-[#000000]">Deliverer</p>
+      <p className="text-[12px] font-medium text-black">Deliverer</p>
       {closed ? (
         <p className="mt-1 text-[12px] font-normal text-muted-foreground">
           {order.deliverer ? `Carried by ${order.deliverer}.` : 'Nobody was named for this one.'}

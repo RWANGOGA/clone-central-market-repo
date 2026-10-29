@@ -38,7 +38,7 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-black text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
           <p className="block leading-[22px]">9:41</p>
         </div>
       </div>

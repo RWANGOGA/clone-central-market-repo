@@ -205,7 +205,7 @@ function AppShell() {
   return (
     <div className="min-h-dvh bg-[#f7f7f5] p-2 sm:p-4">
       {/* Responsive shop shell: full width on small screens, bezel frame on md+. */}
-      <div className="max-w-[430px] mx-auto bg-[#ffffff] relative overflow-hidden rounded-[40px] shadow-2xl md:border-8 md:border-black md:rounded-[52px] h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-2rem)] md:max-h-[900px]">
+      <div className="max-w-[430px] mx-auto bg-white relative overflow-hidden rounded-[40px] shadow-2xl md:border-8 md:border-black md:rounded-[52px] h-[calc(100dvh-1rem)] sm:h-[calc(100dvh-2rem)] md:max-h-[900px]">
         <Routes>
           <Route
             path="/"

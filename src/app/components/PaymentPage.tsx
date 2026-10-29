@@ -180,7 +180,7 @@ export default function PaymentPage({
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       <StatusBar />
       <Header cartCount={cartCount} onBack={onBack} onMenuClick={onMenuClick} />
       <ProgressIndicators />
@@ -199,7 +199,7 @@ export default function PaymentPage({
         <p className="leading-[32px]">Payment</p>
       </div>
 
-      <div className="absolute left-6 top-[258px] text-[16px] text-[#000000] font-normal translate-y-[-50%]">
+      <div className="absolute left-6 top-[258px] text-[16px] text-black font-normal translate-y-[-50%]">
         <p className="leading-[1.5] whitespace-pre">
           {stage === 'details' ? 'Choose how you want to pay' : stage === 'approval' ? 'Approve the payment' : 'Payment received'}
         </p>
@@ -227,7 +227,7 @@ export default function PaymentPage({
                     >
                       <span
                         className={`block text-[13px] font-medium ${
-                          active ? 'text-brand' : 'text-[#000000]'
+                          active ? 'text-brand' : 'text-black'
                         }`}
                       >
                         {option.label}
@@ -257,7 +257,7 @@ export default function PaymentPage({
                           }`}
                         >
                           <span className="text-left">
-                            <span className="block text-[14px] font-medium text-[#000000]">
+                            <span className="block text-[14px] font-medium text-black">
                               {method.label}
                             </span>
                             {method.ussd && (
@@ -303,7 +303,7 @@ export default function PaymentPage({
 
               {channel === 'cod' && (
                 <div className="rounded-xl border border-neutral-200 p-4 space-y-1">
-                  <p className="text-[14px] font-medium text-[#000000]">
+                  <p className="text-[14px] font-medium text-black">
                     Pay when your order arrives
                   </p>
                   <p className="text-[12px] leading-[18px] font-normal text-muted-foreground">
@@ -337,7 +337,7 @@ export default function PaymentPage({
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-brand">
                   {intent.nextAction?.ussd ? `Dial ${intent.nextAction.ussd}` : 'Awaiting approval'}
                 </p>
-                <p className="text-[14px] leading-[20px] font-normal text-[#000000]">
+                <p className="text-[14px] leading-[20px] font-normal text-black">
                   {intent.nextAction?.instructions ??
                     'Approve the request on your phone. The order moves on once the provider confirms.'}
                 </p>
@@ -396,7 +396,7 @@ export default function PaymentPage({
                 <button
                   onClick={cancelPayment}
                   disabled={busy}
-                  className="w-full border border-neutral-300 rounded-lg py-2.5 text-[13px] font-normal text-[#000000] disabled:opacity-60"
+                  className="w-full border border-neutral-300 rounded-lg py-2.5 text-[13px] font-normal text-black disabled:opacity-60"
                 >
                   Cancel payment
                 </button>
@@ -455,7 +455,7 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
       <dt className="text-[13px] font-normal text-muted-foreground">{label}</dt>
       <dd
         className={`text-[13px] font-normal ${
-          strong ? 'text-brand font-semibold' : 'text-[#000000]'
+          strong ? 'text-brand font-semibold' : 'text-black'
         }`}
       >
         {value}
@@ -497,7 +497,7 @@ function Footer({
   onPay: () => void;
 }) {
   return (
-    <div className="absolute bg-[#ffffff] bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
+    <div className="absolute bg-white bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
       <button
         onClick={isFormValid && !busy ? onPay : undefined}
         disabled={!isFormValid || busy}
@@ -507,7 +507,7 @@ function Footer({
       >
         <div className="flex flex-row items-center relative size-full">
           <div className="flex flex-row items-center justify-start pl-6 pr-4 py-2 relative w-full">
-            <p className="text-[14px] font-normal text-[#ffffff] grow">
+            <p className="text-[14px] font-normal text-white grow">
               {busy ? 'Working…' : label}
             </p>
             <div className="size-8 shrink-0">
@@ -535,7 +535,7 @@ function StatusBar() {
         </svg>
       </div>
       <div className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]" style={{ left: 'calc(50% - 135.5px)' }}>
-        <p className="font-bold h-5 leading-[0] not-italic text-[#000000] text-[17px] text-center tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+        <p className="font-bold h-5 leading-[0] not-italic text-black text-[17px] text-center tracking-[-0.408px] translate-x-[-50%] w-[54px]">
           <span className="block leading-[22px]">9:41</span>
         </p>
       </div>
@@ -562,7 +562,7 @@ function Header({
   onMenuClick: () => void;
 }) {
   return (
-    <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0">
+    <div className="absolute bg-white h-[149px] left-0 right-0 top-0">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
       <div
@@ -578,7 +578,7 @@ function Header({
         </svg>
         {cartCount > 0 && (
           <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px] flex items-center justify-center">
-            <p className="text-[#ffffff] text-[9px] leading-none">{cartCount}</p>
+            <p className="text-white text-[9px] leading-none">{cartCount}</p>
           </div>
         )}
       </div>
@@ -606,7 +606,7 @@ function Header({
             <div className="flex flex-row items-center gap-2">
               <div className="w-3 h-3">
                 <svg className="block size-full" fill="none" viewBox="0 0 12 12">
-                  <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M7.5 9L4.5 6L7.5 3" className="stroke-brand" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <p className="block leading-[24px] whitespace-pre">Back</p>
@@ -623,18 +623,18 @@ function ProgressIndicators() {
     <>
       <div className="absolute left-6 top-[174px] size-8">
         <svg className="block size-full" fill="none" viewBox="0 0 32 32">
-          <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
+          <circle cx="16" cy="16" fill="var(--fill-0, var(--brand))" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">1</span>
+          <span className="font-normal text-white text-[16px] leading-none">1</span>
         </div>
       </div>
       <div className="absolute size-8 top-[174px]" style={{ left: 'calc(50% + 93.5px)' }}>
         <svg fill="none" viewBox="0 0 32 32" className="block size-full">
-          <circle cx="16" cy="16" fill="var(--fill-0, #426B1F)" r="16" />
+          <circle cx="16" cy="16" fill="var(--fill-0, var(--brand))" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">2</span>
+          <span className="font-normal text-white text-[16px] leading-none">2</span>
         </div>
       </div>
       <div className="absolute size-8 top-[174px]" style={{ left: 'calc(50% + 131.5px)' }}>
@@ -642,7 +642,7 @@ function ProgressIndicators() {
           <circle cx="16" cy="16" fill="var(--fill-0, #757575)" r="16" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-normal text-[#ffffff] text-[16px] leading-none">3</span>
+          <span className="font-normal text-white text-[16px] leading-none">3</span>
         </div>
       </div>
     </>

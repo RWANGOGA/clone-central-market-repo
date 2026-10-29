@@ -446,16 +446,16 @@ export default function ProfilePage({
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full select-none">
+    <div className="bg-white relative size-full select-none">
       <StatusBar />
 
       {/* Header */}
-      <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0 z-10">
+      <div className="absolute bg-white h-[149px] left-0 right-0 top-0 z-10">
         <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
         {/* Mobile Nav */}
-        <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-          <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+        <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+          <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
           <div
             className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
@@ -480,7 +480,7 @@ export default function ProfilePage({
               <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[12px] text-center text-nowrap tracking-[-0.12px]">
                       <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                     </div>
                   </div>
@@ -504,7 +504,7 @@ export default function ProfilePage({
               <div className="absolute bg-red-500 left-[17px] rounded-full size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[10px] text-center text-nowrap tracking-[-0.1px]">
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[10px] text-center text-nowrap tracking-[-0.1px]">
                       <p className="block leading-none whitespace-pre text-[9px]">{unreadCount > 9 ? '9+' : unreadCount}</p>
                     </div>
                   </div>
@@ -517,7 +517,7 @@ export default function ProfilePage({
           {showNotifications && (
             <div className="absolute right-0 top-[52px] w-[320px] bg-white border border-neutral-200 rounded-xl shadow-lg z-50 max-h-[400px] overflow-y-auto">
               <div className="p-3 border-b border-neutral-100 flex items-center justify-between">
-                <h3 className="font-medium text-[15px] text-[#000000]">Notifications</h3>
+                <h3 className="font-medium text-[15px] text-black">Notifications</h3>
                 <div className="flex items-center gap-3">
                   {unreadCount > 0 && (
                     <button
@@ -529,7 +529,7 @@ export default function ProfilePage({
                   )}
                   <button
                     onClick={() => setShowNotifications(false)}
-                    className="text-muted-foreground hover:text-[#000000] text-[12px]"
+                    className="text-muted-foreground hover:text-black text-[12px]"
                   >
                     Close
                   </button>
@@ -549,9 +549,9 @@ export default function ProfilePage({
                       <div className="flex items-start gap-2">
                         <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${notification.read ? 'bg-transparent' : 'bg-brand'}`} />
                         <div className="grow min-w-0">
-                          <p className="text-[13px] font-medium text-[#000000] truncate">{notification.title}</p>
+                          <p className="text-[13px] font-medium text-black truncate">{notification.title}</p>
                           <p className="text-[12px] text-muted-foreground line-clamp-2">{notification.message}</p>
-                          <p className="text-[11px] text-[#9a9a9a] mt-1">
+                          <p className="text-[11px] text-caption mt-1">
                             {new Date(notification.createdAt).toLocaleDateString('en-UG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
@@ -592,7 +592,7 @@ export default function ProfilePage({
                 <div className="flex flex-row items-center gap-1">
                   <div className="w-3 h-3">
                     <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                      <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7.5 9L4.5 6L7.5 3" className="stroke-brand" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <p className="block leading-[24px] whitespace-pre">Back</p>
@@ -632,7 +632,7 @@ export default function ProfilePage({
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div className="grow min-w-0">
-              <h2 className="font-serif font-normal text-[20px] text-[#000000] leading-tight truncate">
+              <h2 className="font-serif font-normal text-[20px] text-black leading-tight truncate">
                 {displayName}
               </h2>
               <p className="font-normal text-[12px] text-muted-foreground truncate">
@@ -661,7 +661,7 @@ export default function ProfilePage({
                   className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
                   <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Total Orders</p>
-                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
+                  <p className="font-serif font-normal text-[28px] text-black leading-none">
                     {totalOrders}
                   </p>
                 </button>
@@ -670,7 +670,7 @@ export default function ProfilePage({
                   className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
                   <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Total Spent</p>
-                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
+                  <p className="font-serif font-normal text-[28px] text-black leading-none">
                     {formatUgx(totalSpent)}
                   </p>
                 </button>
@@ -679,7 +679,7 @@ export default function ProfilePage({
                   className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
                   <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Active Orders</p>
-                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
+                  <p className="font-serif font-normal text-[28px] text-black leading-none">
                     {activeOrders.length}
                   </p>
                 </button>
@@ -688,7 +688,7 @@ export default function ProfilePage({
                   className="border border-neutral-200 rounded-xl p-4 bg-white text-left hover:border-brand hover:shadow-sm transition-all cursor-pointer"
                 >
                   <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-1">Delivered</p>
-                  <p className="font-serif font-normal text-[28px] text-[#000000] leading-none">
+                  <p className="font-serif font-normal text-[28px] text-black leading-none">
                     {deliveredOrders.length}
                   </p>
                 </button>
@@ -696,20 +696,20 @@ export default function ProfilePage({
 
               {/* Recent Activity */}
               <div className="border border-neutral-200 rounded-xl p-4 bg-white">
-                <h3 className="font-medium text-[15px] text-[#000000] mb-3">Recent Orders</h3>
+                <h3 className="font-medium text-[15px] text-black mb-3">Recent Orders</h3>
                 <div className="space-y-3">
                   {orders.slice(0, 3).map((order) => {
                     const status = statusConfig[order.status] || { label: order.status, className: 'bg-neutral-100 text-neutral-800' };
                     return (
                       <div key={order.id} className="flex items-center justify-between py-2 border-b border-neutral-100 last:border-0">
                         <div>
-                          <p className="text-[13px] font-medium text-[#000000]">#{order.reference}</p>
+                          <p className="text-[13px] font-medium text-black">#{order.reference}</p>
                           <p className="text-[12px] text-muted-foreground">
                             {new Date(order.createdAt).toLocaleDateString('en-UG', { month: 'short', day: 'numeric', year: 'numeric' })} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[13px] font-medium text-[#000000]">{formatUgx(order.total)}</p>
+                          <p className="text-[13px] font-medium text-black">{formatUgx(order.total)}</p>
                           <span className={`text-[11px] px-2 py-0.5 rounded ${status.className}`}>{status.label}</span>
                         </div>
                       </div>
@@ -800,13 +800,13 @@ export default function ProfilePage({
                   return (
                     <div key={order.id} className="border border-neutral-200 rounded-xl p-4 bg-white space-y-2">
                       <div className="flex items-center justify-between text-[13px]">
-                        <span className="font-medium text-[#000000]">Order #{order.reference}</span>
+                        <span className="font-medium text-black">Order #{order.reference}</span>
                         <span className={`${status.className} px-2 py-0.5 rounded text-[11px] font-semibold`}>{status.label}</span>
                       </div>
                       <p className="text-[12px] text-muted-foreground">
                         {new Date(order.createdAt).toLocaleDateString('en-UG', { month: 'short', day: 'numeric', year: 'numeric' })} • {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                       </p>
-                      <div className="text-[13px] text-[#000000] pt-1 border-t border-neutral-100 space-y-1">
+                      <div className="text-[13px] text-black pt-1 border-t border-neutral-100 space-y-1">
                         {order.items.map((item) => (
                           <div key={item.id} className="flex justify-between">
                             <span className="truncate mr-2">{item.name}</span>
@@ -816,7 +816,7 @@ export default function ProfilePage({
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t border-neutral-100">
                         <span className="text-[12px] text-muted-foreground">{order.region}{order.district ? `, ${order.district}` : ''}</span>
-                        <span className="font-medium text-[#000000]">{formatUgx(order.total)}</span>
+                        <span className="font-medium text-black">{formatUgx(order.total)}</span>
                       </div>
                       <div className="flex justify-end pt-1">
                         <button
@@ -839,7 +839,7 @@ export default function ProfilePage({
             <div className="space-y-4">
             <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-                <span className="font-medium text-[15px] text-[#000000]">
+                <span className="font-medium text-[15px] text-black">
                   Profile Details
                 </span>
                 <button
@@ -895,7 +895,7 @@ export default function ProfilePage({
                       placeholder="07XX XXX XXX"
                       className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-[14px]"
                     />
-                    <p className="text-[11px] text-[#9a9a9a] mt-1">
+                    <p className="text-[11px] text-caption mt-1">
                       This is your sign-in number. Change it only if you can receive messages on the new one.
                     </p>
                   </div>
@@ -933,7 +933,7 @@ export default function ProfilePage({
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1 font-normal text-[14px] text-[#000000] leading-[22px]">
+                <div className="space-y-1 font-normal text-[14px] text-black leading-[22px]">
                   <p className="font-medium">{displayName}</p>
                   <p className="text-muted-foreground">{displayPhone}</p>
                   {profile?.email && <p className="text-muted-foreground">{profile.email}</p>}
@@ -946,7 +946,7 @@ export default function ProfilePage({
             {/* Saved addresses */}
             <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-[15px] text-[#000000]">
+                <h4 className="font-medium text-[15px] text-black">
                   Saved addresses
                 </h4>
                 {!addressEditor && addresses.length < 10 && (
@@ -973,7 +973,7 @@ export default function ProfilePage({
                 {addresses.map((address) => (
                   <div key={address.id} className="border border-neutral-100 rounded-lg p-3 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-[13px] text-[#000000]">
+                      <span className="font-medium text-[13px] text-black">
                         {address.label}
                       </span>
                       {address.isDefault && (
@@ -1009,7 +1009,7 @@ export default function ProfilePage({
 
               {addressEditor && (
                 <div className="border border-brand/30 rounded-lg p-3 space-y-2 font-normal text-[14px]">
-                  <p className="font-medium text-[13px] text-[#000000]">
+                  <p className="font-medium text-[13px] text-black">
                     {addressEditor.id === null ? 'New address' : 'Edit address'}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
@@ -1097,7 +1097,7 @@ export default function ProfilePage({
                         setAddressEditor(null);
                         setAddressError(null);
                       }}
-                      className="px-4 py-2 rounded-lg border border-neutral-200 text-[13px] text-[#000000]"
+                      className="px-4 py-2 rounded-lg border border-neutral-200 text-[13px] text-black"
                     >
                       Cancel
                     </button>
@@ -1112,7 +1112,7 @@ export default function ProfilePage({
           {activeTab === 'preferences' && (
             <div className="border border-neutral-200 rounded-xl p-4 bg-white space-y-4 font-normal text-[14px]">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-[15px] text-[#000000]">
+                <h4 className="font-medium text-[15px] text-black">
                   Notification & Delivery Preferences
                 </h4>
                 <button
@@ -1126,7 +1126,7 @@ export default function ProfilePage({
               <div className="space-y-3">
                 {PREFERENCE_FLAGS.map((flag) => (
                   <label key={flag.key} className="flex items-center justify-between cursor-pointer">
-                    <span className="text-[13px] text-[#000000]">{flag.label}</span>
+                    <span className="text-[13px] text-black">{flag.label}</span>
                     <input
                       type="checkbox"
                       checked={prefDraft[flag.key]}
@@ -1144,7 +1144,7 @@ export default function ProfilePage({
           {/* Environmental Impact Widget */}
           <div className="border border-brand/20 bg-brand/5 rounded-xl p-4 space-y-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-brand">Your Impact</span>
-            <p className="font-serif font-normal text-[16px] text-[#000000]">
+            <p className="font-serif font-normal text-[16px] text-black">
               {formatUgx(totalSpent)} of regional organic produce purchased
             </p>
             <p className="font-normal text-[12px] text-muted-foreground"> {orders.length} order{orders.length !== 1 ? 's' : ''} placed • {activeOrders.length} active

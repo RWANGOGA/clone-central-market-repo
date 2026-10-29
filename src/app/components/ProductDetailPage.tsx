@@ -73,7 +73,7 @@ export default function ProductDetailPage({
   }, [available, quantity]);
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       {/* Status Bar */}
       <StatusBar />
       
@@ -133,13 +133,13 @@ export default function ProductDetailPage({
           <ExpandableCard
             expandLabel="Full description"
             preview={
-              <p className="text-[16px] font-normal text-[#000000] leading-[24px] line-clamp-3">
+              <p className="text-[16px] font-normal text-black leading-[24px] line-clamp-3">
                 {product.description}
               </p>
             }
             detail={
               <div className="space-y-3">
-                <p className="text-[16px] font-normal text-[#000000] leading-[24px]">
+                <p className="text-[16px] font-normal text-black leading-[24px]">
                   {product.description}
                 </p>
                 <p className="text-[16px] font-normal text-muted-foreground leading-[20px]">
@@ -164,11 +164,11 @@ export default function ProductDetailPage({
       </div>
       
       {/* Footer */}
-      <div className="bg-[#ffffff] shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)] absolute bottom-0 left-0 right-0 h-[100px]">
+      <div className="bg-white shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)] absolute bottom-0 left-0 right-0 h-[100px]">
         <div className="absolute left-6 right-6 top-6">
           <div className="box-border content-stretch flex flex-row gap-4 items-center justify-start p-0 relative w-full">
             {/* Quantity Input */}
-            <div className="bg-[#ffffff] relative rounded-lg shrink-0 w-[58px]">
+            <div className="bg-white relative rounded-lg shrink-0 w-[58px]">
               <div className="absolute border border-neutral-200 border-solid inset-0 pointer-events-none rounded-lg" />
               <div className="relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start px-4 py-3 relative w-[58px]">
@@ -177,7 +177,7 @@ export default function ProductDetailPage({
                       onClick={() => setShowQuantityDropdown(!showQuantityDropdown)}
                       className="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative"
                     >
-                      <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left text-nowrap tracking-[-0.16px]">
+                      <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-black text-[16px] text-left text-nowrap tracking-[-0.16px]">
                         <p className="block leading-[24px] whitespace-pre">
                           {quantity} {product.unit}
                         </p>
@@ -216,7 +216,7 @@ export default function ProductDetailPage({
                       className={`w-full px-4 py-2 text-left text-[14px] font-normal ${
                         num === quantity
                           ? 'bg-brand/8 text-brand font-medium'
-                          : 'hover:bg-gray-50 text-[#000000]'
+                          : 'hover:bg-gray-50 text-black'
                       }`}
                     >
                       {num} {product.unit}
@@ -237,7 +237,7 @@ export default function ProductDetailPage({
               >
                 <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start pl-6 pr-4 py-2 relative w-full">
                   <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[16px] text-left tracking-[-0.16px]">
-                    <p className={`block leading-[24px] text-[14px] ${soldOut ? 'text-[#9a9a9a]' : 'text-[#ffffff]'}`}>
+                    <p className={`block leading-[24px] text-[14px] ${soldOut ? 'text-caption' : 'text-white'}`}>
                       {soldOut ? 'Sold out' : `Add ${quantity} ${product.unit} to basket`}
                     </p>
                   </div>
@@ -295,7 +295,7 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-black text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
           <p className="block leading-[22px]">9:41</p>
         </div>
       </div>
@@ -352,12 +352,12 @@ interface HeaderProps {
 
 function Header({ cartCount, onBack, onMenuClick, onCartClick, productName }: HeaderProps) {
   return (
-    <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0">
+    <div className="absolute bg-white h-[149px] left-0 right-0 top-0">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
       
       {/* Mobile Nav */}
-      <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-        <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+      <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+        <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
         <div
           className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
@@ -381,7 +381,7 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick, productName }: He
             <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[12px] text-center text-nowrap tracking-[-0.12px]">
                     <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                   </div>
                 </div>

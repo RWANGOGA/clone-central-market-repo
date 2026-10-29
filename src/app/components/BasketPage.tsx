@@ -48,7 +48,7 @@ export default function BasketPage({
   const isEmpty = cartItems.length === 0;
 
   return (
-    <div className="relative flex h-full flex-col bg-[#ffffff]">
+    <div className="relative flex h-full flex-col bg-white">
       {/* Status Bar */}
       <StatusBar />
       
@@ -90,7 +90,7 @@ export default function BasketPage({
 
               {/* Subtotal - 24px below the last product card */}
               <div className="flex justify-between items-center">
-                <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-[#000000] text-[18px] text-left text-nowrap">
+                <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-black text-[18px] text-left text-nowrap">
                   <p className="block leading-[1.45] whitespace-pre text-[18px]">Subtotal</p>
                 </div>
                 <div className="flex flex-col font-normal justify-center leading-[0] not-italic text-brand text-[18px] text-nowrap text-right">
@@ -112,7 +112,7 @@ export default function BasketPage({
                     </p>
                   ) : (
                     <div className="flex justify-between items-center font-medium text-[15px]">
-                      <span className="text-[#000000]">Total before delivery</span>
+                      <span className="text-black">Total before delivery</span>
                       <span className="text-brand tabular-nums">{formatUgx(subtotal - discount)}</span>
                     </div>
                   )}
@@ -278,7 +278,7 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-black text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
           <p className="block leading-[22px]">9:41</p>
         </div>
       </div>
@@ -355,7 +355,7 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
   };
 
   return (
-    <div className="bg-[#ffffff] h-[88px] relative shrink-0 w-full">
+    <div className="bg-white h-[88px] relative shrink-0 w-full">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none" />
       
       {/* Product Image */}
@@ -365,9 +365,9 @@ function ProductItem({ item, onUpdateQuantity }: ProductItemProps) {
       />
       
       {/* Product Name and Price */}
-      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[86px] not-italic text-[#000000] text-[14px] text-left top-4 translate-y-[-50%] w-[173px]">
+      <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[86px] not-italic text-black text-[14px] text-left top-4 translate-y-[-50%] w-[173px]">
         <p className="leading-[16px]">
-          <span className="text-[#000000]">
+          <span className="text-black">
             {item.name}
             <span className="text-muted-foreground">
               {' '}

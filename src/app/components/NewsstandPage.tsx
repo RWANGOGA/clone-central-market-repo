@@ -125,17 +125,17 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full select-none">
+    <div className="bg-white relative size-full select-none">
       {/* Status Bar */}
       <StatusBar />
 
       {/* Header */}
-      <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0 z-10">
+      <div className="absolute bg-white h-[149px] left-0 right-0 top-0 z-10">
         <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
         {/* Mobile Nav Top Bar */}
-        <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-          <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+        <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+          <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
           <div
             className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
@@ -160,7 +160,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
               <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
                 <div className="flex flex-col items-center justify-center relative size-full">
                   <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                    <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[12px] text-center text-nowrap tracking-[-0.12px]">
                       <p className="block leading-none whitespace-pre text-[9px]">{cartCount}</p>
                     </div>
                   </div>
@@ -199,7 +199,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                   <div className="flex flex-row items-center gap-1">
                     <div className="w-3 h-3">
                       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                        <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M7.5 9L4.5 6L7.5 3" className="stroke-brand" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <p className="block leading-[24px] whitespace-pre">Back</p>
@@ -244,13 +244,13 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                   expandLabel="Read full story"
                   preview={
                     <div className="space-y-2.5">
-                      <h3 className="font-serif font-normal text-[20px] text-[#000000] leading-[26px]">
+                      <h3 className="font-serif font-normal text-[20px] text-black leading-[26px]">
                         {filteredArticles[0].title}
                       </h3>
                       <p className="font-normal text-[13px] text-muted-foreground leading-[20px] line-clamp-3">
                         {filteredArticles[0].summary}
                       </p>
-                      <p className="text-[11px] font-normal text-[#9a9a9a] leading-[16px]">
+                      <p className="text-[11px] font-normal text-caption leading-[16px]">
                         {filteredArticles[0].source} &bull; {filteredArticles[0].date} &bull;{' '}
                         {filteredArticles[0].readTime}
                       </p>
@@ -273,7 +273,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                       className="text-brand hover:scale-110 transition-transform"
                       aria-label="Bookmark article"
                     >
-                      <svg className="w-5 h-5" fill={bookmarkedIds.has(filteredArticles[0].id) ? "#426b1f" : "none"} viewBox="0 0 24 24" stroke="#426b1f" strokeWidth="1.5">
+                      <svg className={`w-5 h-5 stroke-brand ${bookmarkedIds.has(filteredArticles[0].id) ? 'fill-brand' : 'fill-none'}`} viewBox="0 0 24 24" strokeWidth="1.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                       </svg>
                     </button>
@@ -294,13 +294,13 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                     <span className="text-[11px] font-semibold text-brand uppercase tracking-wide">
                       {article.category}
                     </span>
-                    <h4 className="font-serif font-normal text-[17px] text-[#000000] leading-[22px]">
+                    <h4 className="font-serif font-normal text-[17px] text-black leading-[22px]">
                       {article.title}
                     </h4>
                     <p className="font-normal text-[12px] text-muted-foreground leading-[18px] line-clamp-2">
                       {article.summary}
                     </p>
-                    <p className="text-[11px] font-normal text-[#9a9a9a] leading-[16px]">
+                    <p className="text-[11px] font-normal text-caption leading-[16px]">
                       {article.source} &bull; {article.date} &bull; {article.readTime}
                     </p>
                   </div>
@@ -321,7 +321,7 @@ export default function NewsstandPage({ onBack, onMenuClick, onCartClick, cartCo
                     className="text-brand"
                     aria-label="Bookmark article"
                   >
-                    <svg className="w-4 h-4" fill={bookmarkedIds.has(article.id) ? "#426b1f" : "none"} viewBox="0 0 24 24" stroke="#426b1f" strokeWidth="1.5">
+                    <svg className={`w-4 h-4 stroke-brand ${bookmarkedIds.has(article.id) ? 'fill-brand' : 'fill-none'}`} viewBox="0 0 24 24" strokeWidth="1.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                     </svg>
                   </button>

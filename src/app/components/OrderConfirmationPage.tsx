@@ -138,7 +138,7 @@ export default function OrderConfirmationPage({
   const itemCount = order?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       <StatusBar />
 
       <Header
@@ -216,7 +216,7 @@ export default function OrderConfirmationPage({
               {/* Payment call to action */}
               {needsPayment && onPay && (
                 <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 space-y-2">
-                  <h3 className="font-medium text-[14px] text-[#000000]">
+                  <h3 className="font-medium text-[14px] text-black">
                     {awaitingApproval ? 'Payment is waiting for approval' : 'Payment is still due'}
                   </h3>
                   <p className="font-normal text-[12px] text-muted-foreground leading-[18px]">
@@ -244,7 +244,7 @@ export default function OrderConfirmationPage({
                 </div>
               ) : (
                 <div className="bg-[#f8f9fa] rounded-xl p-4 border border-neutral-200">
-                  <h3 className="font-medium text-[15px] text-[#000000] mb-4">
+                  <h3 className="font-medium text-[15px] text-black mb-4">
                     Delivery progress
                   </h3>
                   <ol className="space-y-0">
@@ -280,7 +280,7 @@ export default function OrderConfirmationPage({
                           <div className={`pb-4 ${last ? 'pb-0' : ''}`}>
                             <p
                               className={`font-medium text-[13px] leading-[18px] ${
-                                done || current ? 'text-[#000000]' : 'text-[#9a9a9a]'
+                                done || current ? 'text-black' : 'text-caption'
                               }`}
                             >
                               {step.label}
@@ -289,7 +289,7 @@ export default function OrderConfirmationPage({
                               {step.description}
                             </p>
                             {when && (
-                              <p className="font-normal text-[11px] text-[#9a9a9a] mt-0.5">
+                              <p className="font-normal text-[11px] text-caption mt-0.5">
                                 {formatWhen(when)}
                               </p>
                             )}
@@ -305,7 +305,7 @@ export default function OrderConfirmationPage({
               {order && (
                 <div className="border border-neutral-200 rounded-xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-[14px] text-[#000000]">Your basket</h3>
+                    <h3 className="font-medium text-[14px] text-black">Your basket</h3>
                     <span className="font-normal text-[12px] text-muted-foreground">
                       {itemCount} item{itemCount === 1 ? '' : 's'}
                     </span>
@@ -313,7 +313,7 @@ export default function OrderConfirmationPage({
                   <div className="space-y-1">
                     {order.items.map((item) => (
                       <div key={item.id} className="flex justify-between gap-2 font-normal text-[13px]">
-                        <span className="text-[#000000] truncate">
+                        <span className="text-black truncate">
                           {item.quantity} × {item.name}
                         </span>
                         <span className="text-muted-foreground whitespace-nowrap">{formatUgx(item.lineTotal)}</span>
@@ -335,7 +335,7 @@ export default function OrderConfirmationPage({
                       <span>Delivery</span>
                       <span>{formatUgx(order.shipping)}</span>
                     </div>
-                    <div className="flex justify-between text-[#000000] font-medium text-[14px] pt-1">
+                    <div className="flex justify-between text-black font-medium text-[14px] pt-1">
                       <span>Total</span>
                       <span>{formatUgx(order.total)}</span>
                     </div>
@@ -355,7 +355,7 @@ export default function OrderConfirmationPage({
                     {addressLines.map((line, index) => (
                       <p
                         key={index}
-                        className="font-normal text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]"
+                        className="font-normal text-[14px] text-black tracking-[-0.14px] leading-[22px]"
                       >
                         {line}
                       </p>
@@ -366,7 +366,7 @@ export default function OrderConfirmationPage({
                   <h3 className="font-normal text-[14px] text-muted-foreground tracking-[-0.14px] leading-[24px] mb-1">
                     Placed
                   </h3>
-                  <p className="font-normal text-[14px] text-[#000000] tracking-[-0.14px] leading-[22px]">
+                  <p className="font-normal text-[14px] text-black tracking-[-0.14px] leading-[22px]">
                     {order ? formatWhen(order.createdAt) : '—'}
                   </p>
                   {/* A line here used to read "Standard Eco Courier • Tracking
@@ -380,7 +380,7 @@ export default function OrderConfirmationPage({
               {/* Status history */}
               {order && order.timeline.length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="font-medium text-[14px] text-[#000000]">Order updates</h3>
+                  <h3 className="font-medium text-[14px] text-black">Order updates</h3>
                   <div className="divide-y divide-neutral-100 border border-neutral-200 rounded-xl overflow-hidden">
                     {order.timeline
                       .slice()
@@ -388,10 +388,10 @@ export default function OrderConfirmationPage({
                       .map((event) => (
                         <div key={event.id} className="p-3 bg-white">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium text-[12px] text-[#000000] capitalize">
+                            <span className="font-medium text-[12px] text-black capitalize">
                               {event.toStatus}
                             </span>
-                            <span className="font-normal text-[11px] text-[#9a9a9a]">
+                            <span className="font-normal text-[11px] text-caption">
                               {formatWhen(event.at)}
                             </span>
                           </div>
@@ -449,7 +449,7 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-black text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
           <p className="block leading-[22px]">9:41</p>
         </div>
       </div>
@@ -505,12 +505,12 @@ interface HeaderProps {
 
 function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
   return (
-    <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0">
+    <div className="absolute bg-white h-[149px] left-0 right-0 top-0">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
       {/* Mobile Nav */}
-      <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-        <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+      <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+        <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
         <div
           className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
           style={{ left: "calc(50% - 0.5px)" }}
@@ -531,7 +531,7 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
             <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px]">
               <div className="flex flex-col items-center justify-center relative size-full">
                 <div className="box-border content-stretch flex flex-col gap-2 items-center justify-center px-0.5 py-px relative size-4">
-                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-center text-nowrap tracking-[-0.12px]">
+                  <div className="flex flex-col font-medium justify-center leading-[0] not-italic relative shrink-0 text-white text-[12px] text-center text-nowrap tracking-[-0.12px]">
                     <p className="block leading-none whitespace-pre">{cartCount}</p>
                   </div>
                 </div>
@@ -569,7 +569,7 @@ function Header({ cartCount, onShop, onMenuClick, title }: HeaderProps) {
                 <div className="flex flex-row items-center gap-1">
                   <div className="w-3 h-3">
                     <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 12 12">
-                      <path d="M7.5 9L4.5 6L7.5 3" stroke="#426b1f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7.5 9L4.5 6L7.5 3" className="stroke-brand" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <p className="block leading-[24px] whitespace-pre">Shop</p>
@@ -589,7 +589,7 @@ interface FooterProps {
 
 function Footer({ onShop }: FooterProps) {
   return (
-    <div className="absolute bg-[#ffffff] bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
+    <div className="absolute bg-white bottom-0 h-[124px] left-0 overflow-clip right-0 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
       {/* Continue Shopping Button */}
       <button
         onClick={onShop}
@@ -597,7 +597,7 @@ function Footer({ onShop }: FooterProps) {
       >
         <div className="flex flex-row items-center relative size-full">
           <div className="box-border content-stretch flex flex-row gap-2 items-center justify-center pl-6 pr-6 py-2 relative w-full">
-            <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative text-[#ffffff] text-[16px] text-center tracking-[-0.16px]">
+            <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative text-white text-[16px] text-center tracking-[-0.16px]">
               <p className="block leading-[24px]">Continue shopping</p>
             </div>
           </div>

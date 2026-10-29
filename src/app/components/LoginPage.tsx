@@ -44,14 +44,14 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full select-none">
+    <div className="bg-white relative size-full select-none">
       <StatusBar />
 
-      <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0 z-10">
+      <div className="absolute bg-white h-[149px] left-0 right-0 top-0 z-10">
         <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
-        <div className="absolute bg-[#ffffff] h-16 left-0 overflow-clip right-0 top-[31px]">
-          <div className="absolute bg-[#ffffff] h-[66px] left-0 top-0 w-[393px]" />
+        <div className="absolute bg-white h-16 left-0 overflow-clip right-0 top-[31px]">
+          <div className="absolute bg-white h-[66px] left-0 top-0 w-[393px]" />
           <div
             className="absolute flex flex-col font-serif font-medium justify-center leading-[0] text-brand text-[24px] text-center text-nowrap top-9 tracking-[-0.24px] translate-x-[-50%] translate-y-[-50%]"
             style={{ left: "calc(50% - 0.5px)" }}
@@ -64,7 +64,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
       <div className="absolute left-0 right-0 top-[149px] bottom-0 overflow-y-auto">
         <div className="px-6 pt-6 pb-10 space-y-6">
           <div>
-            <h1 className="font-serif font-normal text-[28px] text-[#000000] leading-tight">
+            <h1 className="font-serif font-normal text-[28px] text-black leading-tight">
               Welcome back
             </h1>
             <p className="font-normal text-[14px] text-muted-foreground mt-1">
@@ -147,7 +147,7 @@ export default function LoginPage({ onBack, onLogin, onNavigateToSignup }: Login
           <div className="text-center">
             <button
               onClick={onBack}
-              className="text-muted-foreground font-normal text-[13px] hover:text-[#000000]"
+              className="text-muted-foreground font-normal text-[13px] hover:text-black"
             >
               ← Back to shop
             </button>

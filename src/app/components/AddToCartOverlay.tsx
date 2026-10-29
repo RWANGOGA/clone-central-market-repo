@@ -35,12 +35,12 @@ export default function AddToCartOverlay({ isVisible, product, quantity }: AddTo
         <BgIllustration />
         
         {/* Product Name */}
-        <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[88px] not-italic text-[#ffffff] text-[18px] text-left text-nowrap top-[50px] translate-y-[-50%]">
+        <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[88px] not-italic text-white text-[18px] text-left text-nowrap top-[50px] translate-y-[-50%]">
           <p className="block leading-[16px] whitespace-pre">{product.name}</p>
         </div>
         
         {/* "Adding to basket:" label */}
-        <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[88px] not-italic opacity-50 text-[#ffffff] text-[16px] text-left text-nowrap top-[30px] translate-y-[-50%]">
+        <div className="absolute flex flex-col font-normal justify-center leading-[0] left-[88px] not-italic opacity-50 text-white text-[16px] text-left text-nowrap top-[30px] translate-y-[-50%]">
           <p className="block leading-[16px] whitespace-pre">Adding to basket:</p>
         </div>
         
@@ -81,13 +81,13 @@ function BgIllustration() {
 
 function QuantityInput({ quantity }: { quantity: number }) {
   return (
-    <div className="absolute bg-[#ffffff] right-6 rounded-lg top-4">
+    <div className="absolute bg-white right-6 rounded-lg top-4">
       <div className="absolute border border-neutral-200 border-solid inset-0 pointer-events-none rounded-lg" />
       <div className="relative size-full">
         <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start px-4 py-3 relative">
           <div className="relative shrink-0">
             <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative">
-              <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[16px] text-left text-nowrap tracking-[-0.16px]">
+              <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-black text-[16px] text-left text-nowrap tracking-[-0.16px]">
                 <p className="block leading-[24px] whitespace-pre">{quantity}</p>
               </div>
               <div className="flex h-[4px] items-center justify-center relative shrink-0 w-[7px]">

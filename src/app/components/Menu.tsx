@@ -102,7 +102,7 @@ function MenuItems({ onNavigate, items }: MenuItemsProps) {
           <button
             key={item.screen}
             onClick={() => onNavigate(item.screen)}
-            className="flex flex-col font-serif font-normal justify-center leading-[0] relative shrink-0 text-[#ffffff] text-[26px] text-left text-nowrap tracking-[-0.52px] hover:opacity-80 transition-opacity"
+            className="flex flex-col font-serif font-normal justify-center leading-[0] relative shrink-0 text-white text-[26px] text-left text-nowrap tracking-[-0.52px] hover:opacity-80 transition-opacity"
           >
             <p className="block leading-[30px] whitespace-pre text-[36px]">
               {item.label}

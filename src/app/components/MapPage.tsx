@@ -29,7 +29,7 @@ export default function MapPage({
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       {/* The map fills the frame below the header. */}
       <div className="absolute inset-x-0 bottom-0 top-[149px]">
         <DeliveryMap onSelectPlace={handleSelect} />
@@ -43,7 +43,7 @@ export default function MapPage({
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
               Delivery point
             </p>
-            <p className="text-[14px] font-medium text-[#000000] truncate">{picked}</p>
+            <p className="text-[14px] font-medium text-black truncate">{picked}</p>
           </div>
           <button
             onClick={() => onUseAsDeliveryPlace?.(picked)}
@@ -59,7 +59,7 @@ export default function MapPage({
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
             From your checkout
           </p>
-          <p className="text-[14px] font-medium text-[#000000]">
+          <p className="text-[14px] font-medium text-black">
             {initialDistrict}
           </p>
         </div>
@@ -77,7 +77,7 @@ interface HeaderProps {
 
 function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
   return (
-    <div className="absolute bg-[#ffffff] h-[149px] left-0 right-0 top-0 z-[1100]">
+    <div className="absolute bg-white h-[149px] left-0 right-0 top-0 z-[1100]">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
 
       <div className="absolute left-6 right-6 top-[103px]">
@@ -92,7 +92,7 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
                 <svg className="block size-full" fill="none" viewBox="0 0 12 12">
                   <path
                     d="M7.5 9L4.5 6L7.5 3"
-                    stroke="#426b1f"
+                    className="stroke-brand"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -130,7 +130,7 @@ function Header({ cartCount, onBack, onMenuClick, onCartClick }: HeaderProps) {
         </svg>
         {cartCount > 0 && (
           <div className="absolute bg-brand left-[17px] rounded-lg size-4 top-[-1px] flex items-center justify-center">
-            <p className="text-[#ffffff] text-[9px] leading-none">{cartCount}</p>
+            <p className="text-white text-[9px] leading-none">{cartCount}</p>
           </div>
         )}
       </button>

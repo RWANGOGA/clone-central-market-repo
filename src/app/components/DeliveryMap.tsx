@@ -175,7 +175,7 @@ export default function DeliveryMap({
     return (
       <div className="h-full w-full flex items-center justify-center bg-[#f7f7f5] px-6">
         <div className="text-center">
-          <p className="text-[15px] font-medium text-[#000000]">Map unavailable</p> <p className="mt-2 text-[13px] text-muted-foreground font-normal leading-[20px]">
+          <p className="text-[15px] font-medium text-black">Map unavailable</p> <p className="mt-2 text-[13px] text-muted-foreground font-normal leading-[20px]">
             {loadError}
           </p>
         </div>
@@ -253,7 +253,7 @@ export default function DeliveryMap({
               pathOptions={{
                 color: '#ffffff',
                 weight: 1.5,
-                fillColor: selected?.id === node.id ? '#b07d2b' : BRAND,
+                fillColor: selected?.id === node.id ? AMBER : BRAND,
                 fillOpacity: 0.95,
               }}
               eventHandlers={{ click: () => drill(node) }}
@@ -305,7 +305,7 @@ export default function DeliveryMap({
                   className={`text-[11px] px-2.5 py-1 rounded-full border font-normal transition-colors ${
                     regionId === region.id
                       ? 'bg-brand text-white border-brand'
-                      : 'bg-white text-[#000000] border-neutral-300 hover:border-brand'
+                      : 'bg-white text-black border-neutral-300 hover:border-brand'
                   }`}
                 >
                   {region.name.replace(' Region', '')}
@@ -320,7 +320,7 @@ export default function DeliveryMap({
 
       {selected && (
         <div className="absolute bottom-24 left-3 right-3 z-[1050] bg-white/95 rounded-xl shadow-lg px-3 py-2">
-          <p className="text-[13px] font-medium text-[#000000]">{selected.name}</p> <p className="text-[11px] text-muted-foreground font-normal">
+          <p className="text-[13px] font-medium text-black">{selected.name}</p> <p className="text-[11px] text-muted-foreground font-normal">
             {selected.kind}
             {selected.children.length > 0
               ? ` · ${selected.children.length} below`
@@ -342,7 +342,7 @@ function Legend({
   return (
     <div className="absolute bottom-3 left-3 z-[1050] bg-white/95 rounded-lg shadow px-2.5 py-1.5 space-y-0.5 max-w-[62%]">
       {levels.map((level) => (
-        <p key={level.level} className="text-[10px] font-normal text-muted-foreground"> <span className="text-[#000000]">{level.count}</span> {level.label ?? level.level.toLowerCase() + 's'}
+        <p key={level.level} className="text-[10px] font-normal text-muted-foreground"> <span className="text-black">{level.count}</span> {level.label ?? level.level.toLowerCase() + 's'}
           {!level.geometryAvailable && <span style={{ color: AMBER }}> · no outline data</span>}
         </p>
       ))}

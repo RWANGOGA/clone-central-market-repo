@@ -3,6 +3,13 @@ import { Circle, CircleMarker, GeoJSON, MapContainer, TileLayer, useMap } from '
 import 'leaflet/dist/leaflet.css';
 import { fetchBoundaries, locatePlace, type BoundaryStatus, type LocatedPlace } from '../lib/geoApi';
 
+/**
+ * Leaflet paints SVG attributes from these JS strings, so the Tailwind token
+ * utilities cannot reach them; this mirrors var(--brand) as the single source
+ * of the market green for the map layers.
+ */
+const BRAND = '#426b1f';
+
 interface DeliveryLocationMapProps {
   /** District or town exactly as it was chosen at checkout. */
   district: string;
@@ -106,7 +113,7 @@ export default function DeliveryLocationMap({
         <FallbackMap region={region} district={district} />
         <div className="absolute inset-0 bg-white/85 flex items-center justify-center px-6 text-center">
           <div>
-            <p className="text-[13px] font-medium text-[#000000]">
+            <p className="text-[13px] font-medium text-black">
               Could not place this order on the map
             </p>
             <p className="mt-1 text-[11px] leading-[16px] font-normal text-muted-foreground"> The geography service did not resolve {district || 'this district'}. The rider still
@@ -147,9 +154,9 @@ export default function DeliveryLocationMap({
           <GeoJSON
             data={feature}
             style={{
-              color: '#426b1f',
+              color: BRAND,
               weight: 1.6,
-              fillColor: '#426b1f',
+              fillColor: BRAND,
               fillOpacity: 0.14,
             }}
           />
@@ -162,9 +169,9 @@ export default function DeliveryLocationMap({
               center={[place.centroid.lat, place.centroid.lng]}
               radius={radiusFor(place)}
               pathOptions={{
-                color: '#426b1f',
+                color: BRAND,
                 weight: 1,
-                fillColor: '#426b1f',
+                fillColor: BRAND,
                 fillOpacity: 0.08,
                 dashArray: '4 4',
               }}
@@ -175,7 +182,7 @@ export default function DeliveryLocationMap({
               pathOptions={{
                 color: '#ffffff',
                 weight: 2.5,
-                fillColor: '#426b1f',
+                fillColor: BRAND,
                 fillOpacity: 1,
               }}
             />
@@ -187,7 +194,7 @@ export default function DeliveryLocationMap({
       {/* Caption states what the pin actually means. */}
       <div className="absolute left-2 top-2 right-2 z-[1050] flex items-start justify-between gap-2">
         <div className="bg-white/95 rounded-lg shadow px-2 py-1 min-w-0">
-          <p className="text-[11px] font-medium text-[#000000] truncate">
+          <p className="text-[11px] font-medium text-black truncate">
             {place ? `${place.name} district` : 'Locating…'}
           </p>
           {place && (
@@ -251,7 +258,7 @@ function FallbackMap({ district }: { region: string; district: string }) {
         {outline.state === 'ready' && (
           <GeoJSON
             data={outline.geojson}
-            style={{ color: '#426b1f', weight: 1, fillColor: '#426b1f', fillOpacity: 0.1 }}
+            style={{ color: BRAND, weight: 1, fillColor: BRAND, fillOpacity: 0.1 }}
           />
         )}
       </MapContainer>

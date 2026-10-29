@@ -153,7 +153,7 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
   };
 
   return (
-    <div className="relative flex h-full flex-col bg-[#ffffff]">
+    <div className="relative flex h-full flex-col bg-white">
       {/* Status Bar */}
       <StatusBar />
       
@@ -200,7 +200,7 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
                       onClick={() => applySavedAddress(address)}
                       className="shrink-0 max-w-[180px] text-left border border-neutral-200 rounded-lg px-3 py-2 hover:border-brand transition-colors"
                     >
-                      <span className="block font-medium text-[13px] text-[#000000] truncate">
+                      <span className="block font-medium text-[13px] text-black truncate">
                         {address.label}{address.isDefault ? ' · default' : ''}
                       </span>
                       <span className="block font-normal text-[11px] text-muted-foreground truncate">
@@ -219,7 +219,7 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
                 onChange={(e) => updateFormField('fullName', e.target.value)}
                 placeholder="e.g. Namukasa Allen"
                 autoComplete="name"
-                className="bg-[#ffffff] border border-neutral-200 rounded-lg px-4 py-2 w-full font-normal text-[16px] text-[#000000]"
+                className="bg-white border border-neutral-200 rounded-lg px-4 py-2 w-full font-normal text-[16px] text-black"
               />
             </FormField>
 
@@ -232,7 +232,7 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
                   inputMode="tel"
                   autoComplete="tel"
                   placeholder="07XX XXX XXX"
-                  className={`bg-[#ffffff] border rounded-lg px-4 py-2 w-full font-normal text-[16px] text-[#000000] ${
+                  className={`bg-white border rounded-lg px-4 py-2 w-full font-normal text-[16px] text-black ${
                     showPhoneError ? 'border-red-500' : 'border-neutral-200'
                   }`}
                 />
@@ -270,7 +270,7 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
                 onChange={(e) => updateFormField('address', e.target.value)}
                 placeholder="Plot number, street and nearest landmark"
                 autoComplete="street-address"
-                className="bg-[#ffffff] border border-neutral-200 rounded-lg px-4 py-2 w-full font-normal text-[16px] text-[#000000]"
+                className="bg-white border border-neutral-200 rounded-lg px-4 py-2 w-full font-normal text-[16px] text-black"
               />
             </FormField>
 
@@ -345,7 +345,7 @@ function LeftSide() {
         className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
         style={{ left: "calc(50% - 135.5px)" }}
       >
-        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-[#000000] text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
+        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-black text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
           <p className="block leading-[22px]">9:41</p>
         </div>
       </div>

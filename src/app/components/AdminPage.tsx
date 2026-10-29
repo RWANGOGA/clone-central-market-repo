@@ -286,7 +286,7 @@ function StaffShell({
                   ? 'bg-brand text-white'
                   : item.disabled
                     ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                    : 'bg-neutral-100 text-[#000000]'
+                    : 'bg-neutral-100 text-black'
               }`}
             >
               {item.label}
@@ -1272,7 +1272,7 @@ function PeoplePanel({
             key={item.value || 'all'}
             onClick={() => setKind(item.value as WorkerKind | '')}
             className={`px-3 py-1 rounded-full text-[12px] font-medium ${
-              kind === item.value ? 'bg-brand text-white' : 'bg-neutral-100 text-[#000000]'
+              kind === item.value ? 'bg-brand text-white' : 'bg-neutral-100 text-black'
             }`}
           >
             {item.label}
@@ -1443,7 +1443,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 onChange={(e) => update('code', e.target.value)}
                 placeholder="WELCOME10"
                 autoCapitalize="characters"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] uppercase text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] uppercase text-black"
               />
             </label>
             <label className="col-span-2 text-[12px] text-muted-foreground">
@@ -1452,7 +1452,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 value={draft.description ?? ''}
                 onChange={(e) => update('description', e.target.value)}
                 placeholder="10% off the first basket"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
               />
             </label>
             <label className="text-[12px] text-muted-foreground">
@@ -1460,7 +1460,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
               <select
                 value={draft.kind}
                 onChange={(e) => update('kind', e.target.value as PromoDraft['kind'])}
-                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-[13px] text-black"
               >
                 <option value="percent">Percent off</option>
                 <option value="fixed">Shillings off</option>
@@ -1473,7 +1473,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 min={1}
                 value={draft.value}
                 onChange={(e) => update('value', Math.floor(Number(e.target.value) || 0))}
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
               />
             </label>
             <label className="text-[12px] text-muted-foreground">
@@ -1483,7 +1483,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 min={0}
                 value={draft.minSubtotal ?? 0}
                 onChange={(e) => update('minSubtotal', Math.max(0, Math.floor(Number(e.target.value) || 0)))}
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
               />
             </label>
             {draft.kind === 'percent' && (
@@ -1495,7 +1495,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                   value={draft.maxDiscount ?? ''}
                   onChange={(e) => update('maxDiscount', numberOrNull(e.target.value))}
                   placeholder="No cap"
-                  className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                  className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
                 />
               </label>
             )}
@@ -1507,7 +1507,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 value={draft.usageLimit ?? ''}
                 onChange={(e) => update('usageLimit', numberOrNull(e.target.value))}
                 placeholder="Unlimited"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
               />
             </label>
             <label className="text-[12px] text-muted-foreground">
@@ -1518,7 +1518,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 value={draft.perCustomerLimit ?? ''}
                 onChange={(e) => update('perCustomerLimit', numberOrNull(e.target.value))}
                 placeholder="Unlimited"
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
               />
             </label>
             <label className="col-span-2 text-[12px] text-muted-foreground">
@@ -1527,7 +1527,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 type="date"
                 value={draft.endsAt ?? ''}
                 onChange={(e) => update('endsAt', e.target.value || null)}
-                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-[#000000]"
+                className="mt-1 w-full rounded-lg border border-neutral-200 px-3 py-2 text-[13px] text-black"
               />
             </label>
           </div>
@@ -1550,7 +1550,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-[14px] text-[#000000]">{promo.code}</p>
+                      <p className="font-medium text-[14px] text-black">{promo.code}</p>
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${PROMO_STATE_STYLES[promo.state]}`}>
                         {promo.state}
                       </span>
@@ -1562,7 +1562,7 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                   <button
                     onClick={() => toggle(promo)}
                     disabled={busyId === promo.id}
-                    className="shrink-0 rounded-lg border border-neutral-200 px-2.5 py-1 text-[11px] text-[#000000] disabled:opacity-50"
+                    className="shrink-0 rounded-lg border border-neutral-200 px-2.5 py-1 text-[11px] text-black disabled:opacity-50"
                   >
                     {promo.active ? 'Pause' : 'Resume'}
                   </button>
@@ -1570,22 +1570,22 @@ function PromotionsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m
                 <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
                   <div className="flex justify-between">
                     <dt>Rule</dt>
-                    <dd className="text-[#000000]">{rule}</dd>
+                    <dd className="text-black">{rule}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt>Min basket</dt>
-                    <dd className="text-[#000000]">{promo.minSubtotal ? formatUgx(promo.minSubtotal) : 'None'}</dd>
+                    <dd className="text-black">{promo.minSubtotal ? formatUgx(promo.minSubtotal) : 'None'}</dd>
                   </div>
                   <div className="flex justify-between">
                     <dt>Used</dt>
-                    <dd className="text-[#000000]">
+                    <dd className="text-black">
                       {promo.usedCount}
                       {promo.usageLimit ? ` / ${promo.usageLimit}` : ''}
                     </dd>
                   </div>
                   <div className="flex justify-between">
                     <dt>Per customer</dt>
-                    <dd className="text-[#000000]">{promo.perCustomerLimit ?? 'Unlimited'}</dd>
+                    <dd className="text-black">{promo.perCustomerLimit ?? 'Unlimited'}</dd>
                   </div>
                 </dl>
               </div>
@@ -1682,7 +1682,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
               key={range.days}
               onClick={() => setRangeDays(range.days)}
               className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                rangeDays === range.days ? 'bg-brand text-white' : 'bg-neutral-100 text-[#000000]'
+                rangeDays === range.days ? 'bg-brand text-white' : 'bg-neutral-100 text-black'
               }`}
             >
               {range.label}
@@ -1744,11 +1744,11 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
                   return (
                     <div key={stage.value} className="flex items-center gap-2">
                       <span className={`h-2 w-2 rounded-full ${stage.color}`} />
-                      <span className="w-[76px] text-[12px] text-[#000000]">{stage.label}</span>
+                      <span className="w-[76px] text-[12px] text-black">{stage.label}</span>
                       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-100">
                         <div className={`h-full ${stage.color}`} style={{ width: `${(count / pipelineTotal) * 100}%` }} />
                       </div>
-                      <span className="w-6 text-right text-[12px] text-[#000000]">{count}</span>
+                      <span className="w-6 text-right text-[12px] text-black">{count}</span>
                     </div>
                   );
                 })}
@@ -1764,7 +1764,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
                 {overview.payments.map((row) => (
                   <div key={row.status} className="flex justify-between gap-2">
                     <dt className="text-muted-foreground">{PAYMENT_LABELS[row.status] ?? row.status}</dt>
-                    <dd className="text-[#000000]">{row.count} · {formatUgx(row.amount)}</dd>
+                    <dd className="text-black">{row.count} · {formatUgx(row.amount)}</dd>
                   </div>
                 ))}
               </dl>
@@ -1779,7 +1779,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
                 {topProducts.map((product) => (
                   <div key={product.productId}>
                     <div className="flex justify-between gap-2 text-[12px]">
-                      <span className="truncate text-[#000000]">{product.name}</span>
+                      <span className="truncate text-black">{product.name}</span>
                       <span className="shrink-0 text-muted-foreground">{product.units} {product.unit}</span>
                     </div>
                     <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-neutral-100">
@@ -1801,7 +1801,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
               <dl className="space-y-1 text-[12px]">
                 {regions.slice(0, 5).map((row) => (
                   <div key={`${row.region}-${row.district ?? ''}`} className="flex justify-between gap-2"> <dt className="truncate text-muted-foreground">{row.region}{row.district ? ` · ${row.district}` : ''}</dt>
-                    <dd className="shrink-0 text-[#000000]">
+                    <dd className="shrink-0 text-black">
                       {row.orders} order{row.orders === 1 ? '' : 's'} · {formatUgx(row.revenue)}
                     </dd>
                   </div>
@@ -1818,7 +1818,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
                 {restock.map((row) => (
                   <div key={row.productId} className="flex justify-between gap-2">
                     <dt className="truncate text-muted-foreground">{row.name}</dt>
-                    <dd className="shrink-0 text-[#000000]">
+                    <dd className="shrink-0 text-black">
                       {row.daysOfCover} days · {row.stock} {row.unit} left
                     </dd>
                   </div>
@@ -1834,7 +1834,7 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
               <dl className="space-y-1 text-[12px]">
                 {overview.promos.map((promo) => (
                   <div key={promo.code} className="flex justify-between gap-2">
-                    <dt className="text-[#000000]">{promo.code}</dt>
+                    <dt className="text-black">{promo.code}</dt>
                     <dd className="text-muted-foreground">{promo.uses} uses · {formatUgx(promo.discount)}</dd>
                   </div>
                 ))}
@@ -1863,7 +1863,7 @@ function Kpi({ label, value, note }: { label: string; value: string; note: strin
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
       <p className="text-[11px] text-muted-foreground">{label}</p>
-      <p className="text-[16px] font-medium text-[#000000]">{value}</p>
+      <p className="text-[16px] font-medium text-black">{value}</p>
       <p className="text-[10px] text-muted-foreground">{note}</p>
     </div>
   );
@@ -1872,7 +1872,7 @@ function Kpi({ label, value, note }: { label: string; value: string; note: strin
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
-      <p className="mb-2 text-[12px] font-medium text-[#000000]">{title}</p>
+      <p className="mb-2 text-[12px] font-medium text-black">{title}</p>
       {children}
     </div>
   );
@@ -2136,7 +2136,7 @@ function AdminsPanel({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium text-[#000000]">
+                    <p className="truncate text-[13px] font-medium text-black">
                       {account.name}
                       {self ? ' (you)' : ''}
                     </p>
@@ -2224,7 +2224,7 @@ function AdminsPanel({
                     type="button"
                     disabled={pending || account.activeSessions === 0}
                     onClick={() => change(account, { revokeSessions: true })}
-                    className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-[#000000] disabled:text-neutral-300"
+                    className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-black disabled:text-neutral-300"
                   >
                     Sign out everywhere
                   </button>
@@ -2237,7 +2237,7 @@ function AdminsPanel({
                         setResetFor(resetFor === account.id ? null : account.id);
                         setResetPassword('');
                       }}
-                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-[#000000] disabled:text-neutral-300"
+                      className="rounded-lg border border-neutral-200 px-2 py-1 text-[11px] font-medium text-black disabled:text-neutral-300"
                     >
                       Set password
                     </button>
@@ -2279,7 +2279,7 @@ function AdminsPanel({
       )}
 
       <form onSubmit={addAccount} className="space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
-        <p className="text-[13px] font-medium text-[#000000]">
+        <p className="text-[13px] font-medium text-black">
           Add a staff account
         </p>
         <Field label="Full name">

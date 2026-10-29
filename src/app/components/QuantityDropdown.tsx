@@ -22,14 +22,14 @@ export default function QuantityDropdown({ quantity, onQuantityChange }: Quantit
       {/* Dropdown Trigger */}
       <button
         onClick={toggleDropdown}
-        className="bg-[#ffffff] w-[60px] rounded-lg relative z-20"
+        className="bg-white w-[60px] rounded-lg relative z-20"
       >
         <div className="absolute border border-neutral-200 border-solid inset-0 pointer-events-none rounded-lg" />
         <div className="relative size-full">
           <div className="box-border content-stretch flex flex-col gap-2 items-start justify-start px-2 py-1 relative">
             <div className="relative shrink-0">
               <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative">
-                <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-[#000000] text-[14px] text-left text-nowrap tracking-[-0.14px]">
+                <div className="flex flex-col font-normal justify-center leading-[0] not-italic relative shrink-0 text-black text-[14px] text-left text-nowrap tracking-[-0.14px]">
                   <p className="block leading-[20px] whitespace-pre">{quantity}</p>
                 </div>
                 <div className="flex h-[4px] items-center justify-center relative shrink-0 w-[7px]">
@@ -51,7 +51,7 @@ export default function QuantityDropdown({ quantity, onQuantityChange }: Quantit
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 w-[60px] bg-[#ffffff] rounded-bl-[4px] rounded-br-[4px] shadow-[0px_4px_4px_0px_rgba(26,26,26,0.25)]">
+        <div className="absolute top-full left-0 z-50 w-[60px] bg-white rounded-bl-[4px] rounded-br-[4px] shadow-[0px_4px_4px_0px_rgba(26,26,26,0.25)]">
           <div className="absolute inset-0 pointer-events-none shadow-[-2px_0px_0px_0px_inset_#6b6b6b,0px_-2px_0px_0px_inset_#6b6b6b,2px_0px_0px_0px_inset_#6b6b6b]" />
           <div className="relative size-full">
             <div className="box-border content-stretch flex flex-col items-start justify-start px-0 py-2 relative size-full max-h-[200px] overflow-y-auto">

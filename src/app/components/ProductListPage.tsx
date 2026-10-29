@@ -59,7 +59,7 @@ export default function ProductListPage({
   stockLive
 }: ProductListPageProps) {
   return (
-    <div className="flex h-full flex-col bg-[#ffffff]">
+    <div className="flex h-full flex-col bg-white">
       {/* Status Bar */}
       <StatusBar />
       
@@ -216,11 +216,11 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
   const lowStock = stockLevel?.state === 'low';
 
   return (
-    <div className="bg-[#ffffff] relative shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)] shrink-0 w-full rounded-[12px]">
+    <div className="bg-white relative shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)] shrink-0 w-full rounded-[12px]">
       <div className="box-border content-stretch flex flex-row items-start justify-start overflow-clip p-0 relative w-full">
         {/* Product Image */}
         <div
-          className="bg-[#ffffff] relative self-stretch shrink-0 w-[93px] cursor-pointer rounded-l-[12px]"
+          className="bg-white relative self-stretch shrink-0 w-[93px] cursor-pointer rounded-l-[12px]"
           style={{
             backgroundImage: `url('${product.images[0]}')${product.images[1] ? `, url('${product.images[1]}')` : ''}`,
             backgroundSize: 'cover'
@@ -236,7 +236,7 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
             <div className="box-border content-stretch flex flex-col gap-1 items-start justify-center pl-4 pr-8 py-4 relative size-full">
               <div className="relative shrink-0 w-full">
                 <div className="box-border content-stretch flex flex-col font-normal gap-2 items-start justify-start leading-[0] not-italic p-0 relative text-left w-full">
-                  <div className="flex flex-col justify-center relative shrink-0 text-[#000000] text-[0px] w-[173px]">
+                  <div className="flex flex-col justify-center relative shrink-0 text-black text-[0px] w-[173px]">
                     <p className="leading-[16px] text-[14px]">
                       {product.name}
                       <br />
@@ -259,7 +259,7 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
                     }
                     detail={
                       <div className="space-y-2">
-                        <p className="text-[11px] font-normal text-[#000000] leading-[16px]">
+                        <p className="text-[11px] font-normal text-black leading-[16px]">
                           {product.description}
                         </p>
                         <p className="text-[11px] font-normal text-muted-foreground leading-[16px]">
@@ -308,7 +308,7 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
             soldOut
               ? 'bg-neutral-200 cursor-not-allowed'
               : lowStock
-                ? 'bg-[#b07d2b] hover:bg-[#96691f]'
+                ? 'bg-brand-gold hover:bg-brand-gold-deep'
                 : 'bg-brand hover:bg-[#355214]'
           }`}
         >

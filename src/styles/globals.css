@@ -38,6 +38,35 @@
   --brand-deep: #35571a;
   --brand-soft: #eef3e6;
 
+  /*
+   * The amber accent used by the stock and order-queue badges and the selected
+   * fill on the delivery maps. It was repeated as a literal (#b07d2b, with a
+   * darker hover state #96691f) across four components, so it now has a name.
+   */
+  --brand-gold: #b07d2b;
+  --brand-gold-deep: #96691f;
+
+  /* The secondary grey for meta lines (source - date - read time). */
+  --caption: #9a9a9a;
+
+  /*
+   * Status colours shared by the storefront and the staff console, so a
+   * "confirmed" green or a "processing" blue is one decision, not a hex typed
+   * per component.
+   */
+  --success: #2f855a;
+  --info: #2b6cb0;
+
+  /*
+   * Motion as a token, not a magic number. Durations and easings are decided
+   * once here so a transition across the app shares one rhythm; components
+   * reference them (duration-(--motion-base), ease-brand) rather than typing
+   * an ad-hoc millisecond figure or bezier curve.
+   */
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+
   /* ---- surfaces, as shadcn/ui expects them ---- */
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
@@ -147,6 +176,14 @@
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
   --color-brand-soft: var(--brand-soft);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-deep: var(--brand-gold-deep);
+  --color-caption: var(--caption);
+  --color-success: var(--success);
+  --color-info: var(--info);
+
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-brand-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -55,7 +55,7 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
   };
 
   return (
-    <div className="bg-[#ffffff] relative size-full">
+    <div className="bg-white relative size-full">
       <div className="absolute inset-0 flex items-center justify-center px-6">
         <form onSubmit={submit} className="w-full max-w-[320px] space-y-4">
           <div>
@@ -130,7 +130,7 @@ export default function AdminGate({ onSignedIn }: AdminGateProps) {
             {busy ? 'Signing in…' : 'Sign in'}
           </button>
 
-          <p className="text-[11px] leading-[16px] font-normal text-[#9a9a9a]">
+          <p className="text-[11px] leading-[16px] font-normal text-caption">
             Accounts are created by an owner with <code>npm run db:seed:admin</code>. There is no
             default account.
           </p>

@@ -135,7 +135,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                 {level.label}
               </p>
               {parentChosen && options.length === 0 && (
-                <p className="text-[11px] font-normal text-[#b07d2b]">
+                <p className="text-[11px] font-normal text-brand-gold">
                   none recorded
                 </p>
               )}
@@ -149,11 +149,11 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                 aria-expanded={isOpen}
                 className={`w-full border rounded-lg px-4 py-2 text-left font-normal text-[16px] flex items-center justify-between ${
                   disabled
-                    ? 'bg-neutral-100 border-neutral-200 text-[#9a9a9a] cursor-not-allowed'
-                    : 'bg-white border-neutral-200 text-[#000000] cursor-pointer'
+                    ? 'bg-neutral-100 border-neutral-200 text-caption cursor-not-allowed'
+                    : 'bg-white border-neutral-200 text-black cursor-pointer'
                 }`}
               >
-                <span className={`text-[12px] truncate ${chosen ? '' : 'text-[#9a9a9a]'}`}>
+                <span className={`text-[12px] truncate ${chosen ? '' : 'text-caption'}`}>
                   {chosen
                     ? `${chosen} (${options.find((o) => o.name === chosen)?.kind ?? ''})`
                     : parentChosen
@@ -188,7 +188,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
                       className={`w-full px-4 py-2 text-left text-[13px] font-normal hover:bg-brand/5 ${
                         option.name === chosen
                           ? 'text-brand font-medium'
-                          : 'text-[#000000]'
+                          : 'text-black'
                       }`}
                     >
                       {optionLabel(option)}
