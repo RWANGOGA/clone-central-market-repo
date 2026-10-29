@@ -6,11 +6,15 @@
  * granted per role here instead of comparing `role === 'owner'` in a dozen
  * route files.
  *
+ * Role is only one axis. The other is which market the account belongs to, and
+ * that is answered in `marketScope.ts` — this matrix says what a role may do
+ * wherever it is pinned, never which market it may do it in.
+ *
  * This module deliberately imports nothing from the database: it is the part
  * that can be unit tested without a DATABASE_URL.
  */
 
-export type AdminRole = 'owner' | 'manager' | 'staff';
+export type AdminRole = 'super' | 'owner' | 'manager' | 'staff';
 
 export type Permission =
   | 'catalogue.write'
@@ -38,18 +42,35 @@ const MANAGER: readonly Permission[] = [
 /** A shop assistant fulfils orders and nothing else. */
 const STAFF: readonly Permission[] = ['orders.write'];
 
+/**
+ * The platform operator: every permission there is.
+ *
+ * Naming this role is the point. Before it existed, "sees everything" was an
+ * accident of `admins.market_id` being null, so any market owner could be moved
+ * off a market and silently become the platform. Now the two axes have to agree
+ * with each other, and `isSuper` checks both.
+ */
+const SUPER: readonly Permission[] = [
+  ...MANAGER,
+  'customers.write',
+  'admins.write',
+  'markets.write',
+];
+
 export const ROLE_PERMISSIONS: Record<AdminRole, readonly Permission[]> = {
-  // Opening a market is not part of running one, so the role gate is only half
-  // of it: `markets.write` sits on owner, and the route additionally requires a
-  // platform account (`admins.market_id` is null). An owner of one market can
-  // therefore never create a second one and staff it as they please.
-  owner: [...MANAGER, 'customers.write', 'admins.write', 'markets.write'],
+  super: SUPER,
+  // An owner runs one market: the shop, its people, its accounts and its
+  // shoppers. Opening a market is not part of running one, so `markets.write`
+  // belongs to super alone — and the route asks the account's market as well,
+  // so an owner promoted on a pinned account still cannot found a rival.
+  owner: [...MANAGER, 'customers.write', 'admins.write'],
   manager: MANAGER,
   staff: STAFF,
 };
 
 export const ROLE_LABELS: Record<AdminRole, string> = {
-  owner: 'Owner',
+  super: 'Super admin',
+  owner: 'Market owner',
   manager: 'Manager',
   staff: 'Shop assistant',
 };
@@ -73,5 +94,7 @@ export function can(role: AdminRole, permission: Permission): boolean {
 }
 
 export function isAdminRole(value: string): value is AdminRole {
-  return value === 'owner' || value === 'manager' || value === 'staff';
+  // Read off the matrix rather than a second list of literals, so a role can be
+  // added in one place only.
+  return Object.hasOwn(ROLE_PERMISSIONS, value);
 }

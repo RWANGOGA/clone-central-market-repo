@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isInOtherMarket,
   isPlatform,
+  isSuper,
   ownerMarket,
   requestedMarket,
   targetMarket,
@@ -19,8 +20,8 @@ import {
 const platform: AdminIdentity = {
   id: 1,
   email: 'platform@example.com',
-  name: 'Platform Owner',
-  role: 'owner',
+  name: 'Super Admin',
+  role: 'super',
   marketId: null,
 };
 
@@ -32,10 +33,29 @@ const kampala: AdminIdentity = {
   marketId: 7,
 };
 
+// The shape the `super` role exists to rule out: an account that carries no
+// market, and so reads every one, on a role that is not the platform's.
+const drifted: AdminIdentity = {
+  id: 3,
+  email: 'stray@example.com',
+  name: 'Unpinned Owner',
+  role: 'owner',
+  marketId: null,
+};
+
 describe('market scope', () => {
   it('treats a null market on an account as the platform tier', () => {
     expect(isPlatform(platform)).toBe(true);
     expect(isPlatform(kampala)).toBe(false);
+  });
+
+  it('names the platform by role and boundary together', () => {
+    expect(isSuper(platform)).toBe(true);
+    expect(isSuper(kampala)).toBe(false);
+    // Reading is unbounded for a drifted row, but it is not the platform's
+    // operator: it may not open a market or mint a super.
+    expect(isSuper(drifted)).toBe(false);
+    expect(isPlatform(drifted)).toBe(true);
   });
 
   it('refuses to say which market a platform account belongs to', () => {

@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { marketWorkers, markets, orders, products } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
 import { slugify } from '@/lib/catalogue';
-import { isPlatform } from '@/lib/marketScope';
+import { isPlatform, isSuper } from '@/lib/marketScope';
 import { recordActivity } from '@/lib/activity';
 import { error, json } from '@/lib/http';
 import { csrfCheck } from '@/lib/security';
@@ -100,10 +100,11 @@ export async function POST(request: Request) {
   if (!guard.ok) return error(guard.message, guard.status);
   const admin = guard.admin;
 
-  // The permission says the role is senior enough. This says the account is not
-  // a market's owner at all, which is the only kind that may open another.
-  if (!isPlatform(admin)) {
-    return error('Only a platform owner can open a market. Ask the platform to add yours.', 403);
+  // The permission says the role is senior enough. This says the account is the
+  // platform itself: opening a market is a super admin's act, not a market
+  // owner's, so an owner that somehow carries `markets.write` is still refused.
+  if (!isSuper(admin)) {
+    return error('Only a super admin can open a market. Ask the platform to add yours.', 403);
   }
 
   const parsed = createSchema.safeParse(await request.json().catch(() => null));

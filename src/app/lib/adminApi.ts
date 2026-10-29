@@ -10,7 +10,12 @@ const BASE = apiUrl('/api/admin');
  * another origin in production.
  */
 
-export type AdminRole = 'owner' | 'manager' | 'staff';
+/**
+ * Mirrors `api/src/lib/adminPermissions.ts`, which owns the matrix. `super` is
+ * the platform tier — the only role allowed to hold no market — and an account
+ * below it always belongs to one market.
+ */
+export type AdminRole = 'super' | 'owner' | 'manager' | 'staff';
 
 export type AdminIdentity = {
   id: number;
@@ -663,12 +668,16 @@ export type AdminDraft = {
   email: string;
   role: AdminRole;
   password: string;
-  /** Only a platform owner may choose this; anyone else is pinned to their own. */
+  /**
+   * Only the platform may choose this; anyone else is pinned to their own
+   * market. Null asks for an account that holds no market, which the API grants
+   * to a super admin alone.
+   */
   marketId?: number | null;
 };
 
 export type AdminChange = {
-  /** Move the account to another market, or to none (platform). */
+  /** Move the account to another market, or to none — a super admin's only shape. */
   marketId?: number | null;
   name?: string;
   role?: AdminRole;

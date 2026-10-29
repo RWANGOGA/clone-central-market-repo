@@ -139,7 +139,7 @@ export async function guardAdmin(
     return {
       ok: false,
       status: 403,
-      message: `Your role (${admin.role}) cannot ${PERMISSION_LABELS[permission]}. Ask an owner for access.`,
+      message: `Your role (${admin.role}) cannot ${PERMISSION_LABELS[permission]}. Ask a more senior account for access.`,
     };
   }
   return { ok: true, admin };

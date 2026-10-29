@@ -1,10 +1,11 @@
 import { and, count, eq, gt, sql } from 'drizzle-orm';
-import { marketScope } from '@/lib/marketScope';
+import { isSuper, marketScope } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { adminSessions, admins, markets, nowText } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
 import { adminDto } from '@/lib/adminAccounts';
+import { ROLE_LABELS } from '@/lib/adminPermissions';
 import { hashPassword } from '@/lib/password';
 import { recordActivity } from '@/lib/activity';
 import { error, json } from '@/lib/http';
@@ -14,9 +15,10 @@ import { error, json } from '@/lib/http';
  *
  * The rules that protect the shop from locking itself out live here rather than
  * in the UI: an owner cannot demote or deactivate themselves, and the last
- * active owner cannot be removed. A password set through this route belongs to
- * somebody else, so it signs that person out everywhere. Changing your own
- * password stays on /admin/password, which verifies the current one first.
+ * active owner of a market cannot be removed. A password set through this route
+ * belongs to somebody else, so it signs that person out everywhere. Changing
+ * your own password stays on /admin/password, which verifies the current one
+ * first.
  */
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -24,11 +26,11 @@ type Ctx = { params: Promise<{ id: string }> };
 const patchSchema = z
   .object({
     name: z.string().trim().min(2).max(80).optional(),
-    role: z.enum(['owner', 'manager', 'staff']).optional(),
+    role: z.enum(['super', 'owner', 'manager', 'staff']).optional(),
     active: z.boolean().optional(),
     password: z.string().min(10).max(200).optional(),
     revokeSessions: z.boolean().optional(),
-    /** Moving an account between markets. Only a platform account may. */
+    /** Moving an account between markets. Only a super admin may. */
     marketId: z.number().int().positive().nullish(),
   })
   .refine((value) => Object.values(value).some((item) => item !== undefined), {
@@ -66,13 +68,13 @@ export async function PATCH(request: Request, { params }: Ctx) {
     }
   }
 
-  // Moving an account from one market to another is a platform decision: an
-  // owner of one market must not be able to lend their team to a rival, nor
-  // pull in somebody else's staff.
+  // Moving an account is a platform decision twice over: which market it belongs
+  // to, and whether it belongs to none at all. A market's owner may do neither,
+  // so it cannot lend its team to a rival or hand somebody the whole platform.
   let movesTo: number | null | undefined;
   if (parsed.data.marketId !== undefined) {
-    if (admin.marketId !== null) {
-      return error('Only a platform owner can move an account between markets.', 403);
+    if (!isSuper(admin)) {
+      return error('Only a super admin can move an account between markets.', 403);
     }
     movesTo = parsed.data.marketId ?? null;
     if (movesTo !== null) {
@@ -81,23 +83,47 @@ export async function PATCH(request: Request, { params }: Ctx) {
     }
   }
 
-  const demoting = target.role === 'owner' && role !== undefined && role !== 'owner';
-  const deactivating = target.role === 'owner' && active === false;
-  if (demoting || deactivating) {
-    const [owners] = await db
+  // The market the account would end up owning, whether the change arrives as a
+  // role, a move, or both in one request.
+  const resultingMarket = movesTo !== undefined ? movesTo : target.marketId;
+
+  // The invariant is checked on the row this request would leave behind, not on
+  // the field it names, so `role: 'super'` cannot slip through by pinning the
+  // account to a market in the same breath.
+  if (role === 'super') {
+    if (!isSuper(admin)) return error('Only a super admin can promote to super admin.', 403);
+    if (resultingMarket !== null) {
+      return error('A super admin serves every market, so it cannot be pinned to one.', 422);
+    }
+  } else if (role !== undefined && resultingMarket === null) {
+    // The same rule read from the other side: a demotion may not leave an
+    // account holding no market, because that is the platform's shape and this
+    // row would claim none of its accountability.
+    return error('Choose a market for this account: only a super admin holds none.', 422);
+  }
+
+  // Two lock-outs are worth refusing a change for: a market left without an
+  // owner cannot manage its own accounts, and a platform left without a super
+  // cannot open a market or appoint another. A manager or assistant is
+  // replaceable by the owner, so those roles are not counted here.
+  const guarded = target.role === 'super' || target.role === 'owner';
+  const steppingDown = guarded && role !== undefined && role !== target.role;
+  const deactivating = guarded && active === false;
+  if (steppingDown || deactivating) {
+    const [remaining] = await db
       .select({ n: count() })
       .from(admins)
       .where(
         and(
-          eq(admins.role, 'owner'),
+          eq(admins.role, target.role),
           eq(admins.active, true),
           target.marketId === null
             ? sql`${admins.marketId} IS NULL`
             : eq(admins.marketId, target.marketId),
         ),
       );
-    if (Number(owners?.n ?? 0) <= 1) {
-      return error('At least one active owner must remain.', 409);
+    if (Number(remaining?.n ?? 0) <= 1) {
+      return error(`At least one active ${ROLE_LABELS[target.role].toLowerCase()} must remain.`, 409);
     }
   }
 

@@ -10,7 +10,7 @@ export type { AdminIdentity };
  *
  * `admins.role` answers what an account may do. This answers the other half of
  * the question — where it may do it — and the two are independent: a manager of
- * one market is not a manager of the platform, and the platform owner is not
+ * one market is not a manager of the platform, and the super admin is not
  * "a manager of every market" but something else entirely.
  *
  * A market admin must never be able to read a row that belongs to another
@@ -20,8 +20,10 @@ export type { AdminIdentity };
  * in the same way, and it keeps the counts honest.
  *
  * `marketId === null` on an account is the platform tier, which sees everything.
- * The same null on a data row means "predates markets", which the seeder hands
- * to the first market — a null is only ever an absence of boundary on an
+ * The role that is allowed to hold that absence is `super`, and `isSuper` is how
+ * a route checks it; a null with any other role is a row that has drifted, not a
+ * tier. The same null on a data row means "predates markets", which the seeder
+ * hands to the first market — a null is only ever an absence of boundary on an
  * account, never an invitation to show unowned data to everyone.
  */
 
@@ -53,6 +55,21 @@ export function visibleMarketFilter(
 
 export function isPlatform(admin: AdminIdentity): boolean {
   return admin.marketId === null;
+}
+
+/**
+ * The account that runs the platform, not merely one that happens to carry no
+ * market id.
+ *
+ * `isPlatform` is a data-visibility primitive and answers "is this account
+ * unbounded?", which is what the read paths need. This answers the governance
+ * question — may the account open a market or mint another platform admin — and
+ * requires both axes to agree. Without it, detaching an owner from its market
+ * would silently promote it, because the old model had no word for "platform"
+ * beyond the absence of a number.
+ */
+export function isSuper(admin: AdminIdentity): boolean {
+  return admin.role === 'super' && admin.marketId === null;
 }
 
 /**

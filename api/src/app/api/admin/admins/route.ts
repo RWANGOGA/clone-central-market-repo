@@ -1,5 +1,5 @@
 import { asc, count, eq, gt } from 'drizzle-orm';
-import { marketScope, targetMarket } from '@/lib/marketScope';
+import { marketScope, isSuper, targetMarket } from '@/lib/marketScope';
 import { z } from 'zod';
 import { db } from '@/db';
 import { adminSessions, admins, nowText } from '@/db/schema';
@@ -15,15 +15,22 @@ import { error, json } from '@/lib/http';
  * Owner-only: creating an account is the same act as granting a role, so it
  * cannot be delegated to the role it creates. Passwords are hashed here and
  * never returned; the DTO deliberately has no field for them.
+ *
+ * A super admin is the exception to "a role can be granted by its holder": only
+ * a super may mint another super, because that role is the platform and a
+ * market's owner appointing one would be appointing its own boss.
  */
 
 const createSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().toLowerCase().email().max(160),
-  role: z.enum(['owner', 'manager', 'staff']),
+  role: z.enum(['super', 'owner', 'manager', 'staff']),
   password: z.string().min(10).max(200),
-  /** Ignored for a market admin, which can only staff its own market. */
-  marketId: z.number().int().positive().optional(),
+  /**
+   * Ignored for a market admin, which can only staff its own market. An
+   * explicit null asks for a platform account, which only a super may give.
+   */
+  marketId: z.number().int().positive().nullish(),
 });
 
 export async function GET(request: Request) {
@@ -59,8 +66,21 @@ export async function POST(request: Request) {
 
   const { name, email, role, password } = parsed.data;
 
-  const marketId = targetMarket(admin, parsed.data.marketId ?? null);
-  if (!marketId.ok) return error(marketId.message, 422);
+  // `super` is the platform rather than a senior market role, so it is granted
+  // only by an existing super and never pinned to one market: a super holding a
+  // market id would be a row whose two axes disagree about what it can see.
+  let marketId: number | null;
+  if (role === 'super') {
+    if (!isSuper(admin)) return error('Only a super admin can create a super admin.', 403);
+    if (parsed.data.marketId != null) {
+      return error('A super admin serves every market, so it cannot be pinned to one.', 422);
+    }
+    marketId = null;
+  } else {
+    const resolved = targetMarket(admin, parsed.data.marketId ?? null);
+    if (!resolved.ok) return error(resolved.message, 422);
+    marketId = resolved.marketId;
+  }
 
   const existing = await db.query.admins.findFirst({ where: eq(admins.email, email) });
   if (existing) return error('An account with that email already exists.', 409);
@@ -68,7 +88,7 @@ export async function POST(request: Request) {
   const passwordHash = await hashPassword(password);
   const [created] = await db
     .insert(admins)
-    .values({ name, email, passwordHash, role, marketId: marketId.marketId })
+    .values({ name, email, passwordHash, role, marketId })
     .returning();
 
   await recordActivity({

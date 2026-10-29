@@ -53,7 +53,12 @@ A database that already exists needs neither command. `db:push` on a populated
 schema can offer to truncate a table over a unique constraint that is in fact
 already there; answer no and check with `psql` before letting it drop data the
 app validates addresses against. The seed chain includes the staff account,
-which comes from `ADMIN_EMAIL`, `ADMIN_PASSWORD` and `ADMIN_NAME`.
+which comes from `ADMIN_EMAIL`, `ADMIN_PASSWORD` and `ADMIN_NAME` and is created
+as a `super` — the platform tier, not a market. On a development database, add
+`SEED_MARKET_OWNERS=1` to give every market its own `owner` as well: without a
+second, narrower account to compare against, the market boundary is invisible in
+the console. Those owners all share `ADMIN_PASSWORD`, which is why the flag is
+off by default and does not belong on a live database.
 
 ## Deploying it
 

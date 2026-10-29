@@ -258,11 +258,16 @@ export const admins = pgTable('admins', {
   email: text('email').notNull().unique(),
   name: text('name').notNull(),
   passwordHash: text('password_hash').notNull(),
-  role: text('role', { enum: ['owner', 'manager', 'staff'] }).notNull().default('manager'),
+  role: text('role', { enum: ['super', 'owner', 'manager', 'staff'] }).notNull().default('manager'),
   /**
    * The market this account runs. Null means no market, which is the platform
    * tier: the account that can see every market and create the others. Role
    * says what an account may do; this says where it may do it.
+   *
+   * The two are meant to agree: `super` is the only role that may hold a null,
+   * and the admin routes refuse a super that carries a market. A row that
+   * disagrees with the rule is treated as unbounded for reading, because
+   * `isPlatform` is a data filter and is deliberately not a permission check.
    */
   marketId: integer('market_id').references(() => markets.id, { onDelete: 'set null' }),
   active: boolean('active').notNull().default(true),

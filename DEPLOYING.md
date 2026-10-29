@@ -202,6 +202,35 @@ Demo orders come from `npm run db:backfill:orders` with the same inline
 Neon also gives you a browser SQL Editor, which is the quickest way to confirm a
 row landed.
 
+### On a database that already has data
+
+Two things shipped with the market-scoped console have to be applied to the live
+schema before the new API code goes out, or the routes will be reading columns
+and roles that are not there yet:
+
+```bash
+cd api
+DB='postgresql://…direct, not pooled…'
+DATABASE_URL="$DB" npm run db:push && DATABASE_URL="$DB" npm run db:migrate:super-role
+```
+
+`db:push` adds `notifications.market_id` and its index. `admins.role` needs no
+DDL: the allowed values live in the TypeScript schema only and the column is
+plain text with no CHECK, confirmed against `pg_constraint`.
+
+`db:migrate:super-role` then rewrites the platform's own account, because "sees
+every market" used to be carried by `market_id IS NULL` alone: it promotes every
+unscoped `owner` to `super` and audits the rest, exiting non-zero if any row
+still contradicts the rule (a super pinned to a market, or a lesser role holding
+none). It is idempotent, so re-running it is safe. Run it **before** the deploy:
+the routes now treat the role as authoritative, and until it has run a live
+platform account is an owner, which means it can no longer open a market.
+
+If `db:push` asks about truncating `districts` over `districts_name_region_kind_unique`,
+that drift predates this work and the answer is no — see the note in `README.md`.
+Selective `--force` is not the fix: it would drop 196 rows of geography the
+address picker validates against.
+
 ## 4. Shop on GitHub Pages
 
 1. GitHub → Settings → **Pages** → Build and deployment → Source: **GitHub

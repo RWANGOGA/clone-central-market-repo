@@ -118,7 +118,9 @@ export default function AdminPage({ onClose }: { onClose?: () => void }) {
 
   if (!admin) return <AdminGate onSignedIn={setAdmin} />;
 
-  const canManageAdmins = admin.role === 'owner';
+  // Mirrors `admins.write` in api/src/lib/adminPermissions.ts: a market owner
+  // staffs its own market, and a super admin staffs the platform.
+  const canManageAdmins = admin.role === 'super' || admin.role === 'owner';
 
   return (
     <StaffShell
@@ -181,6 +183,10 @@ function StaffShell({
   // to them at all. The server enforces the same matrix regardless.
   const isStaff = admin.role === 'staff';
   const isPlatform = admin.marketId == null;
+  // Opening a market is the platform's act, not merely an act of an account that
+  // happens to carry no market id. The API refuses the difference, so the console
+  // does not offer a button that would only come back with a 403.
+  const isSuper = isPlatform && admin.role === 'super';
   const marketName = isPlatform
     ? null
     : (markets.find((item) => item.id === admin.marketId)?.name ?? 'My market');
@@ -211,7 +217,7 @@ function StaffShell({
           { value: 'analytics' as const, label: 'Analytics' },
           { value: 'people' as const, label: 'People' },
         ]),
-    ...(isPlatform ? [{ value: 'markets' as const, label: 'Markets' }] : []),
+    ...(isSuper ? [{ value: 'markets' as const, label: 'Markets' }] : []),
     { value: 'activity', label: 'Activity log' },
     { value: 'customers', label: 'Customers' },
     ...(canManageAdmins ? [{ value: 'admins' as const, label: 'Admins' }] : []),
@@ -322,7 +328,7 @@ function StaffShell({
           <AdminsPanel admin={admin} markets={markets} flash={flash} fail={fail} />
         )}
         {tab === 'people' && <PeoplePanel marketId={market} flash={flash} fail={fail} />}
-        {tab === 'markets' && isPlatform && (
+        {tab === 'markets' && isSuper && (
           <MarketsPanel markets={markets} reload={refreshMarkets} flash={flash} fail={fail} />
         )}
       </div>
@@ -2000,19 +2006,42 @@ function CustomersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
   );
 }
 
-/* ---------------- Admins (owner only) ---------------- */
+/* ---------------- Admins (owner and above) ---------------- */
 
 const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
-  owner: 'Owner',
+  super: 'Super admin',
+  owner: 'Market owner',
   manager: 'Manager',
   staff: 'Shop assistant',
 };
 
 const ADMIN_ROLE_HINTS: Record<AdminRole, string> = {
-  owner: 'Everything, including accounts and customer access.',
+  super: 'The platform itself: every market, every permission, and the right to open a new market.',
+  owner: 'Everything in one market, including its accounts and customer access.',
   manager: 'Catalogue, stock, orders, promos and suppliers.',
   staff: 'Fulfil orders only.',
 };
+
+/**
+ * Which roles the signed-in account is allowed to hand out.
+ *
+ * `super` is missing unless the caller is one: a market owner who could appoint
+ * a platform admin would be choosing who outranks them.
+ */
+function assignableRoles(callerIsSuper: boolean): AdminRole[] {
+  return callerIsSuper
+    ? ['super', 'owner', 'manager', 'staff']
+    : ['owner', 'manager', 'staff'];
+}
+
+/**
+ * A row whose stored role the caller cannot grant is still shown, so that a
+ * drifted account is visible rather than silently renamed by the select.
+ */
+function roleOptionsFor(callerIsSuper: boolean, current: AdminRole): AdminRole[] {
+  const options = assignableRoles(callerIsSuper);
+  return options.includes(current) ? options : [...options, current];
+}
 
 function AdminsPanel({
   admin,
@@ -2025,9 +2054,12 @@ function AdminsPanel({
   flash: (m: string) => void;
   fail: (m: string) => void;
 }) {
-  // A platform owner names the market an account belongs to. A market owner
-  // sees only their own team and is never offered the choice.
+  // A platform account names the market an account belongs to. A market owner
+  // sees only their own team and is never offered the choice. A super admin is
+  // the platform, and is the only caller that may create one of itself.
   const asPlatform = admin.marketId == null;
+  const asSuper = asPlatform && admin.role === 'super';
+  const roleChoices = assignableRoles(asSuper);
   const marketLabel = (id: number | null | undefined) =>
     id == null ? 'All markets' : (markets.find((item) => item.id === id)?.name ?? `Market ${id}`);
   const [accounts, setAccounts] = useState<AdminAccount[]>([]);
@@ -2073,13 +2105,22 @@ function AdminsPanel({
 
   const addAccount = async (e: React.FormEvent) => {
     e.preventDefault();
+    // A super admin holds no market and every role below one must hold one, so
+    // the market answer is either forced empty or insisted on here rather than
+    // left for the server to explain after the button has been pressed.
+    if (role === 'super') {
+      setMarketId('');
+    } else if (asPlatform && marketId === '') {
+      fail('Choose which market this account runs. Only a super admin holds none.');
+      return;
+    }
     setCreating(true);
     const result = await createAdmin({
       name: name.trim(),
       email: email.trim(),
       role,
       password,
-      ...(asPlatform ? { marketId: marketId === '' ? null : Number(marketId) } : {}),
+      ...(asPlatform ? { marketId: role === 'super' ? null : Number(marketId) } : {}),
     });
     setCreating(false);
     if (!result) return fail('Could not reach the service.');
@@ -2117,8 +2158,9 @@ function AdminsPanel({
       <div>
         <SectionTitle size="small" family="label">Staff accounts</SectionTitle>
         <p className="text-[11px] font-normal text-muted-foreground">
-          Owners manage accounts. Managers run the shop. Shop assistants only move orders. An
-          account pinned to a market cannot see another market's data.
+          A super admin runs the platform and opens markets. An owner runs one market, including its
+          accounts. Managers run the shop. Shop assistants only move orders. An account pinned to a
+          market cannot see another market's data.
         </p>
       </div>
 
@@ -2189,11 +2231,19 @@ function AdminsPanel({
                   <select
                     value={account.role}
                     disabled={self || pending}
-                    onChange={(e) => change(account, { role: e.target.value as AdminRole })}
+                    onChange={(e) => {
+                      const chosen = e.target.value as AdminRole;
+                      // Promoting to super has to detach the market in the same
+                      // request, or the server refuses the contradictory row.
+                      change(
+                        account,
+                        chosen === 'super' ? { role: chosen, marketId: null } : { role: chosen },
+                      );
+                    }}
                     title={ADMIN_ROLE_HINTS[account.role]}
                     className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-[11px] font-medium disabled:bg-neutral-100 disabled:text-neutral-400"
                   >
-                    {(Object.keys(ADMIN_ROLE_LABELS) as AdminRole[]).map((value) => (
+                    {roleOptionsFor(asSuper, account.role).map((value) => (
                       <option key={value} value={value}>
                         {ADMIN_ROLE_LABELS[value]}
                       </option>
@@ -2303,7 +2353,7 @@ function AdminsPanel({
             onChange={(e) => setRole(e.target.value as AdminRole)}
             className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px] w-full bg-white"
           >
-            {(Object.keys(ADMIN_ROLE_LABELS) as AdminRole[]).map((value) => (
+            {roleChoices.map((value) => (
               <option key={value} value={value}>
                 {ADMIN_ROLE_LABELS[value]}
               </option>
@@ -2313,14 +2363,20 @@ function AdminsPanel({
             {ADMIN_ROLE_HINTS[role]}
           </p>
         </Field>
-        {asPlatform && (
+        {asPlatform && role === 'super' && (
+          <p className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-[11px] font-normal text-muted-foreground">
+            A super admin belongs to no market: it works across all of them, which is why no market
+            is chosen here.
+          </p>
+        )}
+        {asPlatform && role !== 'super' && (
           <Field label="Market">
             <select
               value={marketId}
               onChange={(e) => setMarketId(e.target.value)}
               className="border border-neutral-200 rounded-lg px-3 py-2 text-[13px] w-full bg-white"
             >
-              <option value="">All markets (platform)</option>
+              <option value="">Choose a market</option>
               {markets.map((item) => (
                 <option key={item.id} value={String(item.id)}>
                   {item.name}
@@ -2328,7 +2384,8 @@ function AdminsPanel({
               ))}
             </select>
             <p className="mt-1 text-[10px] font-normal text-muted-foreground">
-              A platform account sees every market. Pin somebody to one and they see only that one.
+              Pinning somebody to a market is what limits them to it. Only a super admin runs the
+              whole platform, and only a super admin may be left without a market.
             </p>
           </Field>
         )}
