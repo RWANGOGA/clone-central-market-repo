@@ -3,7 +3,7 @@ import svgPaths from "../imports/svg-toln6of0ig";
 import { Input } from './ui/input';
 import GeoCascade from './GeoCascade';
 import { isValidUgandanPhone, normalizeUgandanPhone } from '../lib/uganda';
-import { fetchHierarchy, validateSelection, type GeoNode } from '../lib/geoApi';
+import { fetchHierarchy, validateSelection, reverseGeocode, type GeoNode } from '../lib/geoApi';
 import { fetchCustomerAddresses, type CustomerAddress } from '../lib/customerApi';
 import ScreenHeader from './shared/ScreenHeader';
 
@@ -31,6 +31,11 @@ interface CustomerInfo {
   parish: string;
   village: string;
   address: string;
+  /** Optional pin from "use my current location". */
+  lat?: number;
+  lng?: number;
+  accuracyM?: number;
+  locationSource?: 'gps' | 'manual';
 }
 
 export default function CheckoutPage({ cartCount, customerInfo, signedIn = false, onBack, onMenuClick, onProceedToPayment }: CheckoutPageProps) {
@@ -39,6 +44,11 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
   const [geoError, setGeoError] = useState<string | null>(null);
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState<CustomerAddress[]>([]);
+  // "Use my current location" walks through these states so the buyer always
+  // knows whether the app is asking the device, checking the map, or has given
+  // up and is leaving the cascade for them.
+  const [locateState, setLocateState] = useState<'idle' | 'locating' | 'found' | 'denied' | 'unavailable' | 'outside'>('idle');
+  const [locateNote, setLocateNote] = useState<string | null>(null);
 
   useEffect(() => {
     setFormData(customerInfo);
@@ -152,6 +162,67 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
     setGeoError(null);
   };
 
+  /**
+   * Ask the device for a position, then let the server say which district it is
+   * in. The result only ever fills region and district — the two levels we hold
+   * boundaries for — and never types a finer area the buyer has not confirmed.
+   */
+  const useCurrentLocation = () => {
+    if (locateState === 'locating') return;
+    if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
+      setLocateState('unavailable');
+      setLocateNote('This device will not share a location. Choose your area below.');
+      return;
+    }
+    setLocateState('locating');
+    setLocateNote(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        const result = await reverseGeocode(latitude, longitude);
+        if (result.state === 'found' && result.region) {
+          setFormData((prev) => ({
+            ...prev,
+            region: result.region as string,
+            district: result.district,
+            // The outline only proves the district; clear anything finer so a
+            // stale sub-county is not carried under a new location.
+            subCounty: '',
+            parish: '',
+            village: '',
+            lat: latitude,
+            lng: longitude,
+            accuracyM: Number.isFinite(accuracy) ? Math.round(accuracy) : undefined,
+            locationSource: 'gps',
+          }));
+          setGeoError(null);
+          setLocateState('found');
+          setLocateNote(`Located in ${result.district}, ${result.region}. Check the finer areas below.`);
+        } else if (result.state === 'rejected') {
+          setLocateState('outside');
+          setLocateNote(result.message);
+        } else if (result.state === 'unreachable') {
+          setLocateState('unavailable');
+          setLocateNote('Could not reach the location service. Choose your area below.');
+        } else {
+          setLocateState('outside');
+          setLocateNote('No mapped delivery area covers that point. Choose your area below.');
+        }
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setLocateState('denied');
+          setLocateNote('Location permission was declined. Choose your area below.');
+        } else {
+          setLocateState('unavailable');
+          setLocateNote('Could not read your location right now. Choose your area below.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 },
+    );
+  };
+
   return (
     <div className="relative flex h-full flex-col bg-white">
       {/* Status Bar */}
@@ -251,6 +322,42 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
             {/* Administrative chain. GeoCascade enforces that a level can only
                 be chosen after the level above it, and clears every level below
                 whenever a parent changes. */}
+            <div className="w-full">
+              <button
+                type="button"
+                onClick={useCurrentLocation}
+                disabled={locateState === 'locating'}
+                className="inline-flex items-center gap-2 rounded-lg border border-brand bg-brand-soft px-3 py-2 text-[13px] font-medium text-brand-deep disabled:opacity-60"
+              >
+                <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s-6-5.2-6-9.9A6 6 0 1 1 18 11.1C18 15.8 12 21 12 21Z" />
+                  <circle cx="12" cy="11" r="2.2" />
+                </svg>
+                {locateState === 'locating' ? 'Finding you…' : 'Use my current location'}
+              </button>
+              {locateNote && (
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className={`mt-1.5 text-[12px] leading-[18px] font-normal ${
+                    locateState === 'found'
+                      ? 'text-brand-deep'
+                      : locateState === 'denied' || locateState === 'unavailable' || locateState === 'outside'
+                        ? 'text-amber-700'
+                        : 'text-muted-foreground'
+                  }`}
+                >
+                  {locateNote}
+                </p>
+              )}
+              {locateState === 'found' && formData.lat != null && formData.lng != null && (
+                <p className="mt-1 text-[11px] font-normal text-caption">
+                  Pin at {formData.lat.toFixed(4)}, {formData.lng.toFixed(4)}
+                  {formData.accuracyM != null ? ` · ±${formData.accuracyM} m` : ''}
+                </p>
+              )}
+            </div>
+
             <GeoCascade
               hierarchy={hierarchy}
               value={{
@@ -261,8 +368,12 @@ export default function CheckoutPage({ cartCount, customerInfo, signedIn = false
                 village: formData.village,
               }}
               onChange={(next) => {
-                setFormData((prev) => ({ ...prev, ...next }));
+                // A hand-picked area supersedes any pin from "current location",
+                // so drop the stored point rather than keep a mismatched pair.
+                setFormData((prev) => ({ ...prev, ...next, lat: undefined, lng: undefined, accuracyM: undefined, locationSource: undefined }));
                 setGeoError(null);
+                setLocateState('idle');
+                setLocateNote(null);
               }}
               error={geoError}
             />

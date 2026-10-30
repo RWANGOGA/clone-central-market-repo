@@ -468,6 +468,15 @@ export const orders = pgTable('orders', {
     subCounty: string | null;
     parish: string | null;
     village: string | null;
+    /**
+     * Optional pin captured from the device when the buyer used "current
+     * location". Kept beside the address so the market can drop the basket
+     * closer than the district outline allows; never used to route on its own.
+     */
+    lat?: number;
+    lng?: number;
+    accuracyM?: number;
+    locationSource?: 'gps' | 'manual';
   }>(),
   /**
    * Copied from the customer at order time rather than read back through a join.

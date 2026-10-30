@@ -136,6 +136,12 @@ export default function OrderConfirmationPage({
 
   const deliveryDistrict = address?.district || order?.district || customerInfo.district;
   const deliveryRegion = address?.region || order?.region || customerInfo.region;
+  // Only a real device fix has both coordinates; the map falls back to the
+  // district centroid when this is null.
+  const deliveryPin =
+    typeof address?.lat === 'number' && typeof address?.lng === 'number'
+      ? { lat: address.lat, lng: address.lng, accuracyM: address.accuracyM }
+      : null;
   const copy = STATUS_COPY[status] ?? STATUS_COPY.pending;
   const itemCount = order?.items.reduce((sum, item) => (item.lineStatus === 'rejected' ? sum : sum + item.quantity), 0) ?? 0;
 
@@ -358,7 +364,7 @@ export default function OrderConfirmationPage({
               )}
 
               {/* Delivery location */}
-              <DeliveryLocationMap district={deliveryDistrict} region={deliveryRegion} address={address?.address || customerInfo.address} />
+              <DeliveryLocationMap district={deliveryDistrict} region={deliveryRegion} address={address?.address || customerInfo.address} pin={deliveryPin} />
 
               <div className="grid grid-cols-2 gap-4 pt-1 border-t border-neutral-100">
                 <div>

@@ -341,3 +341,41 @@ export function bboxOf(node: GeoNode | null, padRatio = 0.12): Bbox | null {
   const padLng = (east - west) * padRatio || 0.2;
   return [south - padLat, west - padLng, north + padLat, east + padLng];
 }
+
+/**
+ * The result of asking the server which district a pin sits in.
+ *
+ * `outside` is not an error: the point is real but no boundary we hold covers
+ * it, so the caller should keep the manual cascade rather than store a guess.
+ * `unreachable` lets the checkout message stay honest when the API is down.
+ */
+export type ReverseGeocode =
+  | { state: 'found'; region: string | null; district: string; lat: number; lng: number }
+  | { state: 'outside' }
+  | { state: 'rejected'; message: string }
+  | { state: 'unreachable' };
+
+export async function reverseGeocode(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<ReverseGeocode> {
+  try {
+    const params = new URLSearchParams({ lat: String(lat), lng: String(lng) });
+    const response = await fetch(apiUrl(`/api/geo/reverse?${params.toString()}`), { signal });
+
+    if (response.status === 404) return { state: 'outside' };
+
+    const body = await response.json().catch(() => null);
+    if (!response.ok) {
+      const message = (body as { error?: string } | null)?.error ?? 'Could not check that location.';
+      return { state: 'rejected', message };
+    }
+
+    const data = (body as { data?: { region: string | null; district: string; lat: number; lng: number } }).data;
+    if (!data?.district) return { state: 'outside' };
+    return { state: 'found', region: data.region, district: data.district, lat: data.lat, lng: data.lng };
+  } catch {
+    return { state: 'unreachable' };
+  }
+}

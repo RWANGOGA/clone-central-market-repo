@@ -219,6 +219,12 @@ function AppShell() {
         parish: customerData.parish || undefined,
         village: customerData.village || undefined,
         address: customerData.address.trim(),
+        // Only carried when the buyer actually used their current location; the
+        // delivery is still routed on the validated region and district above.
+        lat: customerData.lat,
+        lng: customerData.lng,
+        accuracyM: customerData.accuracyM,
+        locationSource: customerData.locationSource,
       }, promoCode);
       if (!order.reference) throw new Error('The server did not return an order reference.');
       setOrderReference(order.reference);

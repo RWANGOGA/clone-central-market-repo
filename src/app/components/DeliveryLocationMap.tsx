@@ -16,6 +16,12 @@ interface DeliveryLocationMapProps {
   region: string;
   /** Free-text street address, shown as the label but not geocoded. */
   address?: string;
+  /**
+   * The buyer's own pin, when they used "current location". Preferred over the
+   * district centroid, because it marks where they actually stood rather than
+   * the middle of a district that can be tens of kilometres wide.
+   */
+  pin?: { lat: number; lng: number; accuracyM?: number } | null;
   className?: string;
 }
 
@@ -34,13 +40,17 @@ function radiusFor(place: LocatedPlace): number {
   return Math.max(3000, Math.round(Math.sqrt(heightKm * widthKm) * 1000 * 0.5));
 }
 
-function FitToPlace({ place }: { place: LocatedPlace }) {
+function FitToPlace({ place, pin }: { place: LocatedPlace; pin?: { lat: number; lng: number } | null }) {
   const map = useMap();
 
   useEffect(() => {
+    if (pin) {
+      map.flyTo([pin.lat, pin.lng], 14, { duration: 0 });
+      return;
+    }
     const zoom = place.precision === 'town-centre' ? 12 : 10;
     map.flyTo([place.centroid.lat, place.centroid.lng], zoom, { duration: 0 });
-  }, [place]);
+  }, [place, pin]);
 
   return null;
 }
@@ -57,6 +67,7 @@ export default function DeliveryLocationMap({
   district,
   region,
   address,
+  pin,
   className = '',
 }: DeliveryLocationMapProps) {
   const [place, setPlace] = useState<LocatedPlace | null>(null);
@@ -164,29 +175,59 @@ export default function DeliveryLocationMap({
 
         {place && (
           <>
-            {/* How wide the uncertainty is, stated rather than implied. */}
-            <Circle
-              center={[place.centroid.lat, place.centroid.lng]}
-              radius={radiusFor(place)}
-              pathOptions={{
-                color: BRAND,
-                weight: 1,
-                fillColor: BRAND,
-                fillOpacity: 0.08,
-                dashArray: '4 4',
-              }}
-            />
-            <CircleMarker
-              center={[place.centroid.lat, place.centroid.lng]}
-              radius={8}
-              pathOptions={{
-                color: '#ffffff',
-                weight: 2.5,
-                fillColor: BRAND,
-                fillOpacity: 1,
-              }}
-            />
-            <FitToPlace place={place} />
+            {pin ? (
+              <>
+                {/* The buyer's own fix: a marker where they stood, ringed by the
+                    accuracy the device reported rather than a whole district. */}
+                <Circle
+                  center={[pin.lat, pin.lng]}
+                  radius={Math.min(Math.max(pin.accuracyM ?? 50, 20), 5000)}
+                  pathOptions={{
+                    color: BRAND,
+                    weight: 1,
+                    fillColor: BRAND,
+                    fillOpacity: 0.12,
+                    dashArray: '4 4',
+                  }}
+                />
+                <CircleMarker
+                  center={[pin.lat, pin.lng]}
+                  radius={9}
+                  pathOptions={{
+                    color: '#ffffff',
+                    weight: 2.5,
+                    fillColor: BRAND,
+                    fillOpacity: 1,
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                {/* How wide the uncertainty is, stated rather than implied. */}
+                <Circle
+                  center={[place.centroid.lat, place.centroid.lng]}
+                  radius={radiusFor(place)}
+                  pathOptions={{
+                    color: BRAND,
+                    weight: 1,
+                    fillColor: BRAND,
+                    fillOpacity: 0.08,
+                    dashArray: '4 4',
+                  }}
+                />
+                <CircleMarker
+                  center={[place.centroid.lat, place.centroid.lng]}
+                  radius={8}
+                  pathOptions={{
+                    color: '#ffffff',
+                    weight: 2.5,
+                    fillColor: BRAND,
+                    fillOpacity: 1,
+                  }}
+                />
+              </>
+            )}
+            <FitToPlace place={place} pin={pin} />
           </>
         )}
       </MapContainer>
@@ -199,9 +240,11 @@ export default function DeliveryLocationMap({
           </p>
           {place && (
             <p className="text-[10px] leading-[14px] font-normal text-muted-foreground">
-              {place.precision === 'town-centre'
-                ? 'Pin marks the town centre'
-                : 'Pin marks the district centre'}
+              {pin
+                ? 'Pin marks where you shared your location'
+                : place.precision === 'town-centre'
+                  ? 'Pin marks the town centre'
+                  : 'Pin marks the district centre'}
             </p>
           )}
         </div>

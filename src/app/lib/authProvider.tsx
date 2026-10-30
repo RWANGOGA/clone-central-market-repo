@@ -25,6 +25,11 @@ export interface CustomerInfo {
   parish: string;
   village: string;
   address: string;
+  /** Optional pin from "use my current location". Routed on region/district, not this. */
+  lat?: number;
+  lng?: number;
+  accuracyM?: number;
+  locationSource?: 'gps' | 'manual';
 }
 
 const EMPTY_INFO: CustomerInfo = {

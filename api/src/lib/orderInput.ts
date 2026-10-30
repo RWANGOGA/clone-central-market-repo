@@ -14,6 +14,18 @@ export const guestShippingSchema = z.object({
   subCounty: z.string().trim().max(100).optional(),
   parish: z.string().trim().max(100).optional(),
   village: z.string().trim().max(100).optional(),
+  /**
+   * An optional pin from the browser's geolocation. It never replaces the
+   * validated region/district above — the delivery is routed on those — it only
+   * records where the buyer actually stood so the market can drop it nearer.
+   * A point outside Uganda, or that no district outline contains, simply fails
+   * the region/district guard like any other bad location.
+   */
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  /** Accuracy radius in metres reported by the device, if it reported one. */
+  accuracyM: z.number().int().nonnegative().max(100_000).optional(),
+  locationSource: z.enum(['gps', 'manual']).optional(),
 }).strict();
 
 export const createOrderSchema = z.object({

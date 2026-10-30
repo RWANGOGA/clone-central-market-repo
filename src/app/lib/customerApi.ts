@@ -208,6 +208,10 @@ export async function createOrder(
     parish?: string;
     village?: string;
     address: string;
+    lat?: number;
+    lng?: number;
+    accuracyM?: number;
+    locationSource?: 'gps' | 'manual';
   },
   promoCode?: string,
 ): Promise<{ reference: string }> {
@@ -288,6 +292,11 @@ export interface TrackedOrder {
     subCounty?: string | null;
     parish?: string | null;
     village?: string | null;
+    /** Buyer's own pin when they used "current location"; the map prefers it. */
+    lat?: number;
+    lng?: number;
+    accuracyM?: number;
+    locationSource?: 'gps' | 'manual';
   } | null;
   items: TrackedOrderItem[];
   timeline: OrderTimelineEvent[];
