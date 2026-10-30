@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams, useLoca
 import { MotionConfig } from 'framer-motion';
 import { CartProvider, useCart } from './lib/cartProvider';
 import { AuthProvider, useAuth, type CustomerInfo } from './lib/authProvider';
+import { TopUpProvider, useTopUp, type TopUpContextType } from './lib/topUpProvider';
+import TopUpBar from './components/TopUpBar';
 import { createOrder } from './lib/customerApi';
 
 // Import all page components
@@ -22,10 +24,11 @@ import Menu from './components/Menu';
 import MapPage from './components/MapPage';
 import AdminPage from './components/AdminPage';
 
-function ProductDetailRoute({ onMenuClick }: { onMenuClick: () => void }) {
+function ProductDetailRoute({ onMenuClick, topUp }: { onMenuClick: () => void; topUp: TopUpContextType }) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { products, cartCount, stockLevels, stockLive, addToCart } = useCart();
+  const toppingUp = !!topUp.order;
 
   const productId = id ? Number(id) : NaN;
   const product = products.find((p) => p.id === productId);
@@ -38,9 +41,20 @@ function ProductDetailRoute({ onMenuClick }: { onMenuClick: () => void }) {
       stockLevel={stockLevels.get(product.id) ?? null}
       stockLive={stockLive}
       onBack={() => navigate('/')}
-      onAddToCart={(quantity) => addToCart(product.id, quantity)}
+      onAddToCart={async (quantity) => {
+        // While an order is being topped up there is no basket to add to: the
+        // cart became an order at checkout. The shop, with the order named in
+        // its bar, is where the customer watches the total move.
+        if (toppingUp) {
+          if (await topUp.add(product.id, quantity)) navigate('/');
+          return;
+        }
+        addToCart(product.id, quantity);
+      }}
       onMenuClick={onMenuClick}
-      onCartClick={() => navigate('/basket')}
+      onCartClick={() => navigate(toppingUp && topUp.reference ? `/?topUp=${topUp.reference}` : '/basket')}
+      toppingUp={toppingUp}
+      topUpBar={<TopUpBar topUp={topUp} />}
     />
   );
 }
@@ -63,7 +77,7 @@ function OrderConfirmationRoute({ onMenuClick }: { onMenuClick: () => void }) {
   );
 }
 
-function PaymentRoute({ onMenuClick }: { onMenuClick: () => void }) {
+function PaymentRoute({ onMenuClick, topUp }: { onMenuClick: () => void; topUp: TopUpContextType }) {
   const { reference } = useParams<{ reference: string }>();
   const navigate = useNavigate();
   const { cartCount, cartId, finalizePurchase } = useCart();
@@ -79,6 +93,7 @@ function PaymentRoute({ onMenuClick }: { onMenuClick: () => void }) {
       customerName={customerInfo.fullName}
       onBack={() => navigate('/checkout')}
       onMenuClick={onMenuClick}
+      onAddMore={() => reference && topUp.start(reference)}
       onProceedToConfirmation={() => {
         finalizePurchase(cartId);
         navigate(`/order/${reference ?? ''}`);
@@ -109,7 +124,9 @@ export default function App() {
       <MotionConfig reducedMotion="user">
         <CartProvider>
           <AuthProvider>
-            <AppShell />
+            <TopUpProvider>
+              <AppShell />
+            </TopUpProvider>
           </AuthProvider>
         </CartProvider>
       </MotionConfig>
@@ -157,6 +174,10 @@ function AppShell() {
     setPurchaseError,
     setOrderReference,
   } = useAuth();
+  const topUp = useTopUp();
+  // An open order being topped up changes what "add" means everywhere in the
+  // shop: it writes to the order instead of a cart that no longer exists.
+  const toppingUp = !!topUp.order;
 
   const handleMenuNavigation = (screen: string) => {
     const routeMap: Record<string, string> = {
@@ -226,16 +247,24 @@ function AppShell() {
                 onSearchChange={setSearchTerm}
                 onSortChange={setSortOption}
                 onToggleFavorite={toggleFavorite}
-                onAddToCart={(productId) => addToCart(productId, 1)}
+                onAddToCart={(productId) => {
+                  if (toppingUp) {
+                    void topUp.add(productId, 1);
+                    return;
+                  }
+                  addToCart(productId, 1);
+                }}
                 onProductClick={(product) => navigate(`/product/${product.id}`)}
                 onMenuClick={openMenu}
-                onCartClick={() => navigate('/basket')}
+                onCartClick={() => navigate(toppingUp && topUp.reference ? `/?topUp=${topUp.reference}` : '/basket')}
                 stockLevels={stockLevels}
                 stockLive={stockLive}
+                addableMarketId={toppingUp ? topUp.order?.marketId ?? null : undefined}
+                topUpBar={<TopUpBar topUp={topUp} />}
               />
             }
           />
-          <Route path="/product/:id" element={<ProductDetailRoute onMenuClick={openMenu} />} />
+          <Route path="/product/:id" element={<ProductDetailRoute onMenuClick={openMenu} topUp={topUp} />} />
           <Route
             path="/basket"
             element={
@@ -265,7 +294,7 @@ function AppShell() {
               />
             }
           />
-          <Route path="/pay/:reference" element={<PaymentRoute onMenuClick={openMenu} />} />
+          <Route path="/pay/:reference" element={<PaymentRoute onMenuClick={openMenu} topUp={topUp} />} />
           <Route path="/order/:reference" element={<OrderConfirmationRoute onMenuClick={openMenu} />} />
           <Route
             path="/profile"

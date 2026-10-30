@@ -24,6 +24,12 @@ export type CatalogueProduct = {
   dietary: string[];
   stock: number;
   unit: string;
+  /**
+   * The market that sells this product, when the API is reachable. Absent on the
+   * compiled-in fallback, which predates markets and must not block an add on a
+   * guess — the server is the one that refuses a second market in one order.
+   */
+  marketId?: number | null;
 };
 
 type ApiProduct = {
@@ -38,6 +44,7 @@ type ApiProduct = {
   stock: number;
   dietary: string[];
   images: string[];
+  marketId?: number | null;
 };
 
 export type CatalogueState = {
@@ -73,6 +80,7 @@ export async function fetchCatalogue(signal?: AbortSignal): Promise<CataloguePro
       dietary: row.dietary ?? [],
       stock: row.stock ?? 0,
       unit: row.unit,
+      marketId: row.marketId ?? null,
     }));
   } catch {
     return null;

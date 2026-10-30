@@ -256,6 +256,8 @@ export interface TrackedOrder {
   id: number;
   reference: string;
   status: string;
+  /** The market the order belongs to. One order, one market. */
+  marketId?: number | null;
   subtotal: number;
   discount: number;
   promoCode: string | null;
@@ -291,6 +293,41 @@ export interface TrackedOrder {
 export async function fetchOrder(reference: string): Promise<TrackedOrder> {
   const body = await request<{ data: TrackedOrder }>(`/orders/${encodeURIComponent(reference)}`);
   return body.data;
+}
+
+export interface TopUpTotals {
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  tax: number;
+  total: number;
+}
+
+/**
+ * Add goods to an order that is already placed but not yet paid.
+ * The basket becomes an order the moment checkout runs, so top-up is an order
+ * edit: the server re-reserves stock, recomputes the whole total and throws away
+ * any payment prompt priced at the old amount. Everything the screen needs to
+ * show comes back from there — the browser never works out the money.
+ */
+export async function addOrderItem(
+  reference: string,
+  input: { productId: number; quantity: number },
+): Promise<{ reference: string; status: string; total: number; currency: string; totals: TopUpTotals; added: { productId: number; name: string; unit: string; quantity: number }; lineCount: number }> {
+  const body = await request<{
+    data: { id: number; reference: string; status: string; total: number; currency: string };
+    totals: TopUpTotals;
+    meta: { added: { productId: number; name: string; unit: string; quantity: number }; lineCount: number };
+  }>(`/orders/${encodeURIComponent(reference)}/items`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+  return {
+    ...body.data,
+    totals: body.totals,
+    added: body.meta.added,
+    lineCount: body.meta.lineCount,
+  };
 }
 
 export async function fetchCustomerPreferences(): Promise<CustomerPreferences> {

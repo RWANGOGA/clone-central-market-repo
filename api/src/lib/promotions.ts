@@ -16,6 +16,7 @@ export {
   PromoError,
   evaluatePromo,
   normalizePromoCode,
+  promoDiscountFor,
   promoInputSchema,
   promoState,
   stampNow,

@@ -11,7 +11,13 @@
  */
 
 export type OrderEvent = {
-  type: 'order.created' | 'order.status';
+  /**
+   * `order.updated` is a basket change on a still-pending order: the total
+   * moved but no fulfilment state did. The feed treats all three as "this order
+   * changed, look again", which is why nothing here carries a payload beyond
+   * the row's own summary.
+   */
+  type: 'order.created' | 'order.status' | 'order.updated';
   id: number;
   reference: string;
   from?: string | null;

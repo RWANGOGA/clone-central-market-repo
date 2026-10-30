@@ -6,6 +6,7 @@ import ExpandableCard from './shared/ExpandableCard';
 import StockBadge from './StockBadge';
 import type { StockLevel } from '../lib/stockApi';
 import ScreenHeader from './shared/ScreenHeader';
+import type { ReactNode } from 'react';
 
 interface Product {
   id: number;
@@ -21,6 +22,8 @@ interface Product {
   /** Live stock figure, replaced by the inventory service when reachable. */
   stock: number;
   unit: string;
+  /** Which market sells this. Only that market's goods can join an open order. */
+  marketId?: number | null;
 }
 
 type SortOption = 'default' | 'a-z' | 'price';
@@ -40,6 +43,14 @@ interface ProductListPageProps {
   onCartClick: () => void;
   stockLevels: Map<number, StockLevel>;
   stockLive: boolean;
+  /**
+   * Set while the customer is topping up an open order: the shop then only offers
+   * goods from that order's market, because the server refuses a second market.
+   * Undefined means ordinary basket mode.
+   */
+  addableMarketId?: number | null;
+  /** The bar naming the order being edited, rendered between the header and the aisle. */
+  topUpBar?: ReactNode;
 }
 
 export default function ProductListPage({
@@ -56,7 +67,9 @@ export default function ProductListPage({
   onMenuClick,
   onCartClick,
   stockLevels,
-  stockLive
+  stockLive,
+  addableMarketId,
+  topUpBar,
 }: ProductListPageProps) {
   return (
     <div className="flex h-full flex-col bg-white">
@@ -73,6 +86,8 @@ export default function ProductListPage({
         onMenuClick={onMenuClick}
         onCartClick={onCartClick}
       />
+
+      {topUpBar}
       
       {/* Content */}
       <Content 
@@ -83,6 +98,7 @@ export default function ProductListPage({
         onProductClick={onProductClick}
         stockLevels={stockLevels}
         stockLive={stockLive}
+        addableMarketId={addableMarketId}
       />
     </div>
   );
@@ -176,9 +192,10 @@ interface ContentProps {
   onProductClick: (product: Product) => void;
   stockLevels: Map<number, StockLevel>;
   stockLive: boolean;
+  addableMarketId?: number | null;
 }
 
-function Content({ products, favorites, onToggleFavorite, onAddToCart, onProductClick, stockLevels, stockLive }: ContentProps) {
+function Content({ products, favorites, onToggleFavorite, onAddToCart, onProductClick, stockLevels, stockLive, addableMarketId }: ContentProps) {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="box-border content-stretch flex flex-col gap-4 items-start justify-start relative w-full px-6 py-3">
@@ -192,6 +209,7 @@ function Content({ products, favorites, onToggleFavorite, onAddToCart, onProduct
             onClick={() => onProductClick(product)}
             stockLevel={stockLevels.get(product.id) ?? null}
             stockLive={stockLive}
+            addableMarketId={addableMarketId}
           />
         ))}
       </div>
@@ -207,13 +225,24 @@ interface ProductCardProps {
   onClick: () => void;
   stockLevel: StockLevel | null;
   stockLive: boolean;
+  addableMarketId?: number | null;
 }
 
-function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onClick, stockLevel, stockLive }: ProductCardProps) {
+function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onClick, stockLevel, stockLive, addableMarketId }: ProductCardProps) {
   // Sold out means the add button is pointless, so it is disabled rather than
   // left to fail later at payment.
   const soldOut = stockLevel?.state === 'out';
   const lowStock = stockLevel?.state === 'low';
+  // While an order is being topped up, another market's goods cannot join it.
+  // The server would refuse, so the shop refuses the tap and says why instead of
+  // letting the customer discover it on the payment screen.
+  const otherMarket =
+    addableMarketId !== undefined &&
+    addableMarketId !== null &&
+    product.marketId !== undefined &&
+    product.marketId !== addableMarketId;
+  const addBlocked = soldOut || otherMarket;
+  const toppingUp = addableMarketId !== undefined;
 
   return (
     <div className="bg-white relative shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)] shrink-0 w-full rounded-[12px]">
@@ -296,23 +325,30 @@ function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onCli
         </button>
         
         {/* Add to Cart Button. Disabled when sold out, because the order would
-            only be refused at payment. */}
+            only be refused at payment, and while topping up for goods from another
+            market, for the same reason. */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (!soldOut) onAddToCart();
+            if (!addBlocked) onAddToCart();
           }}
-          disabled={soldOut}
-          aria-label={soldOut ? `${product.name} is sold out` : `Add ${product.name} to basket`}
-          className={`absolute bottom-2 right-2 rounded-lg size-8 flex items-center justify-center ${
+          disabled={addBlocked}
+          aria-label={
             soldOut
+              ? `${product.name} is sold out`
+              : otherMarket
+                ? `${product.name} is from another market and cannot join this order`
+                : `Add ${product.name} to ${toppingUp ? 'your order' : 'basket'}`
+          }
+          className={`absolute bottom-2 right-2 rounded-lg size-8 flex items-center justify-center ${
+            addBlocked
               ? 'bg-neutral-200 cursor-not-allowed'
               : lowStock
                 ? 'bg-brand-gold hover:bg-brand-gold-deep'
                 : 'bg-brand hover:bg-[#355214]'
           }`}
         >
-          {soldOut ? <SoldOutIcon /> : <PlusIcon />}
+          {soldOut ? <SoldOutIcon /> : otherMarket ? <OtherMarketIcon /> : <PlusIcon />}
         </button>
       </div>
     </div>
@@ -374,6 +410,21 @@ function PlusIcon() {
         <g>
           <path d={svgPaths.p367b3d00} fill="var(--fill-0, white)" />
         </g>
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * A stall marker rather than a cross: the goods are not wrong, they simply belong
+ * to another market's order, and a cross reads as "this item is unavailable".
+ */
+function OtherMarketIcon() {
+  return (
+    <div className="size-8 flex items-center justify-center">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M2 6.5L8 2.5l6 4v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-6z" stroke="#9a9a9a" strokeWidth="1.4" strokeLinejoin="round" />
+        <path d="M6 13.5v-3h4v3" stroke="#9a9a9a" strokeWidth="1.4" strokeLinejoin="round" />
       </svg>
     </div>
   );

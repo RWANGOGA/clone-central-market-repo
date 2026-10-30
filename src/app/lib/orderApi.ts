@@ -230,7 +230,13 @@ export async function recordRefund(
 }
 
 export type LiveOrderEvent = {
-  type: 'order.created' | 'order.status';
+  /**
+   * `order.updated` means the goods or the money on an open order moved without
+   * the fulfilment state changing. The console treats all three the same way —
+   * this order changed, look again — but the type has to name it or the compiler
+   * says the server can never send it.
+   */
+  type: 'order.created' | 'order.status' | 'order.updated';
   id: number;
   reference: string;
   from?: string | null;

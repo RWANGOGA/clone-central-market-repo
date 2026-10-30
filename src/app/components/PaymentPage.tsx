@@ -14,6 +14,7 @@ import {
   type PaymentTotals,
 } from '../lib/paymentApi';
 import { PageTitle } from './shared/PageTitle';
+import { fetchOrder, type TrackedOrder } from '../lib/customerApi';
 
 interface PaymentPageProps {
   cartCount: number;
@@ -25,6 +26,12 @@ interface PaymentPageProps {
   onBack: () => void;
   onMenuClick: () => void;
   onProceedToConfirmation: () => void;
+  /**
+   * Back to the shop while this order is still open. Every tester wanted to add
+   * one more thing before paying and had nowhere to go, because the basket had
+   * already become an order.
+   */
+  onAddMore?: () => void;
 }
 
 const CHANNELS: { id: PaymentChannel; label: string; blurb: string }[] = [
@@ -44,9 +51,11 @@ export default function PaymentPage({
   onBack,
   onMenuClick,
   onProceedToConfirmation,
+  onAddMore,
 }: PaymentPageProps) {
   const [methods, setMethods] = useState<PaymentMethods | null>(null);
   const [methodsError, setMethodsError] = useState<string | null>(null);
+  const [order, setOrder] = useState<TrackedOrder | null>(null);
 
   const [channel, setChannel] = useState<PaymentChannel>('mobile_money');
   const [provider, setProvider] = useState<string>('');
@@ -59,6 +68,27 @@ export default function PaymentPage({
   const [totals, setTotals] = useState<PaymentTotals | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  /**
+   * Read the order before asking for money. The page used to show no total until
+   * an intent existed, and after a top-up the customer must be able to see the
+   * new figure here — the server recomputes the intent amount from the order, so
+   * what this says is what will be charged.
+   */
+  useEffect(() => {
+    if (!orderReference) return;
+    let cancelled = false;
+    fetchOrder(orderReference)
+      .then((data) => {
+        if (!cancelled) setOrder(data);
+      })
+      .catch(() => {
+        // Offline or not ours to read: the intent still prices itself server-side.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [orderReference]);
 
   useEffect(() => {
     fetchPaymentMethods().then((result) => {
@@ -87,6 +117,16 @@ export default function PaymentPage({
 
   const selectedMethod = activeMethods.find((m) => m.id === provider) ?? null;
   const phoneValid = isValidUgandanPhone(phone);
+
+  /**
+   * The basket is open until payment is confirmed — which is about the money, not
+   * about a stamp on the order: once anything has settled or cash on delivery has
+   * been taken, the goods are sold at the figures already agreed.
+   */
+  const orderOpen =
+    !!order &&
+    order.status === 'pending' &&
+    !order.payments.some((p) => p.status === 'succeeded' || p.status === 'cod');
 
   const isFormValid = useMemo(() => {
     // Cash on delivery has no instrument to validate.
@@ -211,6 +251,35 @@ export default function PaymentPage({
           {stage === 'details' && (
             <>
               {methodsError && <Notice tone="error">{methodsError}</Notice>}
+
+              {order && (
+                <div className="rounded-xl border border-neutral-200 p-4 space-y-1.5">
+                  <Row label="Order" value={order.reference} />
+                  <Row
+                    label={`Items · ${order.items.reduce((n, line) => n + line.quantity, 0)}`}
+                    value={formatUgx(order.subtotal)}
+                  />
+                  {order.discount > 0 && (
+                    <Row
+                      label={order.promoCode ? `Discount · ${order.promoCode}` : 'Discount'}
+                      value={`− ${formatUgx(order.discount)}`}
+                    />
+                  )}
+                  <Row label="Delivery" value={order.shipping === 0 ? 'Free' : formatUgx(order.shipping)} />
+                  <div className="border-t border-neutral-100 pt-1.5">
+                    <Row label="Total to pay" value={formatUgx(order.total)} strong />
+                  </div>
+                  {onAddMore && orderOpen && (
+                    <button
+                      type="button"
+                      onClick={onAddMore}
+                      className="mt-2 w-full cursor-pointer rounded-lg border border-brand px-3 py-2.5 text-[13px] font-medium text-brand"
+                    >
+                      Add more items
+                    </button>
+                  )}
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-2">
                 {CHANNELS.map((option) => {

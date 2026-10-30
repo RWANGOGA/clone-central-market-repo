@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import svgPaths from "../imports/svg-42raqsyfh4";
 import footerSvgPaths from "../imports/svg-ved004mhkj";
 import clsx from "clsx";
@@ -6,6 +6,7 @@ import ExpandableCard from './shared/ExpandableCard';
 import StockBadge from './StockBadge';
 import type { StockLevel } from '../lib/stockApi';
 import { PageTitle } from './shared/PageTitle';
+import { formatUgx } from '../lib/currency';
 
 interface ProductDetailPageProps {
   product: {
@@ -28,6 +29,10 @@ interface ProductDetailPageProps {
   onAddToCart: (quantity: number) => void;
   onMenuClick: () => void;
   onCartClick: () => void;
+  /** True while the customer is adding to an order that is already placed. */
+  toppingUp?: boolean;
+  /** The bar naming the order being edited, shown under the header. */
+  topUpBar?: ReactNode;
 }
 
 export default function ProductDetailPage({
@@ -38,14 +43,22 @@ export default function ProductDetailPage({
   onBack,
   onAddToCart,
   onMenuClick,
-  onCartClick
+  onCartClick,
+  toppingUp = false,
+  topUpBar,
 }: ProductDetailPageProps) {
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showQuantityDropdown, setShowQuantityDropdown] = useState(false);
+  // The photo starts big, because looking at the produce is the decision. Once a
+  // size is chosen the buyer is arithmetic, not browsing, so it gives its height
+  // back to the details — and tapping it brings it back at full size.
+  const [sizeChosen, setSizeChosen] = useState(false);
+  const [photoExpanded, setPhotoExpanded] = useState(false);
 
   const soldOut = stockLevel?.state === 'out';
   const available = stockLevel?.stock ?? 0;
+  const photoCollapsed = sizeChosen && !photoExpanded;
 
   // A kitchen order can be tens of kilos, so the choices follow what is
   // actually on hand rather than stopping at ten.
@@ -64,6 +77,7 @@ export default function ProductDetailPage({
 
   const handleQuantitySelect = (newQuantity: number) => {
     setQuantity(Math.min(newQuantity, Math.max(1, available)));
+    setSizeChosen(true);
     setShowQuantityDropdown(false);
   };
 
@@ -73,32 +87,50 @@ export default function ProductDetailPage({
   }, [available, quantity]);
 
   return (
-    <div className="bg-white relative size-full">
+    <div className="flex h-full flex-col bg-white">
       {/* Status Bar */}
       <StatusBar />
-      
+
       {/* Header */}
-      <Header 
+      <Header
         cartCount={cartCount}
         onBack={onBack}
         onMenuClick={onMenuClick}
         onCartClick={onCartClick}
         productName={product.name}
       />
-      
-      {/* Product Images */}
-      <div className="absolute left-0 right-0 top-[149px] h-[300px]">
-        <div 
-          className="w-full h-full bg-cover bg-center relative"
+
+      {topUpBar}
+
+      {/* Details scroll between the fixed header and the fixed buy bar. */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {/* Product Images */}
+        <div
+          className={`relative w-full overflow-hidden bg-cover bg-center transition-[height] duration-300 ${
+            photoCollapsed ? 'h-[132px]' : 'h-[300px]'
+          }`}
           style={{ backgroundImage: `url('${product.images[currentImageIndex]}')` }}
         >
+          {sizeChosen && (
+            <button
+              type="button"
+              onClick={() => setPhotoExpanded(true)}
+              className="absolute inset-0 cursor-pointer"
+              aria-label={`Show the full photo of ${product.name}`}
+            >
+              <span className="absolute bottom-3 right-3 rounded-lg bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white">
+                Full photo
+              </span>
+            </button>
+          )}
           {/* Image Navigation Dots */}
-          {product.images.length > 1 && (
+          {!photoCollapsed && product.images.length > 1 && (
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
               {product.images.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
+                  aria-label={`Photo ${index + 1} of ${product.images.length}`}
                   className={clsx(
                     "w-2 h-2 rounded-full transition-colors",
                     index === currentImageIndex ? "bg-white" : "bg-white/50"
@@ -108,10 +140,8 @@ export default function ProductDetailPage({
             </div>
           )}
         </div>
-      </div>
-      
-      {/* Product Details */}
-      <div className="absolute left-0 right-0 top-[449px] bottom-[100px] overflow-y-auto">
+
+        {/* Product Details */}
         <div className="px-6 py-6 space-y-6">
           {/* Product Info */}
           <div>
@@ -163,9 +193,20 @@ export default function ProductDetailPage({
         </div>
       </div>
       
-      {/* Footer */}
-      <div className="bg-white shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)] absolute bottom-0 left-0 right-0 h-[100px]">
-        <div className="absolute left-6 right-6 top-6">
+      {/* Buy bar. Pinned by the flex column rather than by a magic offset from the
+          bottom, so the price line and the button cannot drift apart when the
+          photo collapses or the keyboard opens. */}
+      <div className="relative shrink-0 bg-white px-6 pb-5 pt-3 shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]">
+        {/* What this order costs right now, where the finger already is. */}
+        <p
+          className="mb-2 text-[13px] font-medium text-brand-deep"
+          aria-live="polite"
+        >
+          {soldOut
+            ? 'Sold out'
+            : `${quantity} ${product.unit} · ${formatUgx(product.priceValue * quantity)}`}
+        </p>
+        <div>
           <div className="box-border content-stretch flex flex-row gap-4 items-center justify-start p-0 relative w-full">
             {/* Quantity Input */}
             <div className="bg-white relative rounded-lg shrink-0 w-[58px]">
@@ -238,7 +279,9 @@ export default function ProductDetailPage({
                 <div className="box-border content-stretch flex flex-row gap-2 items-center justify-start pl-6 pr-4 py-2 relative w-full">
                   <div className="basis-0 flex flex-col font-normal grow justify-center leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[16px] text-left tracking-[-0.16px]">
                     <p className={`block leading-[24px] text-[14px] ${soldOut ? 'text-caption' : 'text-white'}`}>
-                      {soldOut ? 'Sold out' : `Add ${quantity} ${product.unit} to basket`}
+                      {soldOut
+                        ? 'Sold out'
+                        : `Add ${quantity} ${product.unit} to ${toppingUp ? 'your order' : 'basket'}`}
                     </p>
                   </div>
                   <div className="relative shrink-0 size-8">
@@ -263,7 +306,7 @@ export default function ProductDetailPage({
 
 function StatusBar() {
   return (
-    <div className="absolute h-[47px] left-0 overflow-clip right-0 top-0">
+    <div className="relative h-[47px] shrink-0 overflow-clip">
       <Notch />
       <LeftSide />
       <RightSide />
@@ -352,7 +395,7 @@ interface HeaderProps {
 
 function Header({ cartCount, onBack, onMenuClick, onCartClick, productName }: HeaderProps) {
   return (
-    <div className="absolute bg-white h-[149px] left-0 right-0 top-0">
+    <div className="relative h-[149px] shrink-0 bg-white">
       <div className="absolute border-[0px_0px_1px] border-neutral-200 border-solid inset-0 pointer-events-none shadow-[0px_0px_20px_0px_rgba(0,0,0,0.1)]" />
       
       {/* Mobile Nav */}

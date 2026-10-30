@@ -15,6 +15,12 @@ export type ProductDto = {
   dietary: string[];
   stock: number;
   active: boolean;
+  /**
+   * Which market sells this product. Buyers need it to keep one order inside one
+   * market: adding another market's goods to an order that is already placed is
+   * a guaranteed refusal, so the shop must not offer it.
+   */
+  marketId: number | null;
 };
 
 /**
@@ -37,6 +43,7 @@ export function toProductDto(row: Product): ProductDto {
     dietary: row.dietary,
     stock: row.stock,
     active: row.active,
+    marketId: row.marketId,
   };
 }
 

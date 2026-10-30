@@ -37,6 +37,24 @@ export function stampNow(date = new Date()): string {
 
 export type PromoEvaluation = { discount: number } | { reason: string };
 
+/**
+ * The arithmetic of a code: what it takes off a given subtotal.
+ *
+ * Split out from `evaluatePromo` because two callers need different halves.
+ * Placing an order needs the whole eligibility check. Adding an item to an
+ * order that already claimed the code needs the arithmetic alone — the
+ * redemption is spent, so a code that expired or ran out of redemptions in the
+ * meantime must not revoke a discount the customer already earned, while a
+ * percentage code should still follow the basket up.
+ */
+export function promoDiscountFor(promo: PromoRule, subtotal: number): number {
+  const discount = promo.kind === 'percent'
+    ? Math.floor((subtotal * promo.value) / 100)
+    : promo.value;
+  const capped = promo.maxDiscount !== null ? Math.min(discount, promo.maxDiscount) : discount;
+  return Math.min(capped, subtotal);
+}
+
 export function evaluatePromo(promo: PromoRule, subtotal: number, now = new Date()): PromoEvaluation {
   if (!promo.active) return { reason: 'This code is no longer available.' };
   const stamp = stampNow(now);
@@ -50,11 +68,7 @@ export function evaluatePromo(promo: PromoRule, subtotal: number, now = new Date
     return { reason: `Add UGX ${shortfall} more to use this code.` };
   }
 
-  const discount = promo.kind === 'percent'
-    ? Math.floor((subtotal * promo.value) / 100)
-    : promo.value;
-  const capped = promo.maxDiscount !== null ? Math.min(discount, promo.maxDiscount) : discount;
-  const applied = Math.min(capped, subtotal);
+  const applied = promoDiscountFor(promo, subtotal);
   if (applied <= 0) return { reason: 'This code does not reduce this basket.' };
   return { discount: applied };
 }
