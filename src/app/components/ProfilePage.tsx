@@ -244,7 +244,7 @@ export default function ProfilePage({
   const totalSpent = orders
     .filter((order) => order.status !== 'cancelled')
     .reduce((sum, order) => sum + (order.total || 0), 0);
-  const activeOrders = orders.filter(o => ['pending', 'processing', 'shipped'].includes(o.status));
+  const activeOrders = orders.filter(o => ['pending', 'confirmed', 'processing', 'shipped'].includes(o.status));
   const deliveredOrders = orders.filter(o => o.status === 'delivered');
 
   const showAllOrders = () => {
@@ -263,7 +263,7 @@ export default function ProfilePage({
   };
 
   const filteredOrders = useMemo(() => {
-    if (orderFilter === 'active') return orders.filter(o => ['pending', 'processing', 'shipped'].includes(o.status));
+    if (orderFilter === 'active') return orders.filter(o => ['pending', 'confirmed', 'processing', 'shipped'].includes(o.status));
     if (orderFilter === 'delivered') return orders.filter(o => o.status === 'delivered');
     return orders;
   }, [orders, orderFilter]);
@@ -439,6 +439,7 @@ export default function ProfilePage({
 
   const statusConfig: Record<string, { label: string; className: string }> = {
     pending: { label: 'Pending', className: 'bg-yellow-100 text-yellow-800' },
+    confirmed: { label: 'Confirmed', className: 'bg-teal-100 text-teal-800' },
     processing: { label: 'Processing', className: 'bg-blue-100 text-blue-800' },
     shipped: { label: 'Shipped', className: 'bg-purple-100 text-purple-800' },
     delivered: { label: 'Delivered', className: 'bg-green-100 text-green-800' },

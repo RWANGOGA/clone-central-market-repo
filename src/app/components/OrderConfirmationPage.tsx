@@ -28,13 +28,15 @@ interface CustomerInfo {
 
 const STEPS = [
   { key: 'pending', label: 'Order placed', description: 'We received your order and reserved your produce.' },
-  { key: 'processing', label: 'Being prepared', description: 'Paid for and packed by the farm team.' },
+  { key: 'confirmed', label: 'Confirmed by the market', description: 'A person at the market has checked your order and is ready to pack it.' },
+  { key: 'processing', label: 'Being prepared', description: 'Being packed by the farm team.' },
   { key: 'shipped', label: 'Out for delivery', description: 'A rider is on the way with your basket.' },
   { key: 'delivered', label: 'Delivered', description: 'Handed over at your delivery address.' },
 ] as const;
 
 const STATUS_COPY: Record<string, { title: string; subtitle: string }> = {
   pending: { title: 'Waiting for payment', subtitle: 'Complete payment and we will start packing your basket.' },
+  confirmed: { title: 'The market has confirmed your order', subtitle: 'Someone has checked it over and will start packing shortly.' },
   processing: { title: 'Your order is being prepared', subtitle: 'The farm team is packing your produce right now.' },
   shipped: { title: 'Your order is on the way', subtitle: 'A rider has picked up your basket.' },
   delivered: { title: 'Your order was delivered', subtitle: 'Thank you for shopping with Mu Katale.' },
@@ -87,7 +89,7 @@ export default function OrderConfirmationPage({
   }, [load]);
 
   const status = order?.status ?? 'pending';
-  const isActive = status === 'pending' || status === 'processing' || status === 'shipped';
+  const isActive = status === 'pending' || status === 'confirmed' || status === 'processing' || status === 'shipped';
 
   // Live updates while the order is moving. A delivered or cancelled order
   // cannot change again, so polling stops there.
@@ -135,7 +137,7 @@ export default function OrderConfirmationPage({
   const deliveryDistrict = address?.district || order?.district || customerInfo.district;
   const deliveryRegion = address?.region || order?.region || customerInfo.region;
   const copy = STATUS_COPY[status] ?? STATUS_COPY.pending;
-  const itemCount = order?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+  const itemCount = order?.items.reduce((sum, item) => (item.lineStatus === 'rejected' ? sum : sum + item.quantity), 0) ?? 0;
 
   return (
     <div className="bg-white relative size-full">
@@ -311,14 +313,26 @@ export default function OrderConfirmationPage({
                     </span>
                   </div>
                   <div className="space-y-1">
-                    {order.items.map((item) => (
-                      <div key={item.id} className="flex justify-between gap-2 font-normal text-[13px]">
-                        <span className="text-black truncate">
-                          {item.quantity} × {item.name}
-                        </span>
-                        <span className="text-muted-foreground whitespace-nowrap">{formatUgx(item.lineTotal)}</span>
-                      </div>
-                    ))}
+                    {order.items.map((item) => {
+                      const refused = item.lineStatus === 'rejected';
+                      return (
+                        <div key={item.id} className="font-normal text-[13px]">
+                          <div className="flex justify-between gap-2">
+                            <span className={refused ? 'text-neutral-400 line-through truncate' : 'text-black truncate'}>
+                              {item.quantity} × {item.name}
+                            </span>
+                            <span className={refused ? 'text-neutral-400 line-through whitespace-nowrap' : 'text-muted-foreground whitespace-nowrap'}>
+                              {formatUgx(item.lineTotal)}
+                            </span>
+                          </div>
+                          {refused && (
+                            <p className="text-[11px] text-red-600 mt-0.5 leading-[15px]">
+                              Not supplied{item.rejectionNote ? ` — ${item.rejectionNote}` : ''}. You were not charged for this.
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                   <div className="pt-2 border-t border-neutral-100 space-y-1 font-normal text-[12px]">
                     <div className="flex justify-between text-muted-foreground">

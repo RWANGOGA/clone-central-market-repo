@@ -377,8 +377,8 @@ export default function PaymentPage({
                     Pay when your order arrives
                   </p>
                   <p className="text-[12px] leading-[18px] font-normal text-muted-foreground">
-                    The rider collects the total in cash. Your order is confirmed immediately and
-                    the items are reserved for you.
+                    The rider collects the total in cash. Your items are reserved now, and the
+                    market will confirm the order before it is packed.
                   </p>
                 </div>
               )}
@@ -479,7 +479,7 @@ export default function PaymentPage({
             <div className="space-y-3">
               <Notice tone="success">
                 {intent.channel === 'cod'
-                  ? `${formatUgx(intent.amount)} is due on delivery. Your order is confirmed.`
+                  ? `${formatUgx(intent.amount)} is due on delivery. The market will confirm your order before packing.`
                   : `${formatUgx(intent.amount)} received by ${intent.provider}.`}
               </Notice>
               <dl className="rounded-xl border border-neutral-200 p-4 space-y-1.5">

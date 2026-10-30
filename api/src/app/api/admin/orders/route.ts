@@ -22,6 +22,7 @@ import { error, json } from '@/lib/http';
 
 const ORDER_FLOW_KEYS = Object.keys(ORDER_FLOW) as [
   'pending',
+  'confirmed',
   'processing',
   'shipped',
   'delivered',

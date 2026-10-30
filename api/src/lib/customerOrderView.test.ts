@@ -51,6 +51,8 @@ const item = (): OrderItem => ({
   priceValue: 10000,
   quantity: 2,
   lineTotal: 20000,
+  lineStatus: 'included',
+  rejectionNote: null,
 });
 
 const payment = (overrides: Partial<Payment> = {}): Payment => ({
@@ -189,13 +191,13 @@ describe('customerCancelBlocker', () => {
   it('permits only pending, and explains every refusal in its own words', () => {
     expect(customerCancelBlocker('pending')).toBeNull();
 
-    const refused = ['processing', 'shipped', 'delivered', 'cancelled'];
+    const refused = ['confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
     const reasons = refused.map((status) => customerCancelBlocker(status));
     for (const reason of reasons) {
       expect(reason).toBeTruthy();
       expect(reason!.endsWith('.')).toBe(true);
     }
-    // Four different situations must not collapse into one generic sentence,
+    // Five different situations must not collapse into one generic sentence,
     // because the customer's next step differs for each of them.
     expect(new Set(reasons).size).toBe(refused.length);
   });

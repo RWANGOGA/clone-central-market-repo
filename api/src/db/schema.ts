@@ -433,9 +433,14 @@ export const orders = pgTable('orders', {
   /**
    * Fulfilment only. Money lives on payments.status, so a paid order that has
    * not shipped is simply "processing" rather than a separate paid state.
+   *
+   * `confirmed` sits between the two: it is the market saying it has looked at
+   * the goods and will fill the order, which is the step the buyer's testing
+   * report asked for by name. It is not a payment state, and paying does not
+   * set it.
    */
   status: text('status', {
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
   })
     .notNull()
     .default('pending'),
@@ -530,6 +535,18 @@ export const orderItems = pgTable('order_items', {
   priceValue: integer('price_value').notNull(),
   quantity: integer('quantity').notNull(),
   lineTotal: integer('line_total').notNull(),
+  /**
+   * Whether the market will actually supply this line.
+   *
+   * A rejected line is never deleted. It is the customer's record of what they
+   * asked for, the refund's reference, and the reason a later dispute can be
+   * answered — so the status changes and the row stays.
+   */
+  lineStatus: text('line_status', { enum: ['included', 'rejected'] })
+    .notNull()
+    .default('included'),
+  /** Shown to the customer beside the rejected line: "out at the farm", say. */
+  rejectionNote: text('rejection_note'),
 }, (table) => [
   index('idx_order_items_order').on(table.orderId),
   index('idx_order_items_product').on(table.productId),

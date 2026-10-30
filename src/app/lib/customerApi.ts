@@ -250,6 +250,14 @@ export interface TrackedOrderItem {
   priceValue: number;
   quantity: number;
   lineTotal: number;
+  /**
+   * Whether the market will supply this line. A refused line stays on the order
+   * as the record of what was asked for, marked here so the buyer can see it
+   * rather than wonder why the total changed.
+   */
+  lineStatus?: 'included' | 'rejected';
+  /** Why it was refused, shown beside the line. */
+  rejectionNote?: string | null;
 }
 
 export interface TrackedOrder {

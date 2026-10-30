@@ -18,7 +18,6 @@ import { allow } from '@/lib/rateLimit';
 import { csrfCheck } from '@/lib/security';
 import { publishOrderEvent } from '@/lib/orderEvents';
 import { createCustomerNotification } from '@/lib/notifications';
-import { markOrderProcessing } from '@/lib/orderLifecycle';
 
 /**
  * Create a payment intent for an order.
@@ -165,31 +164,22 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    if (channel === 'cod') {
-      const moved = await markOrderProcessing(
-        tx,
-        order.id,
-        'Cash on delivery confirmed',
-        'customer',
-      );
-      if (!moved) throw new Error('ORDER_NOT_PENDING');
-    }
-
+    // Cash on delivery records the money as owed, not as received, and it no
+    // longer starts the market's work: choosing COD is not the same as somebody
+    // having checked that the goods exist. The order waits at `pending` for the
+    // same confirmation as a paid one.
     return row;
-  }).catch((err) => {
-    if (err instanceof Error && err.message === 'ORDER_NOT_PENDING') return null;
-    throw err;
   });
 
   if (!payment) return error('This order is not awaiting payment.', 409);
 
   if (channel === 'cod' && order.customerId) {
     publishOrderEvent({
-      type: 'order.status',
+      type: 'order.updated',
       id: order.id,
       reference: order.reference,
-      from: 'pending',
-      to: 'processing',
+      from: order.status,
+      to: order.status,
       total: order.total,
       currency: order.currency,
       marketId: order.marketId ?? null,
@@ -201,8 +191,8 @@ export async function POST(request: Request) {
     await createCustomerNotification({
       customerId: order.customerId,
       type: 'order',
-      title: 'Order confirmed',
-      message: `Order ${order.reference} is confirmed for cash on delivery.`,
+      title: 'Cash on delivery arranged',
+      message: `Order ${order.reference} will be collected on delivery. The market confirms the goods first, and you will see it on the order page.`,
     });
   }
 
@@ -307,15 +297,6 @@ export async function PATCH(request: Request) {
         .returning();
       if (!updated) return null;
 
-      if (payment.orderId) {
-        await markOrderProcessing(
-          tx,
-          payment.orderId,
-          `Payment ${payment.reference} confirmed`,
-          'customer',
-        );
-      }
-
       return updated;
     });
 
@@ -323,11 +304,13 @@ export async function PATCH(request: Request) {
 
     if (order?.customerId) {
       publishOrderEvent({
-        type: 'order.status',
+        // Paid, not yet accepted: the confirmation is a separate decision the
+        // market makes about goods, not about money.
+        type: 'order.updated',
         id: order.id,
         reference: order.reference,
         from: order.status,
-        to: 'processing',
+        to: order.status,
         total: order.total,
         currency: order.currency,
         marketId: order.marketId ?? null,

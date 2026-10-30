@@ -7,6 +7,7 @@ import {
   getOrder,
   listOrders,
   recordRefund,
+  rejectOrderLine,
   setOrderStatus,
   subscribeToOrders,
   type MoneyState,
@@ -20,6 +21,7 @@ import { formatUgx } from '../lib/currency';
 
 const STATUS_TONE: Record<OrderStatus, string> = {
   pending: 'bg-brand-gold/12 text-brand-gold-deep border-brand-gold/25',
+  confirmed: 'bg-brand/15 text-brand-deep border-brand/30',
   processing: 'bg-brand/10 text-brand border-brand/20',
   shipped: 'bg-info/10 text-info border-info/20',
   delivered: 'bg-success/10 text-success border-success/20',
@@ -184,6 +186,21 @@ export default function OrderQueue({
     load();
   };
 
+  const rejectLine = async (order: OrderDetail, lineId: number, note: string) => {
+    const result = await rejectOrderLine(order.reference, { lineId, note });
+    if (!result) {
+      setError('Could not reach the service.');
+      return;
+    }
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setSelected(result.data.data);
+    setError(null);
+    load();
+  };
+
   if (selected) {
     return (
       <OrderDetailPanel
@@ -193,6 +210,7 @@ export default function OrderQueue({
         onMove={(next) => move(selected, next)}
         onCollect={() => settle(selected)}
         onRefund={(draft) => refund(selected, draft)}
+        onRejectLine={(lineId, note) => rejectLine(selected, lineId, note)}
         onAssigned={(assigned) =>
           setSelected((current) =>
             current
@@ -403,6 +421,7 @@ function OrderDetailPanel({
   onMove,
   onCollect,
   onRefund,
+  onRejectLine,
   onAssigned,
   onError,
 }: {
@@ -412,6 +431,7 @@ function OrderDetailPanel({
   onMove: (next: string) => void;
   onCollect: () => Promise<void>;
   onRefund: (draft: RefundDraft) => Promise<void>;
+  onRejectLine: (lineId: number, note: string) => Promise<void>;
   onAssigned: (assigned: { delivererId: number | null; deliverer: string | null }) => void;
   onError: (message: string | null) => void;
 }) {
@@ -419,6 +439,9 @@ function OrderDetailPanel({
   const [note, setNote] = useState('');
   const [collecting, setCollecting] = useState(false);
   const [refunding, setRefunding] = useState(false);
+  // A line can be refused only while the goods have not gone out, and only by
+  // someone who can both change the order and move money back.
+  const canReject = canRefund && (order.status === 'pending' || order.status === 'confirmed');
 
   const act = async (next: string) => {
     setBusy(next);
@@ -542,7 +565,11 @@ function OrderDetailPanel({
                     title={blocked ? 'Collect the cash first' : undefined}
                     className="px-3 py-2 rounded-lg border border-neutral-300 text-[12px] font-medium disabled:opacity-40"
                   >
-                    {busy === next ? 'Moving…' : `Mark ${next}`}
+                    {busy === next
+                      ? 'Moving…'
+                      : next === 'confirmed'
+                        ? 'Confirm goods'
+                        : `Mark ${next}`}
                   </button>
                 );
               })}
@@ -564,16 +591,41 @@ function OrderDetailPanel({
             Items
           </p>
           <div className="space-y-1.5">
-            {order.items.map((item) => (
-              <div key={item.id} className="flex items-baseline justify-between gap-2">
-                <span className="text-[12px] font-normal text-black">
-                  {item.quantity} × {item.name}
-                </span>
-                <span className="text-[12px] font-normal text-muted-foreground">
-                  {formatUgx(item.lineTotal)}
-                </span>
-              </div>
-            ))}
+            {order.items.map((item) =>
+              item.lineStatus === 'rejected' ? (
+                <div key={item.id} className="rounded-lg bg-neutral-50 px-2 py-1.5">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-[12px] font-normal text-neutral-400 line-through">
+                      {item.quantity} × {item.name}
+                    </span>
+                    <span className="text-[12px] font-normal text-neutral-400 line-through">
+                      {formatUgx(item.lineTotal)}
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-normal text-red-600">
+                    Refused{item.rejectionNote ? ` — ${item.rejectionNote}` : ''}. Not supplied.
+                  </p>
+                </div>
+              ) : (
+                <div key={item.id} className="flex items-center justify-between gap-2">
+                  <span className="text-[12px] font-normal text-black">
+                    {item.quantity} × {item.name}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-[12px] font-normal text-muted-foreground">
+                      {formatUgx(item.lineTotal)}
+                    </span>
+                    {canReject && (
+                      <LineReject
+                        itemName={item.name}
+                        busy={busy !== null}
+                        onSubmit={(noteText) => onRejectLine(item.id, noteText)}
+                      />
+                    )}
+                  </span>
+                </div>
+              ),
+            )}
           </div>
           <div className="mt-2 pt-2 border-t border-neutral-100 space-y-1">
             <MoneyRow label="Subtotal" value={order.subtotal} />
@@ -679,6 +731,79 @@ function OrderDetailPanel({
             ))}
           </ol>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Refuse one line of an open order.
+ *
+ * A small inline prompt rather than a modal, because the reason is the whole
+ * point — it is what the customer reads beside the struck-out line and what the
+ * refund cites. Leaving it blank is not offered.
+ */
+function LineReject({
+  itemName,
+  busy,
+  onSubmit,
+}: {
+  itemName: string;
+  busy: boolean;
+  onSubmit: (note: string) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const submit = async () => {
+    const text = note.trim();
+    if (text.length < 3) return;
+    setSending(true);
+    await onSubmit(text);
+    setSending(false);
+    setNote('');
+    setOpen(false);
+  };
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        disabled={busy}
+        className="text-[11px] font-medium text-red-600 disabled:opacity-40"
+      >
+        Refuse
+      </button>
+    );
+  }
+
+  return (
+    <div className="w-full space-y-1.5 rounded-lg border border-red-200 bg-red-50 p-2">
+      <p className="text-[11px] font-medium text-red-700">
+        Cannot supply {itemName}? Its goods go back on the shelf and its money is handled.
+      </p>
+      <input
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="Reason shown to the customer"
+        className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-[12px] font-normal"
+      />
+      <div className="flex gap-1.5">
+        <button
+          onClick={submit}
+          disabled={sending || note.trim().length < 3}
+          className="flex-1 rounded-lg bg-red-600 py-1.5 text-[12px] font-medium text-white disabled:opacity-50"
+        >
+          {sending ? 'Refusing…' : 'Refuse this line'}
+        </button>
+        <button
+          onClick={() => setOpen(false)}
+          disabled={sending}
+          className="rounded-lg border border-neutral-300 px-3 py-1.5 text-[12px] font-medium text-black"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );

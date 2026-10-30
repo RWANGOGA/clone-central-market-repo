@@ -32,6 +32,7 @@ export type ActivityAction =
   | 'market.update'
   | 'worker.create'
   | 'worker.update'
+  | 'order.reject'
   | 'order.assign';
 
 export type ActivityInput = {

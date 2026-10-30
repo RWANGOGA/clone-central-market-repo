@@ -71,10 +71,13 @@ export async function PATCH(request: Request, { params }: Ctx) {
     );
   }
 
-  // Payment gates fulfilment. Stock is reserved when the order is placed, so a
-  // pending order is goods held for someone who has not paid yet; staff must
-  // not start picking it on the strength of the order existing.
-  if (existing.status === 'pending' && status === 'processing') {
+  // Payment gates the market's acceptance of the order. Stock is reserved when
+  // the order is placed, so a pending order is goods held for someone who has not
+  // paid yet; accepting it is the moment the market commits, and it must not
+  // commit on the strength of the order existing. Cash on delivery counts as
+  // agreed money — that is the whole arrangement — but the rider still has to
+  // collect it before the order can be closed as delivered, gated below.
+  if (existing.status === 'pending' && status === 'confirmed') {
     const paid = await db
       .select({ id: payments.id })
       .from(payments)
@@ -83,7 +86,10 @@ export async function PATCH(request: Request, { params }: Ctx) {
       )
       .limit(1);
     if (paid.length === 0) {
-      return error('This order has not been paid. Take payment before starting fulfilment.', 409);
+      return error(
+        'This order has not been paid and is not on cash on delivery. Take payment before confirming it.',
+        409,
+      );
     }
   }
 
@@ -185,13 +191,17 @@ export async function PATCH(request: Request, { params }: Ctx) {
             ? 'Order delivered'
             : status === 'shipped'
               ? 'Order on its way'
-              : 'Order update',
+              : status === 'confirmed'
+                ? 'Order confirmed'
+                : 'Order update',
       message:
         status === 'cancelled'
           ? money.refundDue
             ? `Order ${updated.reference} was cancelled. Any stock held for it has been returned, and we will contact you about your refund.`
             : `Order ${updated.reference} was cancelled. Any stock held for it has been returned.`
-          : `Order ${updated.reference} is now ${status}.`,
+          : status === 'confirmed'
+            ? `The market confirmed order ${updated.reference} and is preparing it.`
+            : `Order ${updated.reference} is now ${status}.`,
     });
   }
 

@@ -21,6 +21,11 @@ export function customerCancelBlocker(status: string): string | null {
   switch (status) {
     case 'processing':
       return 'Picking has already started, so this order needs staff to cancel it. Send a note to the market team.';
+    case 'confirmed':
+      // The market has said it will fill the order and the goods are being held
+      // for them. Cancelling after that is a decision about somebody else's work,
+      // not a button press, so it goes through staff.
+      return 'The market has confirmed this order and is preparing it, so please contact the team to cancel.';
     case 'shipped':
       return 'A rider is already carrying this order, so it cannot be cancelled here. Refuse the delivery, or contact us once it arrives.';
     case 'delivered':

@@ -14,32 +14,6 @@ import { recordMovement } from '@/lib/stockLedger';
 
 type Tx = Pick<typeof db, 'update' | 'insert' | 'select' | 'query' | 'delete'>;
 
-/** Move a pending order to processing. Returns null if it was not pending. */
-export async function markOrderProcessing(
-  tx: Tx,
-  orderId: number,
-  note: string,
-  changedByEmail: string,
-) {
-  const [moved] = await tx
-    .update(orders)
-    .set({ status: 'processing', updatedAt: nowText })
-    .where(and(eq(orders.id, orderId), eq(orders.status, 'pending')))
-    .returning();
-
-  if (!moved) return null;
-
-  await tx.insert(orderStatusEvents).values({
-    orderId,
-    fromStatus: 'pending',
-    toStatus: 'processing',
-    note,
-    changedByEmail,
-  });
-
-  return moved;
-}
-
 /**
  * Cancel a pending order and hand its goods back through the stock ledger.
  *

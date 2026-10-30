@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { db } from '@/db';
 import { notifications, orders, payments, nowText } from '@/db/schema';
 import { env } from '@/lib/env';
-import { markOrderProcessing } from '@/lib/orderLifecycle';
 import { publishOrderEvent } from '@/lib/orderEvents';
 import { createCustomerNotification } from '@/lib/notifications';
 
@@ -98,16 +97,23 @@ export async function POST(request: Request) {
         .returning();
       if (!updated) return null;
 
-      const orderMoved = payment.orderId
-        ? await markOrderProcessing(
-            tx,
-            payment.orderId,
-            `Payment ${payment.reference} confirmed by gateway`,
-            'payment-gateway',
-          )
-        : true;
+      // Payment used to move the order to processing. It no longer does: money
+      // and goods are separate axes, and the market has to confirm the goods for
+      // themselves. What is still needed here is the safety check that the old
+      // compare-and-set gave — that a payment has not landed on an order that is
+      // no longer waiting for it. Locking the row is what makes that check mean
+      // something: a confirmation racing this callback cannot slip between the
+      // read and the write.
+      const held = payment.orderId
+        ? await tx
+            .select({ status: orders.status })
+            .from(orders)
+            .where(eq(orders.id, payment.orderId))
+            .for('update')
+        : [{ status: 'pending' as const }];
+      const orderWasOpen = held.length > 0 && held[0].status === 'pending';
 
-      return { updated, orderMoved };
+      return { updated, orderWasPending: orderWasOpen };
     });
 
     if (!settlement) {
@@ -119,11 +125,12 @@ export async function POST(request: Request) {
       return new Response('payment is not settleable', { status: 409 });
     }
 
-    const { updated: settled, orderMoved } = settlement;
+    const { updated: settled, orderWasPending } = settlement;
 
-    if (!orderMoved && order) {
-      // Money was captured for an order that is no longer pending — usually
-      // cancelled by the stale-order sweep while the prompt was in flight.
+    if (!orderWasPending && order) {
+      // Money was captured for an order that is no longer waiting for payment —
+      // usually cancelled by the stale-order sweep while the prompt was in
+      // flight, or already confirmed by the market off a different attempt.
       // Flag it for a refund rather than silently keeping the cash.
       await db.insert(notifications).values({
         type: 'payment',
@@ -146,11 +153,13 @@ export async function POST(request: Request) {
 
     if (order?.customerId) {
       publishOrderEvent({
-        type: 'order.status',
+        // The money moved; the goods did not. The console refreshes on this and
+        // the confirmation gate is what it will find waiting there.
+        type: 'order.updated',
         id: order.id,
         reference: order.reference,
         from: order.status,
-        to: 'processing',
+        to: order.status,
         total: order.total,
         currency: order.currency,
         marketId: order.marketId ?? null,

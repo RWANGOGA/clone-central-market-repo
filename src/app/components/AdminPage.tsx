@@ -1144,6 +1144,7 @@ const RANGES = [
 
 const PIPELINE: { value: string; label: string; color: string }[] = [
   { value: 'pending', label: 'Pending', color: 'bg-amber-400' },
+  { value: 'confirmed', label: 'Confirmed', color: 'bg-teal-500' },
   { value: 'processing', label: 'Processing', color: 'bg-blue-400' },
   { value: 'shipped', label: 'Shipped', color: 'bg-indigo-400' },
   { value: 'delivered', label: 'Delivered', color: 'bg-brand' },

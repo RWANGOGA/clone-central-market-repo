@@ -12,10 +12,11 @@ const BASE = apiUrl('/api/admin');
  * token.
  */
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
 export const ORDER_STATUSES: OrderStatus[] = [
   'pending',
+  'confirmed',
   'processing',
   'shipped',
   'delivered',
@@ -70,6 +71,9 @@ export type OrderItem = {
   priceValue: number;
   quantity: number;
   lineTotal: number;
+  /** Whether the market will supply this line. A refused line stays visible. */
+  lineStatus?: 'included' | 'rejected';
+  rejectionNote?: string | null;
 };
 
 export type PaymentRow = {
@@ -224,6 +228,29 @@ export async function recordRefund(
   draft: RefundDraft,
 ): Promise<Result<{ data: OrderDetail }>> {
   return call<{ data: OrderDetail }>(`/orders/${encodeURIComponent(String(idOrRef))}/refunds`, {
+    method: 'POST',
+    body: JSON.stringify(draft),
+  });
+}
+
+export type RejectDraft = {
+  lineId: number;
+  note: string;
+  method?: 'cash' | 'mobile_money' | 'wallet';
+};
+
+/**
+ * Refuse one line of an order that is still open.
+ *
+ * The line is never deleted — it is marked rejected, its goods go back on the
+ * shelf and its money is refunded or taken off what the rider still owes. The
+ * server needs both `orders.write` and `refunds.write` for this.
+ */
+export async function rejectOrderLine(
+  idOrRef: string | number,
+  draft: RejectDraft,
+): Promise<Result<{ data: OrderDetail; meta: { cashBack: number; refundReference: string | null; totals: { subtotal: number; discount: number; shipping: number; tax: number; total: number } } }>> {
+  return call(`/orders/${encodeURIComponent(String(idOrRef))}/reject`, {
     method: 'POST',
     body: JSON.stringify(draft),
   });
