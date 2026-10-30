@@ -543,3 +543,21 @@ Minimum viable and defensible:
   console whose twelve tabs all weighed the same buried the day's work (orders,
   catalogue, stock) behind screens no market is running yet. Bringing a screen
   back means adding a tab and a panel, not rebuilding a route.
+
+## Buyer-side fixes from the user testing report
+
+`Mu_Katale_User_Testing_Report.pdf` recorded four findings (F1–F4) from watching
+three first-time buyers fail the "add one more item before you pay" task. Each
+shipped as its own commit, so each change traces back to the finding that
+justified it:
+
+| Finding | What it was | Shipped |
+| --- | --- | --- |
+| F1 — basket locked at payment | `POST /api/orders` consumed the cart, so `/pay/:reference` had nothing left to edit | `83295ad` — `POST /api/orders/:id/items` top-ups the open order (money-axis lock, one-market, stock reservation, promo re-evaluation, voids a stale pending payment) |
+| F2 — no real confirmation step | payment auto-advanced fulfilment; nothing between "placed" and "preparing" | `ffaa7fc` — new `confirmed` status, payment stops advancing the order, admin confirm gate one edge earlier, `POST /api/admin/orders/:id/reject` with a line-level refund |
+| F3 — location dead-end | buyers could not turn a phone position into the region/district the cascade demands | `9df7491` — `GET /api/geo/reverse` (Uganda bbox + point-in-polygon over the repo's district geojson), "Use my current location" at checkout, pin persisted in the `shippingAddress` jsonb and preferred by the map |
+| F4 — price below the fold | the product screen was a pixel-positioned export with the price under a fixed photo | `83295ad` — flex-column shell, the photo collapses once a size is chosen, and a live `formatUgx(priceValue × quantity)` line sits pinned beside the buy button |
+
+The staff console also gained a shopper-style drawer menu and a header/readability
+pass for phones, where the 64px rail could not hold the areas, the market switcher
+and the account at once (`336e6e5`).
