@@ -47,6 +47,7 @@ import {
 import { getActiveMarket, setActiveMarket } from '../lib/activeMarket';
 import AdminGate from './AdminGate';
 import AdminSidebar from './admin/AdminSidebar';
+import AdminMenu from './admin/AdminMenu';
 import OrderQueue from './OrderQueue';
 import StockBadge from './StockBadge';
 import { describeStockOf } from '../lib/stockApi';
@@ -162,6 +163,9 @@ function StaffShell({
   const [market, setMarket] = useState<number | null>(getActiveMarket());
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // The console drawer, open only below `lg` where the 64px rail cannot hold
+  // the areas, the market switcher and the account at once.
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const refreshMarkets = useCallback(() => {
     listMarkets().then((result) => {
@@ -228,18 +232,25 @@ function StaffShell({
     ...(canManageAdmins ? [{ value: 'admins' as const, label: 'Admins' }] : []),
   ];
 
+  const roleLabel = ADMIN_ROLE_LABELS[admin.role] ?? admin.role;
+  const activeTabLabel = tabs.find((item) => item.value === tab)?.label ?? 'Staff';
+
   return (
-    <div className="flex h-full bg-[#f7f7f5]">
-      <AdminSidebar
-        tabs={tabs}
-        activeTab={tab}
-        onSelectTab={setTab}
-        isPlatform={isPlatform}
-        marketName={marketName}
-        activeMarket={market}
-        markets={markets}
-        onChooseMarket={chooseMarket}
-      />
+    <div className="relative flex h-full bg-[#f7f7f5]">
+      {/* The rail is the desktop navigation; below `lg` it is too narrow to hold
+          the areas, the market and the account, so the drawer takes over. */}
+      <div className="hidden h-full shrink-0 lg:flex">
+        <AdminSidebar
+          tabs={tabs}
+          activeTab={tab}
+          onSelectTab={setTab}
+          isPlatform={isPlatform}
+          marketName={marketName}
+          activeMarket={market}
+          markets={markets}
+          onChooseMarket={chooseMarket}
+        />
+      </div>
 
       {/*
         Rail and column scroll on their own. A long list of areas cannot push the
@@ -248,28 +259,40 @@ function StaffShell({
         no longer sticky: nothing scrolls under it any more.
       */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="shrink-0 border-b border-neutral-200 bg-white px-4 py-3">
+        <header className="shrink-0 border-b border-neutral-200 bg-white px-4 py-3 sm:px-6">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h1 className="text-[16px] font-serif font-medium text-brand leading-[22px]">
-                Staff
-              </h1>
-              <p className="text-[11px] font-normal text-muted-foreground">
-                {admin.name} · {ADMIN_ROLE_LABELS[admin.role] ?? admin.role}
-              </p>
+            <div className="flex min-w-0 items-center gap-2.5">
+              <button
+                onClick={() => setMenuOpen(true)}
+                aria-label="Open menu"
+                className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-neutral-200 text-black transition-colors hover:bg-neutral-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand lg:hidden"
+              >
+                <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
+                  <line x1="0" y1="1.25" x2="18" y2="1.25" stroke="currentColor" strokeWidth="1.5" />
+                  <line x1="0" y1="12.25" x2="18" y2="12.25" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+              </button>
+              <div className="min-w-0">
+                <h1 className="truncate font-serif text-[18px] font-medium leading-[24px] text-brand">
+                  {activeTabLabel}
+                </h1>
+                <p className="truncate text-[12px] font-normal text-muted-foreground">
+                  {admin.name} · {roleLabel}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="text-[12px] font-medium text-brand"
+                  className="hidden min-h-9 rounded-lg border border-brand/30 px-3 text-[13px] font-medium text-brand transition-colors hover:bg-brand-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:inline-flex"
                 >
                   Back to shop
                 </button>
               )}
               <button
                 onClick={onSignOut}
-                className="text-[12px] font-normal text-muted-foreground"
+                className="min-h-9 rounded-lg px-3 text-[13px] font-normal text-muted-foreground transition-colors hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 Sign out
               </button>
@@ -277,12 +300,18 @@ function StaffShell({
           </div>
 
           {notice && (
-            <p className="mt-2 rounded-lg border border-brand/25 bg-brand/8 px-3 py-2 text-[13px] text-brand font-normal">
+            <p
+              role="status"
+              className="mt-3 rounded-lg border border-brand/25 bg-brand/8 px-3 py-2 text-[13px] font-normal text-brand"
+            >
               {notice}
             </p>
           )}
           {error && (
-            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700 font-normal">
+            <p
+              role="alert"
+              className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-normal text-red-700"
+            >
               {error}
             </p>
           )}
@@ -291,7 +320,7 @@ function StaffShell({
         <div className="min-h-0 flex-1 overflow-y-auto">
           {/* Changing market remounts the panel, so nothing cached from the
               previous market is left on screen while the new one loads. */}
-          <div key={market ?? 'all'} className={tab === 'orders' ? '' : 'p-4'}>
+          <div key={market ?? 'all'} className={tab === 'orders' ? '' : 'mx-auto w-full max-w-5xl p-4 sm:p-6'}>
             {tab === 'orders' && <OrderQueue canRefund={!isStaff} embedded />}
             {tab === 'catalogue' && <CataloguePanel admin={admin} flash={flash} fail={fail} />}
             {tab === 'inventory' && <InventoryPanel flash={flash} fail={fail} />}
@@ -307,6 +336,23 @@ function StaffShell({
           </div>
         </div>
       </div>
+
+      <AdminMenu
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        tabs={tabs}
+        activeTab={tab}
+        onSelectTab={setTab}
+        adminName={admin.name}
+        roleLabel={roleLabel}
+        isPlatform={isPlatform}
+        marketName={marketName}
+        activeMarket={market}
+        markets={markets}
+        onChooseMarket={chooseMarket}
+        onSignOut={onSignOut}
+        onBackToShop={onClose}
+      />
     </div>
   );
 }

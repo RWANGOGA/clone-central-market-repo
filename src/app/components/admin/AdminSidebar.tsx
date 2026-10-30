@@ -19,10 +19,10 @@ import type { Tab } from '../AdminPage';
  * account open" in exactly one place.
  */
 
-type SectionKey = 'fulfilment' | 'catalogue' | 'insight' | 'setup';
+export type SectionKey = 'fulfilment' | 'catalogue' | 'insight' | 'setup';
 
 /** Display order of the groups, and what each is called. */
-const SECTIONS: { key: SectionKey; label: string }[] = [
+export const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: 'fulfilment', label: 'Fulfilment' },
   { key: 'catalogue', label: 'Catalogue' },
   { key: 'insight', label: 'Insight' },
@@ -34,7 +34,7 @@ const SECTIONS: { key: SectionKey; label: string }[] = [
  * miss: add a ninth area to the console and this file fails to compile until it
  * is placed, instead of quietly never rendering.
  */
-const SECTION_FOR_TAB: Record<Tab, SectionKey> = {
+export const SECTION_FOR_TAB: Record<Tab, SectionKey> = {
   orders: 'fulfilment',
   inventory: 'fulfilment',
   catalogue: 'catalogue',
@@ -107,7 +107,7 @@ const ICON_PATHS: Record<Tab, React.ReactNode> = {
   ),
 };
 
-function AreaIcon({ tab }: { tab: Tab }) {
+export function AreaIcon({ tab }: { tab: Tab }) {
   return (
     <span className="size-5 shrink-0">
       <svg
