@@ -50,6 +50,16 @@ services:
     # start command — Render routes to 10000, not 3000.
     startCommand: npm start
 
+    # Reconcile the Neon schema with src/db/schema.ts after each successful build
+    # and before the new instance takes traffic. There are no migration files, so
+    # `drizzle-kit migrate` (what the Docker entrypoint runs) is a no-op; db:push
+    # is the documented way the schema arrives. For a database that is behind the
+    # code this diff is additive (new columns/tables only), and drizzle aborts
+    # rather than dropping data if the change would be destructive. Needs a plan
+    # that supports pre-deploy commands; if it does not, run `npm run db:push` by
+    # hand (see DEPLOYING.md).
+    preDeployCommand: npm run db:push
+
     envVars:
       # Pinned to the version the Docker build and CI use, so a Render default
       # change cannot silently move the runtime.
