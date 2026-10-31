@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     return error(parsed.error.issues[0]?.message ?? 'Invalid payload', 422);
   }
 
-  const { cartId, orderReference, channel, provider, payerName, payerPhone, walletId } = parsed.data;
+  const { orderReference, channel, provider, payerName, payerPhone, walletId } = parsed.data;
 
   if (channel === 'card') {
     return error(
@@ -59,16 +59,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const cart = await requireCart(request, cartId);
-  if (!cart) return error('Cart not found', 404);
-
-  // Cart ownership is the proof here: the reference is useless without the
-  // mk_cart cookie, and the order must belong to that same cart. The tracking
-  // cookie is scoped to /api/orders, so guests cannot present it at this path.
+  // The cart is rotated the moment an order is created, so the browser's
+  // current cart is no longer the one this order came from — requiring the two
+  // to match made every payment after checkout a 404. The order is what is being
+  // paid for, so authorise against it directly: the customer session or the
+  // mk_order_tracking cookie proves it belongs to this browser.
   const order = await db.query.orders.findFirst({
-    where: and(eq(orders.reference, orderReference), eq(orders.cartId, cartId)),
+    where: eq(orders.reference, orderReference),
   });
-  if (!order) return error('Order not found', 404);
+  if (!order || !(await ownsOrder(request, order))) return error('Order not found', 404);
   if (order.status !== 'pending') return error('This order is not awaiting payment.', 409);
 
   if (!(await allow(`payment-intent-order:${order.id}`, 10, 60 * 60))) {
@@ -150,7 +149,7 @@ export async function POST(request: Request) {
       .values({
         reference: makeReference(),
         orderId: order.id,
-        cartId,
+        cartId: order.cartId,
         channel,
         provider,
         status,

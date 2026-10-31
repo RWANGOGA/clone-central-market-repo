@@ -114,8 +114,14 @@ export function cartCookie(token: string): string {
   return `mk_cart=${encodeURIComponent(token)}; Path=/api; HttpOnly; ${cookieAttributes()}; Max-Age=${30 * 24 * 60 * 60}`;
 }
 
+/**
+ * The guest's proof that an order is theirs. Scoped to /api rather than
+ * /api/orders so it also reaches the payment intent route: the cart that made
+ * an order is consumed the moment the order exists, so the order itself is the
+ * only thing left to authorise a guest's payment against.
+ */
 export function trackingCookie(token: string): string {
-  return `mk_order_tracking=${encodeURIComponent(token)}; Path=/api/orders; HttpOnly; ${cookieAttributes()}; Max-Age=${30 * 24 * 60 * 60}`;
+  return `mk_order_tracking=${encodeURIComponent(token)}; Path=/api; HttpOnly; ${cookieAttributes()}; Max-Age=${30 * 24 * 60 * 60}`;
 }
 
 export function getSessionExpiry(): string {
