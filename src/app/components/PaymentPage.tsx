@@ -221,7 +221,6 @@ export default function PaymentPage({
 
   return (
     <div className="bg-white relative size-full">
-      <StatusBar />
       <Header cartCount={cartCount} onBack={onBack} onMenuClick={onMenuClick} />
       <ProgressIndicators />
 
@@ -596,35 +595,11 @@ function Footer({
   );
 }
 
-function StatusBar() {
-  return (
-    <div className="absolute h-[47px] left-0 overflow-clip right-0 top-0">
-      <div className="absolute h-[33px] top-[-2px] translate-x-[-50%] w-[156px]" style={{ left: 'calc(50% + 0.499992px)' }}>
-        <svg className="block size-full" fill="none" viewBox="0 0 156 33">
-          <g>
-            <path d={svgPaths.p28770100} fill="black" />
-            <path d={svgPaths.p28f48b80} fill="var(--fill-0, black)" />
-            <path d={svgPaths.p14d82600} fill="var(--fill-0, black)" />
-          </g>
-        </svg>
-      </div>
-      <div className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]" style={{ left: 'calc(50% - 135.5px)' }}>
-        <p className="font-bold h-5 leading-[0] not-italic text-black text-[17px] text-center tracking-[-0.408px] translate-x-[-50%] w-[54px]">
-          <span className="block leading-[22px]">9:41</span>
-        </p>
-      </div>
-      <div className="absolute h-[13px] top-[19px] translate-x-[-50%] w-[27.401px]" style={{ left: 'calc(50% + 150.201px)' }}>
-        <svg className="block size-full" fill="none" viewBox="0 0 28 13">
-          <g>
-            <path d={svgPaths.p3f827980} opacity="0.35" stroke="var(--stroke-0, black)" />
-            <path d={svgPaths.p5fdc300} fill="var(--fill-0, black)" opacity="0.4" />
-            <path d={svgPaths.pbee4a00} fill="var(--fill-0, black)" />
-          </g>
-        </svg>
-      </div>
-    </div>
-  );
-}
+// The fake phone status bar (9:41 clock, Wi-Fi and battery glyphs, notch) used
+// to be drawn here. It has been removed app-wide: on a real handset the OS
+// already shows the true clock, signal and battery, so the mock only ever
+// duplicated them and overlapped the header. Screens now start at their own
+// header.
 
 function Header({
   cartCount,

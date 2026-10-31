@@ -1,94 +1,13 @@
-import svgPaths from "../../imports/svg-s5y93igtx2";
-
+/**
+ * The mock iOS status bar — a fixed "9:41" clock, Wi-Fi/signal and battery
+ * glyphs and a notch — used to be drawn at the top of every screen. It has been
+ * removed app-wide: on a real handset the operating system already shows the
+ * true time, connection and charge, so the fake only ever duplicated them and
+ * cost every screen 47px of vertical space.
+ *
+ * The component is kept as a no-op so the pages that still render <StatusBar />
+ * simply draw nothing, and the phone's own chrome is what the user sees.
+ */
 export default function StatusBar() {
-  return (
-    // The phone chrome is part of the layout, not a decal on top of it. It used
-    // to be absolutely positioned, which meant every screen had to know its
-    // height and start its own content 47px down; anything that forgot slid
-    // under the clock.
-    <div className="relative h-[47px] shrink-0 overflow-clip">
-      <Notch />
-      <LeftSide />
-      <RightSide />
-    </div>
-  );
-}
-
-function Notch() {
-  return (
-    <div
-      className="absolute h-[33px] top-[-2px] translate-x-[-50%] w-[156px]"
-      style={{ left: "calc(50% + 0.499992px)" }}
-    >
-      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 156 33">
-        <g id="Notch">
-          <path d={svgPaths.p28770100} fill="black" />
-          <path d={svgPaths.p28f48b80} fill="var(--fill-0, black)" />
-          <path d={svgPaths.p14d82600} fill="var(--fill-0, black)" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function LeftSide() {
-  return (
-    <div className="absolute contents left-[25px] top-3.5">
-      <div
-        className="absolute h-[21px] rounded-3xl top-3.5 translate-x-[-50%] w-[54px]"
-        style={{ left: "calc(50% - 135.5px)" }}
-      >
-        <div className="absolute font-bold h-5 leading-[0] left-[27px] not-italic text-black text-[17px] text-center top-px tracking-[-0.408px] translate-x-[-50%] w-[54px]">
-          <p className="block leading-[22px]">9:41</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RightSide() {
-  return (
-    <div className="absolute contents left-[283px] top-[19px]">
-      <div
-        className="absolute h-[13px] top-[19px] translate-x-[-50%] w-[27.401px]"
-        style={{ left: "calc(50% + 150.201px)" }}
-      >
-        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 28 13">
-          <g>
-            <path
-              d={svgPaths.p3f827980}
-              opacity="0.35"
-              stroke="var(--stroke-0, black)"
-            />
-            <path
-              d={svgPaths.p5fdc300}
-              fill="var(--fill-0, black)"
-              opacity="0.4"
-            />
-            <path d={svgPaths.pbee4a00} fill="var(--fill-0, black)" />
-          </g>
-        </svg>
-      </div>
-      <div className="absolute bottom-[32.269%] left-[80%] right-[15.467%] top-[42.553%]">
-        <div className="absolute bottom-[-0.002%] left-0 right-0 top-[0.002%]">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17 12">
-            <path d={svgPaths.p17a4bf30} fill="var(--fill-0, black)" />
-          </svg>
-        </div>
-      </div>
-      <div
-        className="absolute h-3 top-5 translate-x-[-50%] w-[18px]"
-        style={{ left: "calc(50% + 95.5px)" }}
-      >
-        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 12">
-          <g>
-            <path d={svgPaths.p1ec31400} fill="var(--fill-0, black)" />
-            <path d={svgPaths.p19f8d480} fill="var(--fill-0, black)" />
-            <path d={svgPaths.p13f4aa00} fill="var(--fill-0, black)" />
-            <path d={svgPaths.p1bfb7500} fill="var(--fill-0, black)" />
-          </g>
-        </svg>
-      </div>
-    </div>
-  );
+  return null;
 }

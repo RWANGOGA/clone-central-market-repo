@@ -80,7 +80,7 @@ function OrderConfirmationRoute({ onMenuClick }: { onMenuClick: () => void }) {
 function PaymentRoute({ onMenuClick, topUp }: { onMenuClick: () => void; topUp: TopUpContextType }) {
   const { reference } = useParams<{ reference: string }>();
   const navigate = useNavigate();
-  const { cartCount, cartId, finalizePurchase } = useCart();
+  const { cartCount, cartId } = useCart();
   const { customerInfo } = useAuth();
 
   return (
@@ -94,10 +94,7 @@ function PaymentRoute({ onMenuClick, topUp }: { onMenuClick: () => void; topUp: 
       onBack={() => navigate('/checkout')}
       onMenuClick={onMenuClick}
       onAddMore={() => reference && topUp.start(reference)}
-      onProceedToConfirmation={() => {
-        finalizePurchase(cartId);
-        navigate(`/order/${reference ?? ''}`);
-      }}
+      onProceedToConfirmation={() => navigate(`/order/${reference ?? ''}`)}
     />
   );
 }
@@ -163,6 +160,7 @@ function AppShell() {
     applyPromo,
     clearPromo,
     reorderFromOrder,
+    finalizePurchase,
   } = useCart();
   const {
     customerSession,
@@ -228,10 +226,22 @@ function AppShell() {
       }, promoCode);
       if (!order.reference) throw new Error('The server did not return an order reference.');
       setOrderReference(order.reference);
+      // The cart became this order on the server the instant it was created,
+      // so spend it here rather than after payment. Otherwise a Back or reload
+      // keeps pointing at the converted cart and every retry earns a 409.
+      finalizePurchase(cartId);
       navigate(`/pay/${order.reference}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'We could not place your order. Please try again.';
-      setPurchaseError(message);
+      // A spent cart left over from an older session would otherwise retry
+      // forever; rotate to a fresh basket and say so plainly instead of the
+      // raw server wording.
+      if (/no longer active/i.test(message)) {
+        finalizePurchase(cartId);
+        setPurchaseError('That basket had already been used to place an order. Start a new one below.');
+      } else {
+        setPurchaseError(message);
+      }
       if (message.toLowerCase().includes('sold out')) {
         navigate('/basket');
       }
@@ -297,6 +307,7 @@ function AppShell() {
                 onBack={() => navigate('/basket')}
                 onMenuClick={openMenu}
                 onProceedToPayment={handleProceedToPayment}
+                errorMessage={purchaseError}
               />
             }
           />
