@@ -239,14 +239,20 @@ export async function POST(request: Request) {
   });
 
   // Stock is reserved now, so the order is real even before payment. Signed-in
-  // customers get an inbox entry; guests track by reference.
+  // customers get an inbox entry; guests track by reference. This runs after the
+  // transaction has committed, so a failure here must not turn an order that
+  // already exists into a 500 the buyer would retry (and then earn a 409 from).
   if (created.customerId) {
-    await createCustomerNotification({
-      customerId: created.customerId,
-      type: 'order',
-      title: 'Order received',
-      message: `Order ${created.reference} was received. Complete payment to start fulfilment.`,
-    });
+    try {
+      await createCustomerNotification({
+        customerId: created.customerId,
+        type: 'order',
+        title: 'Order received',
+        message: `Order ${created.reference} was received. Complete payment to start fulfilment.`,
+      });
+    } catch (err) {
+      console.error('order notification failed', created.reference, err);
+    }
   }
 
   return json({
