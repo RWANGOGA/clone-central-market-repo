@@ -193,6 +193,12 @@ interface CartContextType {
   catalogueLive: boolean;
   cartItems: CartItem[];
   cartId: number | null;
+  /**
+   * False until the first attempt to restore the saved cart has settled. Lets
+   * screens tell "still loading" apart from "genuinely empty" on a cold load,
+   * instead of flashing the empty state before the server cart arrives.
+   */
+  cartReady: boolean;
   favorites: Set<number>;
   searchTerm: string;
   sortOption: SortOption;
@@ -220,6 +226,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<number | null>(null);
+  const [cartReady, setCartReady] = useState(false);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('default');
@@ -280,22 +287,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     (async () => {
-      const cartId = await resolveCartId();
-      if (cancelled) return;
+      try {
+        const cartId = await resolveCartId();
+        if (cancelled) return;
 
-      if (!cartId) return; // API not running, cart stays local-only
-      cartIdRef.current = cartId;
-      setCartId(cartId);
+        if (!cartId) return; // API not running, cart stays local-only
+        cartIdRef.current = cartId;
+        setCartId(cartId);
 
-      const cart = await fetchCart(cartId);
-      if (cancelled || !cart) return;
+        const cart = await fetchCart(cartId);
+        if (cancelled || !cart) return;
 
-      const restored = cart.items.flatMap((line) => {
-        const product = products.find((p) => p.id === line.productId);
-        return product ? [buildCartItem(product, line.quantity)] : [];
-      });
+        const restored = cart.items.flatMap((line) => {
+          const product = products.find((p) => p.id === line.productId);
+          return product ? [buildCartItem(product, line.quantity)] : [];
+        });
 
-      setCartItems(restored);
+        setCartItems(restored);
+      } finally {
+        // Mark the restore settled either way, so the basket stops showing its
+        // loading state even when the API is down or the cart is empty.
+        if (!cancelled) setCartReady(true);
+      }
     })();
 
     return () => {
@@ -503,6 +516,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     catalogueLive,
     cartItems,
     cartId,
+    cartReady,
     favorites,
     searchTerm,
     sortOption,

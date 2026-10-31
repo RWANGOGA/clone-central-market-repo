@@ -18,6 +18,8 @@ interface CartItem {
 
 interface BasketPageProps {
   cartItems: CartItem[];
+  /** False while the saved cart is still being restored on a cold load. */
+  cartReady?: boolean;
   onBack: () => void;
   onMenuClick: () => void;
   onUpdateQuantity: (productId: number, quantity: number) => void;
@@ -30,6 +32,7 @@ interface BasketPageProps {
 
 export default function BasketPage({ 
   cartItems, 
+  cartReady = true,
   onBack, 
   onMenuClick, 
   onUpdateQuantity,
@@ -55,7 +58,9 @@ export default function BasketPage({
         onMenuClick={onMenuClick}
       />
       
-      {isEmpty ? (
+      {isEmpty && !cartReady ? (
+        <EmptyBasketLoading />
+      ) : isEmpty ? (
         /* Empty State */
         <EmptyBasket onReturnToShop={onBack} />
       ) : (
@@ -235,6 +240,22 @@ function EmptyBasket({ onReturnToShop }: EmptyBasketProps) {
         >
           Return to shop
         </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * A cold load of the basket starts with no items while the saved cart is
+ * fetched. Showing the empty state there reads as "your cart was emptied", so
+ * hold a neutral placeholder until the restore settles.
+ */
+function EmptyBasketLoading() {
+  return (
+    <div className="m-6 rounded-3xl bg-neutral-100">
+      <div className="flex flex-col gap-4 p-6" role="status" aria-live="polite">
+        <h2 className="font-serif text-display text-foreground">Loading your basket…</h2>
+        <p className="text-base text-muted-foreground">Fetching the items you saved.</p>
       </div>
     </div>
   );

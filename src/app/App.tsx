@@ -91,7 +91,10 @@ function PaymentRoute({ onMenuClick, topUp }: { onMenuClick: () => void; topUp: 
       // server reads the amount from it.
       orderReference={reference ?? null}
       customerName={customerInfo.fullName}
-      onBack={() => navigate('/checkout')}
+      // The order was created (and the cart rotated) at checkout, so Back cannot
+      // return to an editable checkout — it would be empty. Send the buyer to the
+      // order itself, where it shows as awaiting payment with Pay available.
+      onBack={() => navigate(reference ? `/order/${reference}` : '/basket')}
       onMenuClick={onMenuClick}
       onAddMore={() => reference && topUp.start(reference)}
       onProceedToConfirmation={() => navigate(`/order/${reference ?? ''}`)}
@@ -142,6 +145,7 @@ function AppShell() {
     products,
     cartItems,
     cartId,
+    cartReady,
     cartCount,
     favorites,
     addToCart,
@@ -286,6 +290,7 @@ function AppShell() {
             element={
               <BasketPage
                 cartItems={cartItems}
+                cartReady={cartReady}
                 onBack={() => navigate('/')}
                 onMenuClick={openMenu}
                 onUpdateQuantity={updateCartItemQuantity}
