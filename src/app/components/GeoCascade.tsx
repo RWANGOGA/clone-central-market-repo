@@ -87,6 +87,23 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
     [hierarchy, value],
   );
 
+  /**
+   * Levels the buyer can actually reach. Region and district always show so the
+   * form keeps its shape, but a deeper level only appears once its parent is
+   * chosen and it has options. Uganda has no published sub-county/parish/village
+   * register in this dataset, so a district that stops there ends the cascade
+   * cleanly instead of showing rows that could never be satisfied.
+   */
+  const visibleLevels = useMemo(
+    () =>
+      LEVELS.filter((level, index) => {
+        if (index <= 1) return true;
+        const parentKey = LEVELS[index - 1].key;
+        return Boolean(value[parentKey]) && optionsFor(level.key).length > 0;
+      }),
+    [value, optionsFor],
+  );
+
   const select = (level: LevelKey, node: GeoNode) => {
     const next: LocationSelection = { ...value, [level]: node.name };
 
@@ -105,6 +122,13 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
     return counts;
   }, [optionsFor]);
 
+  // Districts across the whole tree, so the footer is not stuck at "0" before a
+  // region is chosen (optionsFor only counts under the current selection).
+  const totalDistricts = useMemo(
+    () => (hierarchy ? hierarchy.reduce((sum, region) => sum + region.children.length, 0) : 0),
+    [hierarchy],
+  );
+
   if (error) {
     return (
       <div
@@ -118,7 +142,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
 
   return (
     <div className="space-y-3">
-      {LEVELS.map((level) => {
+      {visibleLevels.map((level) => {
         const index = LEVELS.findIndex((l) => l.key === level.key);
         const options = optionsFor(level.key);
         const chosen = value[level.key];
@@ -205,7 +229,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
               {isOpen && options.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-lg px-4 py-3 z-50 shadow-lg">
                   <p className="text-[13px] leading-[19px] font-normal text-muted-foreground">
-                    No {level.kindLabel.toLowerCase()}s are recorded under{' '}
+                    No {level.kindLabel.toLowerCase()} records under{' '}
                     {value[LEVELS[index - 1].key] || 'this parent'} yet.
                   </p>
                 </div>
@@ -218,7 +242,7 @@ export default function GeoCascade({ hierarchy, value, onChange, error }: GeoCas
       {/* Makes the state of the cascade explicit rather than implied. */}
       <p className="text-[11px] leading-[16px] font-normal text-muted-foreground">
         {hierarchy
-          ? `${totals.get('region')} regions · ${totals.get('district')} districts and towns available`
+          ? `${hierarchy.length} regions · ${value.region ? totals.get('district') : totalDistricts} districts and towns available`
           : 'Loading administrative areas…'}
       </p>
     </div>
