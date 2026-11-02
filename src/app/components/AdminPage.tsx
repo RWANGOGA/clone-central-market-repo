@@ -1282,6 +1282,9 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
   const [regions, setRegions] = useState<RegionalDemandRow[]>([]);
   const [forecast, setForecast] = useState<ForecastResult | null>(null);
   const [loading, setLoading] = useState(true);
+  // When the numbers last came back, plus a gentle auto-refresh, so the
+  // dashboard visibly tracks reality as orders are paid and fulfilled.
+  const [synced, setSynced] = useState<Date | null>(null);
 
   const from = useMemo(() => daysAgo(rangeDays), [rangeDays]);
   const bucket = rangeDays > 31 ? 'week' : 'day';
@@ -1303,10 +1306,18 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
     setTopProducts(p && p.ok ? p.data : []);
     setRegions(r && r.ok ? r.data : []);
     if (f && f.ok) setForecast(f.data);
+    setSynced(new Date());
     if (announce) flash('Dashboard refreshed.');
   }, [bucket, fail, flash, from, rangeDays]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Re-poll every 60s while the dashboard is open. Silent (no flash), because a
+  // running market should see its own movement without being told about it.
+  useEffect(() => {
+    const timer = window.setInterval(() => load(), 60_000);
+    return () => window.clearInterval(timer);
+  }, [load]);
 
   const totals = overview?.totals;
   const chart = [...trend].reverse();
@@ -1335,14 +1346,14 @@ function AnalyticsPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
           ))}
         </div>
         <button onClick={() => load(true)} className="text-[11px] text-brand">
-          Refresh
+          {synced ? `Synced ${synced.toLocaleTimeString()} · Refresh` : 'Refresh'}
         </button>
       </div>
 
       {loading ? (
         <p className="text-[13px] text-muted-foreground py-6 text-center">Crunching the last {rangeDays} days…</p>
       ) : !overview || !totals ? (
-        <p className="text-[13px] text-muted-foreground py-6 text-center">No analytics yet.</p>
+        <p className="text-[13px] text-muted-foreground py-6 text-center">No analytics yet — settle a payment to populate revenue.</p>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-2">
