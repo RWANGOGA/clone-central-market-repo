@@ -15,6 +15,7 @@ export type ActivityAction =
   | 'order.sweep'
   | 'order.refund'
   | 'payment.collect'
+  | 'payment.settle'
   | 'inventory.adjust'
   | 'purchase_order.create'
   | 'purchase_order.receive'
