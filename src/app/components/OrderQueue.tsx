@@ -6,6 +6,7 @@ import {
   collectCash,
   getOrder,
   listOrders,
+  markPaymentReceived,
   recordRefund,
   rejectOrderLine,
   setOrderStatus,
@@ -171,6 +172,24 @@ export default function OrderQueue({
     load();
   };
 
+  // Confirm a mobile-money / wallet payment the merchant line shows as received.
+  // It settles the money only, so the queue reloads and the order can then be
+  // confirmed as a separate step.
+  const markPaid = async (order: OrderDetail, providerRef?: string) => {
+    const result = await markPaymentReceived(order.reference, providerRef);
+    if (!result) {
+      setError('Could not reach the service.');
+      return;
+    }
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setSelected(result.data.data);
+    setError(null);
+    load();
+  };
+
   const refund = async (order: OrderDetail, draft: RefundDraft) => {
     const result = await recordRefund(order.reference, draft);
     if (!result) {
@@ -209,6 +228,7 @@ export default function OrderQueue({
         onBack={() => setSelected(null)}
         onMove={(next) => move(selected, next)}
         onCollect={() => settle(selected)}
+        onMarkPaid={(providerRef) => markPaid(selected, providerRef)}
         onRefund={(draft) => refund(selected, draft)}
         onRejectLine={(lineId, note) => rejectLine(selected, lineId, note)}
         onAssigned={(assigned) =>
@@ -420,6 +440,7 @@ function OrderDetailPanel({
   onBack,
   onMove,
   onCollect,
+  onMarkPaid,
   onRefund,
   onRejectLine,
   onAssigned,
@@ -430,6 +451,7 @@ function OrderDetailPanel({
   onBack: () => void;
   onMove: (next: string) => void;
   onCollect: () => Promise<void>;
+  onMarkPaid: (providerRef?: string) => Promise<void>;
   onRefund: (draft: RefundDraft) => Promise<void>;
   onRejectLine: (lineId: number, note: string) => Promise<void>;
   onAssigned: (assigned: { delivererId: number | null; deliverer: string | null }) => void;
@@ -439,6 +461,17 @@ function OrderDetailPanel({
   const [note, setNote] = useState('');
   const [collecting, setCollecting] = useState(false);
   const [refunding, setRefunding] = useState(false);
+  // A mobile-money / wallet intent sits awaiting_approval until a gateway or a
+  // staff confirmation settles it. Surface those (never cash, which is its own
+  // collect step) so the counter can record money the merchant line shows in.
+  const awaiting = order.payments.filter(
+    (payment) =>
+      payment.channel !== 'cod' &&
+      ['pending', 'awaiting_approval', 'processing'].includes(payment.status),
+  );
+  const awaitingTotal = awaiting.reduce((sum, payment) => sum + payment.amount, 0);
+  const [providerRef, setProviderRef] = useState('');
+  const [marking, setMarking] = useState(false);
   // A line can be refused only while the goods have not gone out, and only by
   // someone who can both change the order and move money back.
   const canReject = canRefund && (order.status === 'pending' || order.status === 'confirmed');
@@ -456,6 +489,14 @@ function OrderDetailPanel({
     onError(null);
     await onCollect();
     setCollecting(false);
+  };
+
+  const markReceived = async () => {
+    setMarking(true);
+    onError(null);
+    await onMarkPaid(providerRef || undefined);
+    setMarking(false);
+    setProviderRef('');
   };
 
   const refund = async (draft: RefundDraft) => {
@@ -538,6 +579,29 @@ function OrderDetailPanel({
             >
               {collecting ? 'Recording…' : `Collect ${formatUgx(order.money.codDue)} in cash`}
             </button>
+          )}
+
+          {awaitingTotal > 0 && (
+            <div className="mt-2 rounded-lg border border-brand-gold/30 bg-brand-gold/10 p-2">
+              <p className="text-[11px] font-normal text-black">
+                {formatUgx(awaitingTotal)} was prompted by{' '}
+                {[...new Set(awaiting.map((payment) => payment.provider))].join(', ')} and is
+                awaiting confirmation. Check the merchant line, then record it here.
+              </p>
+              <input
+                value={providerRef}
+                onChange={(e) => setProviderRef(e.target.value)}
+                placeholder="Transaction ID (optional)"
+                className="mt-1.5 w-full border border-neutral-200 rounded-lg px-2.5 py-1.5 text-[12px] font-normal bg-white"
+              />
+              <button
+                onClick={markReceived}
+                disabled={marking}
+                className="mt-1.5 w-full rounded-lg bg-brand text-white py-2 text-[12px] font-medium disabled:opacity-50"
+              >
+                {marking ? 'Recording…' : `Mark ${formatUgx(awaitingTotal)} as received`}
+              </button>
+            </div>
           )}
         </div>
 
@@ -654,7 +718,7 @@ function OrderDetailPanel({
                   </div>
                   {payment.settledByEmail && (
                     <p className="text-[10px] font-normal text-caption">
-                      Cash taken by {payment.settledByEmail} · {payment.settledAt}
+                      {payment.channel === 'cod' ? 'Cash taken by' : 'Marked received by'} {payment.settledByEmail} · {payment.settledAt}
                     </p>
                   )}
                 </div>

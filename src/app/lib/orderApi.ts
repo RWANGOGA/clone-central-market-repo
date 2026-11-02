@@ -216,6 +216,25 @@ export async function collectCash(
   );
 }
 
+/**
+ * Confirm that a mobile-money or wallet payment has been received.
+ *
+ * Until a live gateway settles an intent, this is how an order whose money
+ * arrived through the merchant line moves off `awaiting_approval`. It only
+ * touches the payment; the order's fulfilment status is a separate step. The
+ * provider's transaction reference is optional and never overwrites one the
+ * gateway already reported.
+ */
+export async function markPaymentReceived(
+  idOrRef: string | number,
+  providerRef?: string,
+): Promise<Result<{ data: OrderDetail }>> {
+  return call<{ data: OrderDetail }>(
+    `/orders/${encodeURIComponent(String(idOrRef))}/mark-paid`,
+    { method: 'POST', body: JSON.stringify(providerRef?.trim() ? { providerRef: providerRef.trim() } : {}) },
+  );
+}
+
 export type RefundDraft = {
   amount: number;
   method: 'cash' | 'mobile_money' | 'wallet';
