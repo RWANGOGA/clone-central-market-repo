@@ -1529,13 +1529,17 @@ function CustomersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
   const [customers, setCustomers] = useState<CustomerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
+  // When the list last came back, so the console visibly tracks current data.
+  const [synced, setSynced] = useState<Date | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
     const result = await listCustomers({ q: q || undefined, active: true, limit: 50 });
     setLoading(false);
     if (!result) return fail('Could not reach the service.');
     if (!result.ok) return fail(result.error);
     setCustomers(result.data.data);
+    setSynced(new Date());
   }, [fail, q]);
 
   useEffect(() => { load(); }, [load]);
@@ -1551,14 +1555,18 @@ function CustomersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search name or phone"
+          placeholder="Search name, phone or email"
           className="flex-1 border border-neutral-200 rounded-lg px-3 py-2 text-[13px]"
         />
+        <button onClick={load} className="shrink-0 text-[12px] text-brand">Refresh</button>
       </div>
+      <p className="text-[10px] text-muted-foreground">
+        {synced ? `Synced ${synced.toLocaleTimeString()}` : 'Loading current data…'}
+      </p>
       {loading ? (
         <p className="text-[13px] text-muted-foreground py-4 text-center">Loading…</p>
       ) : customers.length === 0 ? (
@@ -1569,16 +1577,25 @@ function CustomersPanel({ flash, fail }: { flash: (m: string) => void; fail: (m:
             <tr className="border-b border-neutral-200">
               <th className="pb-2 text-muted-foreground">Name</th>
               <th className="pb-2 text-muted-foreground">Phone</th>
-              <th className="pb-2 text-muted-foreground">Region</th>
+              <th className="pb-2 text-muted-foreground text-right">Orders</th>
+              <th className="pb-2 text-muted-foreground">Last order</th>
+              <th className="pb-2 text-muted-foreground text-right">Lifetime</th>
               <th className="pb-2 text-muted-foreground text-right">Action</th>
             </tr>
           </thead>
           <tbody>
             {customers.map((c) => (
               <tr key={c.id} className="border-b border-neutral-100">
-                <td className="py-2">{c.fullName}</td>
+                <td className="py-2">
+                  <span className="block text-black">{c.fullName}</span>
+                  <span className="block text-[11px] text-muted-foreground">{c.region ?? '—'}</span>
+                </td>
                 <td className="py-2">{c.phone}</td>
-                <td className="py-2">{c.region ?? '—'}</td>
+                <td className="py-2 text-right text-black">{c.orderCount}</td>
+                <td className="py-2 text-[12px] text-muted-foreground">
+                  {c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString() : '—'}
+                </td>
+                <td className="py-2 text-right text-black">{formatUgx(c.lifetimeValue)}</td>
                 <td className="py-2 text-right">
                   <button
                     onClick={() => handleDeactivate(c)}

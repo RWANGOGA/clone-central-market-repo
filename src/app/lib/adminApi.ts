@@ -436,6 +436,10 @@ export type CustomerRow = {
   district: string | null;
   active: boolean;
   createdAt: string;
+  /** Live order context, computed server-side from the orders table. */
+  orderCount: number;
+  lastOrderAt: string | null;
+  lifetimeValue: number;
 };
 
 export type CustomerListResult = {

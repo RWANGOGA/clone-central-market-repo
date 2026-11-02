@@ -1,8 +1,8 @@
-import { and, asc, count, desc, eq, like, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { marketScope } from '@/lib/marketScope';
 import { db } from '@/db';
-import { customers } from '@/db/schema';
+import { customers, orders } from '@/db/schema';
 import { guardAdmin } from '@/lib/adminAuth';
 import { error, json } from '@/lib/http';
 
@@ -71,8 +71,46 @@ export async function GET(request: Request) {
     db.select({ n: count() }).from(customers).where(where),
   ]);
 
+  // Live order context per customer, so the list is more than contact details.
+  // A market only counts its own orders; the platform tier counts all of them.
+  // Lifetime value ignores cancelled orders — money never actually spent.
+  const ids = rows.map((row) => row.id);
+  const stats = ids.length
+    ? await db
+        .select({
+          customerId: orders.customerId,
+          orderCount: count(),
+          lastOrderAt: sql<string>`max(${orders.createdAt})`,
+          lifetimeValue: sql<number>`coalesce(sum(case when ${orders.status} <> 'cancelled' then ${orders.total} else 0 end), 0)`,
+        })
+        .from(orders)
+        .where(
+          and(
+            inArray(orders.customerId, ids),
+            admin.marketId == null ? undefined : eq(orders.marketId, admin.marketId),
+          ),
+        )
+        .groupBy(orders.customerId)
+    : [];
+
+  const byCustomer = new Map(
+    stats.map((row) => [
+      row.customerId,
+      {
+        orderCount: Number(row.orderCount),
+        lastOrderAt: row.lastOrderAt ?? null,
+        lifetimeValue: Number(row.lifetimeValue),
+      },
+    ]),
+  );
+
   return json({
-    data: rows,
+    data: rows.map((row) => ({
+      ...row,
+      orderCount: byCustomer.get(row.id)?.orderCount ?? 0,
+      lastOrderAt: byCustomer.get(row.id)?.lastOrderAt ?? null,
+      lifetimeValue: byCustomer.get(row.id)?.lifetimeValue ?? 0,
+    })),
     meta: {
       total: Number(totals[0]?.n ?? 0),
       limit,
