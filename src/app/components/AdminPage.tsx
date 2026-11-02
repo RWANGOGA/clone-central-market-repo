@@ -322,7 +322,15 @@ function StaffShell({
               previous market is left on screen while the new one loads. */}
           <div key={market ?? 'all'} className={tab === 'orders' ? '' : 'mx-auto w-full max-w-5xl p-4 sm:p-6'}>
             {tab === 'orders' && <OrderQueue canRefund={!isStaff} embedded />}
-            {tab === 'catalogue' && <CataloguePanel admin={admin} flash={flash} fail={fail} />}
+            {tab === 'catalogue' && (
+              <CataloguePanel
+                admin={admin}
+                markets={markets}
+                activeMarket={market}
+                flash={flash}
+                fail={fail}
+              />
+            )}
             {tab === 'inventory' && <InventoryPanel flash={flash} fail={fail} />}
             {tab === 'analytics' && <AnalyticsPanel flash={flash} fail={fail} />}
             {tab === 'customers' && <CustomersPanel flash={flash} fail={fail} />}
@@ -359,10 +367,14 @@ function StaffShell({
 
 function CataloguePanel({
   admin,
+  markets,
+  activeMarket,
   flash,
   fail,
 }: {
   admin: AdminIdentity;
+  markets: MarketRow[];
+  activeMarket: number | null;
   flash: (message: string) => void;
   fail: (message: string) => void;
 }) {
@@ -470,7 +482,15 @@ function CataloguePanel({
         </button>
       )}
 
-      {adding && <ProductForm onCancel={() => setAdding(false)} onSubmit={handleCreated} />}
+      {adding && (
+        <ProductForm
+          onCancel={() => setAdding(false)}
+          onSubmit={handleCreated}
+          markets={markets}
+          isPlatform={admin.marketId == null}
+          defaultMarket={activeMarket}
+        />
+      )}
 
       <div className="flex items-center gap-1.5" role="group" aria-label="Catalogue filter">
         {CATALOGUE_VIEWS.map((item) => {
@@ -586,17 +606,32 @@ function CataloguePanel({
 function ProductForm({
   onCancel,
   onSubmit,
+  markets,
+  isPlatform,
+  defaultMarket,
 }: {
   onCancel: () => void;
   onSubmit: (draft: ProductDraft, imageDataUrl?: string) => Promise<boolean>;
+  markets: MarketRow[];
+  isPlatform: boolean;
+  defaultMarket: number | null;
 }) {
   const [draft, setDraft] = useState<ProductDraft>(EMPTY_DRAFT);
   const [image, setImage] = useState<string | undefined>();
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  // A platform account spans every market, so a new product is invisible until
+  // it is assigned to one. Default to the market the console is already showing
+  // when there is one; otherwise the choice is forced below.
+  const [marketId, setMarketId] = useState<string>(
+    defaultMarket != null ? String(defaultMarket) : '',
+  );
 
   const set = <K extends keyof ProductDraft>(key: K, value: ProductDraft[K]) =>
     setDraft((prev) => ({ ...prev, [key]: value }));
+
+  const marketChosen =
+    !isPlatform || (marketId !== '' && Number.isInteger(Number(marketId)) && Number(marketId) > 0);
 
   const valid =
     draft.name.trim().length >= 2 &&
@@ -605,17 +640,23 @@ function ProductForm({
     draft.location.trim().length >= 2 &&
     draft.priceValue >= 1 &&
     Number.isInteger(draft.priceValue) &&
-    draft.stock >= 0;
+    draft.stock >= 0 &&
+    marketChosen;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!valid || busy) return;
     setBusy(true);
     setLocalError(null);
-    const ok = await onSubmit(
-      { ...draft, name: draft.name.trim(), farm: draft.farm.trim() },
-      image,
-    );
+    const payload: ProductDraft = {
+      ...draft,
+      name: draft.name.trim(),
+      farm: draft.farm.trim(),
+      // Only a platform account names a market; a market account's rows are
+      // pinned to its own market by the server.
+      ...(isPlatform ? { marketId: Number(marketId) } : {}),
+    };
+    const ok = await onSubmit(payload, image);
     setBusy(false);
     if (!ok) setLocalError('The product was not added. Check the fields above.');
     else setDraft(EMPTY_DRAFT);
@@ -645,6 +686,26 @@ function ProductForm({
           className={`${inputClass} resize-none`}
         />
       </Field>
+      {isPlatform && (
+        <Field label="Market">
+          <select
+            value={marketId}
+            onChange={(e) => setMarketId(e.target.value)}
+            className={`${inputClass} bg-white`}
+          >
+            <option value="">Choose a market</option>
+            {markets.map((item) => (
+              <option key={item.id} value={String(item.id)}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-[10px] font-normal text-muted-foreground">
+            Your account spans every market, so this item has to be placed on one market's
+            shelves. It will only be sold and listed there.
+          </p>
+        </Field>
+      )}
       <div className="grid grid-cols-2 gap-2">
         <Field label="Farm">
           <input

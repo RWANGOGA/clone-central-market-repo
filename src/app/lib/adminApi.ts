@@ -60,6 +60,13 @@ export type ProductDraft = {
   stock: number;
   dietary: string[];
   imageDataUrl?: string;
+  /**
+   * Which market sells this. Only a platform account names one — its account
+   * spans every market, so the API answers 422 when it adds a product without
+   * choosing. A market account is pinned to its own market by the server and
+   * never sends this.
+   */
+  marketId?: number;
 };
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string; status: number } | null;
